@@ -1,0 +1,56 @@
+@font-face {
+    font-family: "IBM Plex Mono";
+    src: url("/fonts/IBMPlexMono-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    src: url("/fonts/IBMPlexSans-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "IBM Plex Serif";
+    src: url("/fonts/IBMPlexSerif-Regular.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "IBM Plex Serif";
+    font-style: italic;
+    src: url("/fonts/IBMPlexSerif-RegularItalic.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "IBM Plex Serif";
+    font-weight: bold;
+    src: url("/fonts/IBMPlexSerif-SemiBold.ttf") format("truetype");
+}
+
+@font-face {
+    font-family: "IBM Plex Serif";
+    font-style: italic;
+    font-weight: bold;
+    src: url("/fonts/IBMPlexSerif-SemiBoldItalic.ttf") format("truetype");
+}
+
+:root {
+    --monospace: "IBM Plex Mono", monospace;
+    --sans-serif: "IBM Plex Sans", sans-serif;
+    --serif: "IBM Plex Serif", serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+}
+
+button,
+input,
+textarea {
+    outline: none;
+    resize: none;
+}

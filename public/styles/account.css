@@ -1,0 +1,55 @@
+.flex {
+    display: flex;
+    max-height: 100vh;
+}
+
+.flex > div {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    flex: 50%;
+    flex-grow: 0;
+    overflow: hidden;
+}
+
+#main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1rem 3rem;
+}
+
+#showcase {
+    background-color: #f1f5f9;
+    padding: 2rem;
+}
+
+#showcase img {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.05);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+form > div {
+    gap: 5px;
+}
+
+form button {
+    background-color: #15803d;
+    font-family: var(--sans-serif);
+}
+
+form input {
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    display: block;
+    font-family: var(--sans-serif);
+    font-size: 1rem;
+    line-height: 1.5rem;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+}

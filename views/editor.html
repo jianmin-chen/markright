@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>markright</title>
+        <base targte="_blank" />
+        <link rel="stylesheet" href="/styles/base.css" />
+        <link rel="stylesheet" href="/styles/hljs.css" />
+        <link rel="stylesheet" href="/styles/app.css" />
+        <link rel="stylesheet" href="/styles/editor.css" />
+        <script src="/scripts/hljs.js"></script>
+        <script src="/scripts/utils.js"></script>
+        <script src="/scripts/parser.js"></script>
+    </head>
+    <body>
+        <div class="contextmenu" id="folder-contextmenu">
+            <div class="item" id="new-file">New file</div>
+            <div class="item" id="rename-folder">Rename</div>
+            <div class="item" id="delete-folder">
+                <span style="color: red">Delete</span>
+            </div>
+        </div>
+        <div class="contextmenu" id="file-contextmenu">
+            <div class="item" id="rename-file">Rename</div>
+            <div class="item" id="download-markdown">Download Markdown</div>
+            <div class="item" id="download-html">Download HTML</div>
+            <div class="item" id="delete-file">
+                <span style="color: red">Delete</span>
+            </div>
+        </div>
+        <div id="wrapper">
+            <div id="menu">
+                <ul id="tree"></ul>
+                <button id="new">&plus; New folder</button>
+            </div>
+            <textarea id="input"></textarea>
+            <div id="output"></div>
+        </div>
+        <script src="/scripts/new.js"></script>
+    </body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>markright</title>
+        <link rel="stylesheet" href="/styles/base.css" />
+        <link rel="stylesheet" href="/styles/hljs.css" />
+        <link rel="stylesheet" href="/styles/index.css" />
+        <link rel="stylesheet" href="/styles/editor.css" />
+        <script src="/scripts/hljs.js"></script>
+        <script src="/scripts/utils.js"></script>
+        <script src="/scripts/parser.js"></script>
+    </head>
+    <body>
+        <header>
+            <h1>
+                <code>markright</code> is a minimal, Markdown-based writing
+                tool.
+            </h1>
+            <h2>
+                Test it out!
+                <a class="highlight" href="/app">Or start writing &rarr;</a>
+            </h2>
+            <img alt="Arrow" id="arrow" src="/assets/arrow.png" />
+        </header>
+        <div id="wrapper">
+            <div id="menu">
+                <ul id="tree"></ul>
+                <button disabled id="new">&plus; New page</button>
+            </div>
+            <textarea id="input"></textarea>
+            <div id="output"></div>
+        </div>
+        <footer>
+            <p>
+                Open source on
+                <a
+                    class="highlight"
+                    href="https://github.com/jianmin-chen/markright"
+                    target="_blank"
+                    >GitHub</a
+                >.
+            </p>
+        </footer>
+        <script>
+            const markdown = `If you don't already know, I recently decided to rebuild my blog. Previously, I had used [Jekyll](https://jekyllrb.com), a Ruby tool designed for writing blogs and their [default theme](https://github.com/jekyll/minima) for GitHub Pages with a couple of tweaks. This time, I decided to build a blog application myself - one that would allow me to:
+
+* Write blog articles on the site and send emails, i.e., kind of like an admin panel
+* Posts vs. complete articles for quick updates
+* One with my own custom design
+
+Ultimately, I decided to switch over because there were some limitations with the previous blog and I wanted to get rid of those limitations. I was also inspired by [Josh W. Comeau](https://www.joshwcomeau.com/)'s blog, which was written with very similar tools. Most importantly, I really just wanted to get some practice building a NextJS full-stack app, since there definitely are tools out there that could get rid of the aforementioned limitations.
+
+---
+
+## The design
+
+The first thing I did was build a static design. Here's a quick snippet of the SCSS:
+
+\`\`\`scss
+#blog-wrapper {
+    /* Flexbox wrapper for entire website */
+    @media screen and (min-width: $min-width) {
+        display: flex;
+        position: relative;
+
+        #nav {
+            flex-basis: 0;
+            flex-grow: 3;
+        }
+
+        #blog {
+            flex-basis: 0;
+            flex-grow: 9;
+        }
+    }
+}
+\`\`\`
+
+I spent a pretty long time tweaking the styles to get the site looking the way I wanted, but it came out pretty great. (I hope.) One of the issues I ran into was styling images:
+
+![A picture of the Golden Gate Bridge that I took! Pretty nice, eh?](https://jianminchen.com/assets/images/2022-07-28-rebuilding-this-blog/goldengatebridge.webp)
+
+I realized that I wanted to add captions to images, but ultimately I would be writing content in [Markdown](https://daringfireball.net/projects/markdown/), just like I had done with Jekyll. In HTML, the images would look like this:
+
+\`\`\`html
+<div class="image">
+    <image src="/assets/images/goldengatebridge.webp">
+    <em>A picture of the Golden Gate Bridge that I took! Pretty nice, eh?</em>
+</div>
+\`\`\`
+
+While Markdown does let you include HTML, I didn't want to write this every time I wanted to use an image. There's a solution to this: the [MDX](https://mdxjs.com/) library. According to the main page of the project site:
+
+> MDX allows you to use JSX in your markdown content. You can import components, such as interactive charts or alerts, and embed them within your content. This makes writing long-form content with components a blast. 🚀
+
+With the MDX library, I could turn the HTML above into a component:
+
+\`\`\`js
+export default {
+    img: ({ src, alt }) => (
+        <span className="image">
+            <img src={src} />
+            <em>{alt}</em>
+        </span>
+    )
+};
+\`\`\`
+
+The only downside of this was that I couldn't use NextJS's image optimization for local images. (If you know, please do let me know. I'm sure I could write a hacky solution, but I don't want to.) Besides, I needed to figure out to add links to headings as well, so I went ahead and did that. Try hovering over the headings!
+
+## Content
+
+Once I finished the design of the different pages, I started working on logic. All the code for this website is located at a personal GitHub [repo](https://github.com/jianmin-chen/blog). In it, I have a file called \`generate.js\` that is responsible for reading the content inside a folder called \`_content\`, which contains:
+
+* Articles
+* Main pages
+
+The difference between these is that articles are viewed through the article pages, while main pages are included in the menu bar - for example, my [resume](/resume).
+
+\`generate.js\` also takes care of generating unique slugs - that is, unique routes for each article so article routes don't overlap. These are then used by NextJS' [\`getStaticProps\`](https://nextjs.org/docs/basic-features/data-fetching/get-static-props) to cache content, thus making loading article content more efficient.
+
+## Newsletter and backend implementation
+
+I also decided to implement a newsletter. This was one of the aforementioned drawbacks of using Jekyll, where I had to create a separate Flask app to store and view subscribers. This new newsletter points to \`/api/subscribe\`, which in turn updates a MongoDB database hosted on MongoDB Atlas, both tools that were on my learning list earlier this year. MongoDB was utilized for managing nearly everything on the backend, which I did through an admin interface that I also had to create. I planned for this admin interface to let me:
+
+* View and delete subscribers
+* View and send newsletters
+
+The backend was implemented with a few tools: \`nodemailer\` for sending the mail (through my personal domain email, *jianmin[at]jianminchen.com*), \`mongoose\` for modeling subscribers and admins in the database, and \`chakra-ui/@react\` so I wouldn't have to write SCSS for the backend (although adapting for mobile was a burden, but oh well).
+
+## Conclusion
+
+After wrapping the code part up, I decided to do a couple of extra things:
+
+* Utilize SEO
+* Test with NextJS' \`core-web-vitals\` to ensure everything was as optimized as I could possibly make it
+* Use \`depcheck\` to make sure there are no unnecessary dependencies
+
+Overall, it was a lot of fun building this! It was genuinely a great learning experience.`;
+            let input, output;
+
+            const update = () => {
+                output.innerHTML = parseMarkdown(input.value);
+                output
+                    .querySelectorAll(".hljs")
+                    .forEach(el => hljs.highlightElement(el));
+            };
+
+            window.onload = () => {
+                input = document.getElementById("input");
+                output = document.getElementById("output");
+
+                input.value = markdown;
+                update();
+
+                input.addEventListener("input", update);
+
+                let tabs = 0;
+                input.addEventListener("keydown", function (event) {
+                    let start = this.selectionStart;
+                    let end = this.selectionEnd;
+
+                    // Emulate tabbing
+                    if (event.key === "Tab") {
+                        event.preventDefault();
+                        // Set textarea value to text before caret + tab + text after caret
+                        this.value = `${this.value.substring(
+                            0,
+                            start
+                        )}    ${this.value.substring(end)}`;
+                        this.selectionStart = this.selectionEnd = start + 4;
+                        tabs += 4;
+                    } else if (event.key === "Enter") {
+                        event.preventDefault();
+                        // Set textarea value to text before caret + newline + current # of tabs + text after caret
+                        this.value = `${this.value.substring(
+                            0,
+                            start
+                        )}\n${" ".repeat(tabs)}${this.value.substring(end)}`;
+                        this.selectionStart = this.selectionEnd =
+                            start + "\n".length + tabs;
+                    } else if (event.key === "Backspace") {
+                        event.preventDefault();
+                        let prev = this.value.substring(start - tabs, start);
+                        if (tabs && prev === " ".repeat(tabs)) {
+                            // Go back a tab
+                            tabs -= 4;
+                            this.value = `${this.value.substring(
+                                0,
+                                start - 4
+                            )}${this.value.substring(end)}`;
+                            this.selectionStart = this.selectionEnd = start - 4;
+                        } else if (prev != undefined) {
+                            // Go back as usual
+                            this.value = `${this.value.substring(
+                                0,
+                                start - 1
+                            )}${this.value.substring(end)}`;
+                            this.selectionStart = this.selectionEnd = start - 1;
+                        }
+                        update();
+                    } else update();
+                });
+            };
+        </script>
+    </body>
+</html>

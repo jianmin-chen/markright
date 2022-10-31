@@ -1,0 +1,12 @@
+#input,
+#output {
+    height: 100%;
+}
+
+@media screen and (min-width: 992px) {
+    body,
+    html {
+        overflow-y: hidden;
+        max-height: 100vh;
+    }
+}

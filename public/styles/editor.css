@@ -1,0 +1,214 @@
+.contextmenu {
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    display: none;
+    font-family: var(--sans-serif);
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 150px;
+    z-index: 999;
+}
+
+.contextmenu .item {
+    cursor: pointer;
+    padding: 0.75rem 1rem;
+}
+
+.contextmenu .item:hover {
+    background-color: #f8fafc;
+}
+
+.contextmenu .item:nth-child(1):hover {
+    /* Add border radius */
+    border-top-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.contextmenu .item:nth-last-child(1):hover {
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.contextmenu .item:not(:nth-last-child(1)) {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+#menu {
+    /* Menu */
+    background-color: #f1f5f9;
+    border-right: 1px solid #cbd5e1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1;
+    position: relative;
+}
+
+#menu ul {
+    /* File tree */
+    font-family: var(--sans-serif);
+    list-style: none;
+    padding: 0;
+}
+
+#menu ul li button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: block;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0.5rem 1rem;
+    text-align: left;
+    width: 100%;
+}
+
+#menu ul li button.active,
+#menu ul li button:hover {
+    background-color: #e2e8f0;
+}
+
+#menu ul li > ul {
+    padding-left: 1rem;
+}
+
+#menu > ul {
+    margin: 0;
+    overflow-y: scroll;
+    padding-top: 1rem;
+}
+
+#new {
+    /* New folder button */
+    background-color: transparent;
+    border: 0;
+    border-top: 1px solid #cbd5e1;
+    color: #94a3b8;
+    cursor: pointer;
+    display: block;
+    font-family: var(--sans-serif);
+    font-size: 1.1rem;
+    padding: 1rem;
+    text-align: left;
+    width: 100%;
+}
+
+#input,
+#output {
+    /* Input/output containers */
+    flex: 3;
+    overflow-y: auto;
+}
+
+#input {
+    border: none;
+    font-family: var(--monospace);
+    font-size: 0.995rem;
+}
+
+#output {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+#output > div {
+    /* Actual Markdown content */
+    margin: auto;
+    padding: 2.5rem 0;
+}
+
+#output > div *:nth-child(1) {
+    margin-top: 0;
+}
+
+/* Markdown styles */
+#output h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--serif);
+    line-height: normal;
+}
+
+#output blockquote {
+    border-left: 3px solid;
+    padding-left: 2rem;
+}
+
+#output code {
+    font-family: var(--monospace);
+    font-size: 1.1rem;
+}
+
+#output img {
+    width: 100%;
+}
+
+#output .hljs {
+    overflow-x: auto;
+    padding: 2rem;
+}
+
+#output .tasklist {
+    list-style: none;
+    padding-left: 0;
+}
+
+#output .tasklist input[type="checkbox"] {
+    line-height: inherit;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+@media screen and (max-width: 991.98px) {
+    #input,
+    #output {
+        width: 100%;
+    }
+
+    #input {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 2rem;
+        min-height: 100vh;
+    }
+
+    #output > div {
+        padding-inline: 2rem;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    #wrapper {
+        /* Flex container for editor */
+        display: flex;
+        height: 100vh;
+    }
+
+    #new {
+        background-color: #f1f5f9;
+        position: relative;
+        z-index: 998;
+    }
+
+    #input,
+    #output {
+        max-height: 100vh;
+    }
+
+    #input {
+        padding: 3rem;
+    }
+
+    #output {
+        border-left: 1px solid #cbd5e1;
+    }
+
+    #output > div {
+        max-width: 85%;
+    }
+}
