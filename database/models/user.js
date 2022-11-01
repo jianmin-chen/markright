@@ -4,7 +4,12 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-    email: String,
+    email: {
+        type: String,
+        required: true,
+        trim: true,
+        unique: true
+    },
     hash: String,
     salt: String,
     folder: String
@@ -27,7 +32,7 @@ userSchema.methods.validatePassword = function (password) {
 userSchema.methods.generateJWT = function () {
     const today = new Date();
     const expiration = new Date(today);
-    expiration.setDate(today.getDate() + 60);
+    expiration.setDate(today.getDate() + 7);
 
     return jwt.sign(
         {
@@ -35,7 +40,7 @@ userSchema.methods.generateJWT = function () {
             id: this._id,
             expires: parseInt(expiration.getTime() / 1000, 10)
         },
-        config.PASSPORT_SECRET
+        config.JWT_SECRET
     );
 };
 
@@ -46,13 +51,5 @@ userSchema.methods.toAuthJSON = function () {
         token: this.generateJWT()
     };
 };
-
-userSchema.pre("save", function (next) {
-    if (this.isNew) {
-        // Create AWS bucket for user, if user is new
-    }
-
-    next();
-});
 
 module.exports = mongoose.models.user || mongoose.model("user", userSchema);

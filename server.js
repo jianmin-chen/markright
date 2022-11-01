@@ -1,6 +1,7 @@
 const config = require("./config");
 const express = require("express");
 const bodyParser = require("body-parser");
+const cookieSession = require("cookie-session");
 const cors = require("cors");
 const errorHandler = require("errorhandler");
 const session = require("express-session");
@@ -16,6 +17,13 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(
+    cookieSession({
+        name: config.COOKIE_NAME,
+        secret: config.COOKIE_SECRET,
+        httpOnly: true
+    })
+);
 app.use(express.static(path.join(__dirname, "public")));
 app.use(
     session({
@@ -29,16 +37,15 @@ app.use(
 // Configure Mongoose
 mongoose.connect(config.MONGODB_URI);
 
+// Require models & routes
+require("./database/models/user");
+
 if (!config.NODE_ENV === "production") {
     // In development mode
     app.use(require("morgan")("dev"));
     app.use(errorHandler());
     mongoose.set("debug", true);
 }
-
-// Require models & routes
-require("./database/models/user");
-require("./utils/passport");
 
 app.use(require("./routes"));
 

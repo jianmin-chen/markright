@@ -30,8 +30,15 @@
         </div>
         <div id="wrapper">
             <div id="menu">
-                <ul id="tree"></ul>
-                <button id="new">&plus; New folder</button>
+                <div>
+                    <form action="/logout" method="GET">
+                        <button class="menu-button" id="logout">
+                            Log out &rarr;
+                        </button>
+                    </form>
+                    <ul id="tree"></ul>
+                </div>
+                <button class="menu-button" id="new">&plus; New folder</button>
             </div>
             <textarea id="input"></textarea>
             <div id="output"></div>

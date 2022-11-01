@@ -1,11 +1,9 @@
 .flex {
     display: flex;
-    max-height: 100vh;
 }
 
 .flex > div {
     font-family: var(--serif);
-    font-size: 1.5rem;
     flex: 50%;
     flex-grow: 0;
     overflow: hidden;
@@ -38,8 +36,16 @@ form > div {
 }
 
 form button {
-    background-color: #15803d;
-    font-family: var(--sans-serif);
+    background-color: yellow;
+    border: none;
+    cursor: pointer;
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: auto;
+    margin-top: 4px;
+    padding: 2px 4px;
+    width: fit-content;
 }
 
 form input {
@@ -52,4 +58,20 @@ form input {
     line-height: 1.5rem;
     padding: 0.5rem 0.75rem;
     width: 100%;
+}
+
+@media screen and (max-width: 991.98px) {
+    .flex {
+        flex-direction: column-reverse;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    .flex {
+        max-height: 100vh;
+    }
+
+    .flex > div {
+        font-size: 1.5rem;
+    }
 }

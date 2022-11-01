@@ -53,9 +53,9 @@ class Editor {
         this.updateEditor();
     }
 
-    getFiles() {
+    async getFiles() {
         // R
-        return localStorage.getItem("markdown-parser");
+        return await fetch("/api/getFiles");
     }
 
     getFile(filename) {
@@ -193,6 +193,13 @@ class Editor {
 }
 
 window.onload = () => {
+    // Check if logged in
+    fetch("/loggedIn")
+        .then(res => res.json())
+        .then(json => {
+            console.log(json);
+        });
+
     input = document.getElementById("input");
     output = document.getElementById("output");
     menu = document.getElementById("tree");

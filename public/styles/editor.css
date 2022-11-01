@@ -80,11 +80,10 @@
     padding-top: 1rem;
 }
 
-#new {
+.menu-button {
     /* New folder button */
-    background-color: transparent;
+    background-color: #f1f5f9;
     border: 0;
-    border-top: 1px solid #cbd5e1;
     color: #94a3b8;
     cursor: pointer;
     display: block;
@@ -93,6 +92,14 @@
     padding: 1rem;
     text-align: left;
     width: 100%;
+}
+
+#logout {
+    border-bottom: 1px solid #cbd5e1;
+}
+
+#new {
+    border-top: 1px solid #cbd5e1;
 }
 
 #input,
@@ -190,7 +197,6 @@ h6 {
     }
 
     #new {
-        background-color: #f1f5f9;
         position: relative;
         z-index: 998;
     }

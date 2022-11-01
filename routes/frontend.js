@@ -1,53 +1,25 @@
+const config = require("../config");
 const express = require("express");
-const passport = require("passport");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 const path = require("path");
-const router = express.Router();
 const auth = require("../utils/auth");
-const getTokenFromHeaders = require("../utils/getTokenFromHeaders");
+const router = express.Router();
 
-router.get("/", auth.optional, (req, res, next) => {
-    if (getTokenFromHeaders(req)) {
-        // Determine if user is already logged in
-        return passport.authenticate(
-            "local",
-            { session: false },
-            (err, passportUser, info) => {
-                if (err)
-                    // Invalid token
-                    return res.sendFile(
-                        path.join(__dirname, "..", "views", "index.html")
-                    );
-                else if (passportUser) return res.redirect("/app"); // Logged in
-                return res.status(400).send(info);
-            }
-        )(req, res, next);
-    }
+const Users = mongoose.models.user;
 
+router.get("/", auth, (req, res, next) => {
+    if (req.session.token && req.userEmail) return res.redirect("/app");
     return res.sendFile(path.join(__dirname, "..", "views", "index.html"));
 });
 
-router.get("/account", auth.optional, (req, res, next) => {
-    if (getTokenFromHeaders(req)) {
-        // Determine if user is already logged in
-        return passport.authenticate(
-            "local",
-            { session: false },
-            (err, passportUser, info) => {
-                if (err)
-                    // Invalid token
-                    return res.sendFile(
-                        path.join(__dirname, "..", "views", "index.html")
-                    );
-                else if (passportUser) return res.redirect("/app"); // Logged in
-                return res.status(400).send(info);
-            }
-        )(req, res, next);
-    }
-
+router.get("/account", auth, (req, res, next) => {
+    if (req.session.token && req.userEmail) return res.redirect("/app");
     return res.sendFile(path.join(__dirname, "..", "views", "account.html"));
 });
 
-router.get("/app", auth.optional, (req, res, next) => {
+router.get("/app", auth, async (req, res, next) => {
+    if (!req.session.token || !req.userEmail) return res.redirect("/account");
     return res.sendFile(path.join(__dirname, "..", "views", "editor.html"));
 });
 
