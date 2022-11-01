@@ -133,13 +133,22 @@
 
 /* Markdown styles */
 #output h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+#output h2,
+#output h3,
+#output h4,
+#output h5,
+#output h6 {
     font-family: var(--serif);
     line-height: normal;
+}
+
+#output h1 code,
+#output h2 code,
+#output h3 code,
+#output h4 code,
+#output h5 code,
+#output h6 code {
+    font-size: inherit;
 }
 
 #output blockquote {

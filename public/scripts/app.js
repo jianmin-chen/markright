@@ -19,34 +19,41 @@ class Editor {
                 if (Object.keys(files).length) {
                     // There are files, so let's populate the file tree
                     this.files = files;
-                    
+
                     let active = localStorage.getItem("markright-active");
                     if (active) {
                         this.activeFile = active;
-                        this.openFolders.push(this.activeFile.split("/")[0]);  // Keep folder open
-                        this.updateEditor();;
+                        this.openFolders.push(this.activeFile.split("/")[0]); // Keep folder open
+                        this.updateEditor();
                     }
 
-                    let openFolders = localStorage.getItem("markright-open-folders");
+                    let openFolders = localStorage.getItem(
+                        "markright-open-folders"
+                    );
                     if (openFolders) this.openFolders = JSON.parse(openFolders);
                     this.updateFiletree();
                 } else {
                     // No files, so let's initialize localStorage
                     localStorage.setItem("markright-open-folders", "[]");
                 }
-            }); 
+            });
     }
 
     setActive(location) {
         this.activeFile = location;
         localStorage.setItem("markright-active", location);
+        this.updateFiletree();
     }
 
-    newFolder(foldername) {
+    async newFolder(foldername) {
         // C - create new folder
         if (foldername in this.files) throw new Error("Folder already exists");
         this.files[foldername] = {};
-        fetch("/api/updateFilesystem", {
+
+        // Update the filetree
+        this.updateFiletree();
+
+        await fetch("/api/updateFilesystem", {
             method: "POST",
             headers: {
                 "Accept": "application/json",
@@ -56,42 +63,43 @@ class Editor {
                 filesystem: JSON.stringify(this.files)
             })
         });
-
-        // Update the filetree
-        this.updateFiletree();
     }
 
-    newFile(foldername, filename) {
+    async newFile(foldername, filename) {
         // C - create new file
         if (this.fileExists(foldername, filename))
             throw new Error("File already exists");
         this.files[foldername][filename] = "";
-        fetch("/api/updateFilesystem", {
-            method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                filesystem: JSON.stringify(this.files)
-            })
-        });
 
         // Update open folders
         if (this.openFolders.indexOf(foldername) === -1) {
             this.openFolders.push(foldername);
-            localStorage.setItem("markright-open-folders", foldername);
+            localStorage.setItem(
+                "markright-open-folders",
+                JSON.stringify(this.openFolders)
+            );
         }
 
         // Update the editor and filetree (set new file to active)
         this.setActive(`${foldername}/${filename}`);
         this.updateEditor();
         this.updateFiletree();
+
+        await fetch("/api/updateFilesystem", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                filesystem: JSON.stringify(this.files)
+            })
+        });
     }
 
     async getFiles() {
         // R
-        return fetch("/api/getFiles");
+        return await fetch("/api/getFiles");
     }
 
     getFile(location) {
@@ -116,32 +124,12 @@ class Editor {
         // U
         let [foldername, filename] = this.activeFile.split("/");
         this.files[foldername][filename] = this.input.value;
-        fetch("/api/updateFilesystem", {
-            method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                filesystem: JSON.stringify(this.files)
-            })
-        });
     }
 
-    renameFolder(foldername, newFoldername) {
+    async renameFolder(foldername, newFoldername) {
         // U - rename folder
         this.files[newFoldername] = this.files[foldername];
         delete this.files[foldername];
-        fetch("/api/updateFilesystem", {
-            method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                filesystem: JSON.stringify(this.files)
-            })
-        });
         if (foldername === this.activeFile.split("/")[0]) {
             this.activeFile = `${newFoldername}/${
                 this.activeFile.split("/")[1]
@@ -153,17 +141,15 @@ class Editor {
         let pos = this.openFolders.indexOf(foldername);
         if (pos !== -1) {
             this.openFolders[pos] = newFoldername;
+            localStorage.setItem(
+                "markright-open-folders",
+                JSON.stringify(this.openFolders)
+            );
         }
 
         this.updateFiletree();
-    }
 
-    renameFile(location, newFilename) {
-        // U - rename file
-        let [folder, file] = location.split("/");
-        this.files[folder][newFilename] = this.files[folder][file];
-        delete this.files[folder][file];
-        fetch("/api/updateFilesystem", {
+        await fetch("/api/updateFilesystem", {
             method: "POST",
             headers: {
                 "Accept": "application/json",
@@ -173,6 +159,13 @@ class Editor {
                 filesystem: JSON.stringify(this.files)
             })
         });
+    }
+
+    async renameFile(location, newFilename) {
+        // U - rename file
+        let [folder, file] = location.split("/");
+        this.files[folder][newFilename] = this.files[folder][file];
+        delete this.files[folder][file];
         if (location === this.activeFile) {
             this.activeFile = `${folder}/${newFilename}`;
             localStorage.setItem("markright-active", this.activeFile);
@@ -180,12 +173,26 @@ class Editor {
 
         this.updateFiletree();
         this.updateEditor();
+
+        await fetch("/api/updateFilesystem", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                filesystem: JSON.stringify(this.files)
+            })
+        });
     }
 
-    deleteFolder(foldername) {
+    async deleteFolder(foldername) {
         // D - delete folder
         if (!this.folderExists(foldername))
             throw new Error("Folder doesn't exist");
+
+        // Remove from storage
+        delete this.files[foldername];
 
         // If file in folder is active, it is no longer active
         if (foldername === this.activeFile.split("/")[0]) {
@@ -195,19 +202,6 @@ class Editor {
             this.output.innerHTML = "";
             localStorage.setItem("markright-active", "");
         }
-
-        // Remove from storage
-        delete this.files[foldername];
-        fetch("/api/updateFilesystem", {
-            method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                filesystem: JSON.stringify(this.files)
-            })
-        });
 
         // Remove from open folders
         let pos = this.openFolders.indexOf(foldername);
@@ -220,9 +214,20 @@ class Editor {
         }
 
         this.updateFiletree();
+
+        await fetch("/api/updateFilesystem", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                filesystem: JSON.stringify(this.files)
+            })
+        });
     }
 
-    deleteFile(location) {
+    async deleteFile(location) {
         // D - delete specific file
         let [foldername, filename] = location.split("/");
         if (!this.fileExists(foldername, filename))
@@ -239,7 +244,9 @@ class Editor {
 
         // Remove from storage
         delete this.files[foldername][filename];
-        fetch("/api/updateFilesystem", {
+        this.updateFiletree();
+
+        await fetch("/api/updateFilesystem", {
             method: "POST",
             headers: {
                 "Accept": "application/json",
@@ -249,8 +256,6 @@ class Editor {
                 filesystem: JSON.stringify(this.files)
             })
         });
-
-        this.updateFiletree();
     }
 
     updateEditor() {
@@ -374,6 +379,19 @@ window.onload = () => {
     // * Obviously, storing and comparing state might be more efficient
     input.addEventListener("input", function (event) {
         editor.update();
+    });
+
+    input.addEventListener("blur", function (event) {
+        fetch("/api/updateFilesystem", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                filesystem: JSON.stringify(editor.files)
+            })
+        });
     });
 
     let tabs = 0;
@@ -573,4 +591,17 @@ window.onload = () => {
 
             fileContextmenu.style.display = "none";
         });
+};
+
+window.onbeforeunload = () => {
+    fetch("/api/updateFilesystem", {
+        method: "POST",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            filesystem: JSON.stringify(editor.files)
+        })
+    });
 };
