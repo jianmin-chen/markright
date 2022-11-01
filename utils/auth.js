@@ -10,7 +10,7 @@ const auth = (req, res, next) => {
     jwt.verify(token, config.JWT_SECRET, (err, decoded) => {
         if (err) return next();
 
-        req.userEmail = decoded.email;
+        req.userId = decoded._id;
         return next();
     });
 };

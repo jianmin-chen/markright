@@ -47,9 +47,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.get("/loggedIn", auth, (req, res, next) => {
-    return res
-        .status(200)
-        .json({ loggedIn: req.session.token && req.userEmail });
+    return res.status(200).json({ loggedIn: req.session.token && req.userId });
 });
 
 router.get("/logout", (req, res, next) => {

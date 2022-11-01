@@ -13,11 +13,18 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+#main > div {
+    margin: auto;
+    overflow: auto;
     padding: 1rem 3rem;
 }
 
 #showcase {
     background-color: #f1f5f9;
+    display: flex;
+    align-items: center;
     padding: 2rem;
 }
 
@@ -68,9 +75,11 @@ form input {
 
 @media screen and (min-width: 992px) {
     .flex {
-        max-height: 100vh;
+        height: 100vh;
     }
+}
 
+@media screen and (min-width: 1200px) {
     .flex > div {
         font-size: 1.5rem;
     }

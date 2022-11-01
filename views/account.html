@@ -12,48 +12,50 @@
     <body>
         <div class="flex">
             <div id="main">
-                <h1>Sign up to save your work.</h1>
-                <form
-                    action="/signup"
-                    method="POST"
-                    style="
-                        border-bottom: 1px solid #e2e8f0;
-                        padding-bottom: 3rem;
-                    ">
-                    <input
-                        autocomplete="off"
-                        name="email"
-                        placeholder="Email..."
-                        required
-                        type="text" />
-                    <input
-                        autocomplete="off"
-                        name="password"
-                        placeholder="Password..."
-                        required
-                        type="password" />
-                    <button type="submit" style="transform: rotate(-3deg)">
-                        Sign up &rarr;
-                    </button>
-                </form>
-                <h1>Or already have an account? Log in.</h1>
-                <form action="/login" method="POST">
-                    <input
-                        autocomplete="off"
-                        name="email"
-                        placeholder="Email..."
-                        required
-                        type="text" />
-                    <input
-                        autocomplete="off"
-                        name="password"
-                        placeholder="Password..."
-                        required
-                        type="password" />
-                    <button type="submit" style="transform: rotate(1deg)">
-                        Log in &rarr;
-                    </button>
-                </form>
+                <div>
+                    <h1>Sign up to save your work.</h1>
+                    <form
+                        action="/signup"
+                        method="POST"
+                        style="
+                            border-bottom: 1px solid #e2e8f0;
+                            padding-bottom: 3rem;
+                        ">
+                        <input
+                            autocomplete="off"
+                            name="email"
+                            placeholder="Email..."
+                            required
+                            type="text" />
+                        <input
+                            autocomplete="off"
+                            name="password"
+                            placeholder="Password..."
+                            required
+                            type="password" />
+                        <button type="submit" style="transform: rotate(-3deg)">
+                            Sign up &rarr;
+                        </button>
+                    </form>
+                    <h1>Or already have an account? Log in.</h1>
+                    <form action="/login" method="POST">
+                        <input
+                            autocomplete="off"
+                            name="email"
+                            placeholder="Email..."
+                            required
+                            type="text" />
+                        <input
+                            autocomplete="off"
+                            name="password"
+                            placeholder="Password..."
+                            required
+                            type="password" />
+                        <button type="submit" style="transform: rotate(1deg)">
+                            Log in &rarr;
+                        </button>
+                    </form>
+                </div>
             </div>
             <div id="showcase">
                 <img src="/assets/app.png" />

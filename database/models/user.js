@@ -2,6 +2,7 @@ const config = require("../../config");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const upload = require("../aws/aws").upload;
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -12,7 +13,7 @@ const userSchema = new mongoose.Schema({
     },
     hash: String,
     salt: String,
-    folder: String
+    filesystem: String
 });
 
 userSchema.methods.setPassword = function (password) {
@@ -51,5 +52,16 @@ userSchema.methods.toAuthJSON = function () {
         token: this.generateJWT()
     };
 };
+
+userSchema.pre("save", function (next) {
+    if (this.isNew) {
+        // Set up new AWS file for user
+        let filename = `${this._id.toString()}.json`;
+        upload(filename, "");
+        this.filesystem = filename;
+    }
+
+    next();
+});
 
 module.exports = mongoose.models.user || mongoose.model("user", userSchema);

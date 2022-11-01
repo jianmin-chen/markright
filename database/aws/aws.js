@@ -7,7 +7,7 @@ const S3 = new AWS.S3({
     secretAccessKey: config.AWS_SECRET
 });
 
-const content = filename => {
+const content = async filename => {
     const params = {
         Bucket: config.AWS_BUCKET,
         Key: filename
@@ -37,16 +37,10 @@ const exists = async filename => {
     });
 };
 
-const upload = async data => {
-    // Generate unique ID for content
-    let uuid;
-    do {
-        uuid = uuidv4();
-    } while (await exists(uuid));
-
+const upload = async (filename, data)  => { 
     const params = {
         Bucket: config.AWS_BUCKET,
-        Key: uuid,
+        Key: filename,
         Body: data
     };
 

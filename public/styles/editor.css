@@ -76,7 +76,7 @@
 
 #menu > ul {
     margin: 0;
-    overflow-y: scroll;
+    overflow-y: auto;
     padding-top: 1rem;
 }
 
