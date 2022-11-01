@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
-const { content, upload }  = require("../database/aws/aws");
+const { content, upload } = require("../database/aws/aws");
 const auth = require("../utils/auth");
 
 const Users = mongoose.models.user;
@@ -16,7 +16,8 @@ router.get("/getFiles", auth, async (req, res, next) => {
 });
 
 router.post("/updateFilesystem", auth, async (req, res, next) => {
-    if (!req.session.token || !req.userId || !req.body.filesystem) return res.status(400);
+    if (!req.session.token || !req.userId || !req.body.filesystem)
+        return res.status(400);
 
     // Find user in database
     let user = await Users.findOne({ _id: req.userId });

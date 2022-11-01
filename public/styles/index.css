@@ -16,6 +16,8 @@ header h2 {
 }
 
 #arrow {
+    -webkit-transform: rotate(120deg);
+    -ms-transform: rotate(120deg);
     transform: rotate(120deg);
     width: 100px;
     height: 100px;
@@ -36,6 +38,7 @@ footer {
 #wrapper {
     /* Flex container for editor */
     border: 1px solid #cbd5e1;
+    -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
     margin: 2rem;
 }

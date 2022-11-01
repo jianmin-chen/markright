@@ -37,7 +37,7 @@ const exists = async filename => {
     });
 };
 
-const upload = async (filename, data)  => { 
+const upload = async (filename, data) => {
     const params = {
         Bucket: config.AWS_BUCKET,
         Key: filename,

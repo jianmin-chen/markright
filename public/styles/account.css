@@ -1,17 +1,30 @@
 .flex {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
 }
 
 .flex > div {
     font-family: var(--serif);
+    -webkit-box-flex: 50%;
+    -ms-flex: 50%;
     flex: 50%;
+    -webkit-box-flex: 0;
+    -ms-flex-positive: 0;
     flex-grow: 0;
     overflow: hidden;
 }
 
 #main {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
     justify-content: center;
 }
 
@@ -23,17 +36,27 @@
 
 #showcase {
     background-color: #f1f5f9;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
     padding: 2rem;
 }
 
 #showcase img {
+    -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.05);
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.05);
 }
 
 form {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
     flex-direction: column;
     gap: 8px;
 }
@@ -52,12 +75,15 @@ form button {
     margin: auto;
     margin-top: 4px;
     padding: 2px 4px;
+    width: -webkit-fit-content;
+    width: -moz-fit-content;
     width: fit-content;
 }
 
 form input {
     border: 1px solid #e2e8f0;
     border-radius: 5px;
+    -webkit-box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     display: block;
     font-family: var(--sans-serif);
@@ -69,6 +95,9 @@ form input {
 
 @media screen and (max-width: 991.98px) {
     .flex {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: reverse;
+        -ms-flex-direction: column-reverse;
         flex-direction: column-reverse;
     }
 }
