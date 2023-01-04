@@ -1,3 +1,17 @@
+.gutter {
+    position: relative;
+}
+
+.gutter::after {
+    background-color: #cbd5e1;
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 100%;
+}
+
 .contextmenu {
     background-color: white;
     border-radius: 5px;
@@ -39,7 +53,6 @@
 #menu {
     /* Menu */
     background-color: #f1f5f9;
-    border-right: 1px solid #cbd5e1;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -50,9 +63,6 @@
     -webkit-box-pack: justify;
     -ms-flex-pack: justify;
     justify-content: space-between;
-    -webkit-box-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
     position: relative;
 }
 
@@ -115,9 +125,6 @@
 #input,
 #output {
     /* Input/output containers */
-    -webkit-box-flex: 3;
-    -ms-flex: 3;
-    flex: 3;
     overflow-y: auto;
 }
 
@@ -231,10 +238,6 @@
 
     #input {
         padding: 3rem;
-    }
-
-    #output {
-        border-left: 1px solid #cbd5e1;
     }
 
     #output > div {

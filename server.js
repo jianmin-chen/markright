@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const cors = require("cors");
 const errorHandler = require("errorhandler");
-const session = require("express-session");
 const mongoose = require("mongoose");
 const path = require("path");
 
@@ -25,14 +24,6 @@ app.use(
     })
 );
 app.use(express.static(path.join(__dirname, "public")));
-app.use(
-    session({
-        secret: config.PASSPORT_SECRET,
-        cookie: { maxAge: config.PASSPORT_MAXAGE },
-        resave: false,
-        saveUninitialized: false
-    })
-);
 
 // Configure Mongoose
 mongoose.connect(config.MONGODB_URI);

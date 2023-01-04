@@ -52,6 +52,8 @@ router.get("/loggedIn", auth, (req, res, next) => {
 
 router.get("/logout", (req, res, next) => {
     req.session = null;
+    res.clearCookie("markright-active");
+    res.clearCookie("markright-open-folders");
     return res.redirect("/");
 });
 

@@ -3,6 +3,7 @@ const AWS = require("aws-sdk");
 const { v4: uuidv4 } = require("uuid");
 
 const S3 = new AWS.S3({
+    endpoint: new AWS.Endpoint("s3.wasabisys.com"),
     accessKeyId: config.AWS_ID,
     secretAccessKey: config.AWS_SECRET
 });
