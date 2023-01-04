@@ -10,6 +10,7 @@
         <script src="/scripts/hljs.js"></script>
         <script src="/scripts/utils.js"></script>
         <script src="/scripts/parser.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.0/split.min.js"></script>
     </head>
     <body>
         <header>
@@ -150,6 +151,13 @@ Overall, it was a lot of fun building this! It was genuinely a great learning ex
             };
 
             window.onload = () => {
+                // Set up Split.js
+                Split(["#menu", "#input", "#output"], {
+                    gutterSize: 3,
+                    sizes: [20, 40, 40],
+                    minSize: [200, 300, 300]
+                });
+
                 input = document.getElementById("input");
                 output = document.getElementById("output");
 
