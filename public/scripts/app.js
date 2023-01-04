@@ -361,6 +361,13 @@ class Editor {
 }
 
 window.onload = () => {
+    // Set up Split.js
+    Split(["#menu", "#input", "#output"], {
+        gutterSize: 3,
+        sizes: [14, 43, 43],
+        minSize: [200, 400, 400]
+    });
+
     input = document.getElementById("input");
     output = document.getElementById("output");
     menu = document.getElementById("tree");
