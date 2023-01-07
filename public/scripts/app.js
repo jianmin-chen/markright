@@ -1,4 +1,10 @@
-let input, output, menu, folderContextmenu, fileContextmenu, editor;
+let input,
+    output,
+    menu,
+    folderContextmenu,
+    fileContextmenu,
+    editor,
+    splitInstance;
 
 class Editor {
     constructor(input, output, menu, folderContextmenu, fileContextmenu) {
@@ -360,26 +366,41 @@ class Editor {
     }
 }
 
-window.onload = () => {
+const resize = () => {
+    try {
+        if (splitInstance) splitInstance.destroy();
+    } catch (err) {}
+
     if (window.innerWidth >= 992) {
+        input.style.display = "block";
+        output.style.display = "block";
+
         // Set up Split.js
         let sizes = localStorage.getItem("split-sizes");
         if (sizes) sizes = JSON.parse(sizes);
         else sizes = [14, 43, 43];
-        Split(["#menu", "#input", "#output"], {
+        splitInstance = Split(["#menu", "#input", "#output"], {
             gutterSize: 3,
             sizes,
             minSize: [200, 400, 400],
             onDragEnd: sizes =>
                 localStorage.setItem("split-sizes", JSON.stringify(sizes))
         });
+    } else {
+        input.style.display = "block";
+        output.style.display = "none";
     }
+};
 
+window.onload = () => {
     input = document.getElementById("input");
     output = document.getElementById("output");
     menu = document.getElementById("tree");
     folderContextmenu = document.getElementById("folder-contextmenu");
     fileContextmenu = document.getElementById("file-contextmenu");
+
+    resize();
+    window.addEventListener("resize", resize);
 
     input.readOnly = true;
     editor = new Editor(
@@ -408,16 +429,7 @@ window.onload = () => {
         });
     });
 
-    let keydown = {};
-    const addKeydown = event => (keydown[event.key] = event.type === "keydown");
-    input.addEventListener("keydown", function (event) {
-        addKeydown(event);
-        console.log(keydown);
-    });
-    input.addEventListener("keyup", function (event) {
-        addKeydown(event);
-    });
-
+    let tabs = 0;
     input.addEventListener("keydown", function (event) {
         let start = this.selectionStart;
         let end = this.selectionEnd;
@@ -462,6 +474,41 @@ window.onload = () => {
             editor.update();
         } else editor.update();
     });
+
+    document
+        .getElementById("open-menu")
+        .addEventListener("click", function (event) {
+            const menuWrapper = document.getElementById("menu-wrapper");
+            if (
+                menuWrapper.style.display === "none" ||
+                !menuWrapper.style.display.length
+            )
+                menuWrapper.style.display = "block";
+            else menuWrapper.style.display = "none";
+        });
+
+    document
+        .getElementById("logout")
+        .addEventListener("click", function (event) {
+            // Clear cookies before logging out
+            event.preventDefault();
+            localStorage.clear();
+            event.currentTarget.submit();
+        });
+
+    document
+        .getElementById("open-input")
+        .addEventListener("click", function (event) {
+            document.getElementById("input").style.display = "block";
+            document.getElementById("output").style.display = "none";
+        });
+
+    document
+        .getElementById("open-output")
+        .addEventListener("click", function (event) {
+            document.getElementById("input").style.display = "none";
+            document.getElementById("output").style.display = "block";
+        });
 
     document.getElementById("new").addEventListener("click", function (event) {
         // New folder
@@ -617,14 +664,15 @@ window.onload = () => {
 };
 
 window.onbeforeunload = () => {
-    fetch("/api/updateFilesystem", {
-        method: "POST",
-        headers: {
-            "Accept": "application/json",
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            filesystem: JSON.stringify(editor.files)
-        })
-    });
+    if (editor)
+        fetch("/api/updateFilesystem", {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                filesystem: JSON.stringify(editor.files)
+            })
+        });
 };

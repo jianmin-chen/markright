@@ -201,6 +201,54 @@
 }
 
 @media screen and (max-width: 991.98px) {
+    #menu {
+        position: sticky;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 999;
+    }
+
+    #menu-wrapper {
+        display: none;
+        height: 100%;
+    }
+
+    #mobile-menu {
+        border-bottom: 1px solid #cbd5e1;
+    }
+
+    #open-menu {
+        background-color: transparent;
+        border: 0;
+        color: #94a3b8;
+        cursor: pointer;
+        font-size: 2rem;
+        margin: 0 1rem 0.45rem 1rem;
+    }
+
+    #mobile-tabs {
+        display: flex;
+        position: sticky;
+        top: 0;
+        left: 0;
+    }
+
+    #mobile-tabs button {
+        background-color: white;
+        border: none;
+        border-bottom: 1px solid #cbd5e1;
+        cursor: pointer;
+        flex: 1;
+        font-family: var(--sans-serif);
+        font-size: 1.1rem;
+        padding: 0.5rem 1rem;
+    }
+
+    #mobile-tabs button:nth-child(1) {
+        border-right: 1px solid #cbd5e1;
+    }
+
     #input,
     #output {
         width: 100%;
@@ -210,6 +258,10 @@
         border-bottom: 1px solid #e2e8f0;
         padding: 2rem;
         min-height: 100vh;
+    }
+
+    #output {
+        display: none;
     }
 
     #output > div {
@@ -227,8 +279,15 @@
     }
 
     #new {
-        position: relative;
+        position: absolute;
+        bottom: 0;
+        left: 0;
         z-index: 998;
+    }
+
+    #mobile-menu,
+    #mobile-tabs {
+        display: none;
     }
 
     #input,

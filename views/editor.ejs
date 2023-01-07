@@ -31,15 +31,24 @@
         </div>
         <div id="wrapper">
             <div id="menu">
-                <div>
-                    <form action="/logout" method="GET">
-                        <button class="menu-button" id="logout">
-                            Log out &rarr;
-                        </button>
-                    </form>
-                    <ul id="tree"></ul>
+                <div id="mobile-menu">
+                    <button id="open-menu">&equiv;</button>
                 </div>
-                <button class="menu-button" id="new">&plus; New folder</button>
+                <div id="menu-wrapper">
+                    <div>
+                        <form action="/logout" id="logout" method="GET">
+                            <button class="menu-button">Log out &rarr;</button>
+                        </form>
+                        <ul id="tree"></ul>
+                    </div>
+                    <button class="menu-button" id="new">
+                        &plus; New folder
+                    </button>
+                </div>
+            </div>
+            <div id="mobile-tabs">
+                <button id="open-input">Write</button>
+                <button id="open-output">Read</button>
             </div>
             <textarea id="input"></textarea>
             <div id="output"></div>
