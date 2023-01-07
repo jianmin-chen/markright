@@ -10,17 +10,17 @@ const Users = mongoose.models.user;
 
 router.get("/", auth, (req, res, next) => {
     if (req.session.token && req.userId) return res.redirect("/app");
-    return res.sendFile(path.join(__dirname, "..", "views", "index.html"));
+    return res.render("index");
 });
 
 router.get("/account", auth, (req, res, next) => {
     if (req.session.token && req.userId) return res.redirect("/app");
-    return res.sendFile(path.join(__dirname, "..", "views", "account.html"));
+    return res.render("account");
 });
 
 router.get("/app", auth, async (req, res, next) => {
     if (!req.session.token || !req.userId) return res.redirect("/account");
-    return res.sendFile(path.join(__dirname, "..", "views", "editor.html"));
+    return res.render("editor");
 });
 
 module.exports = router;

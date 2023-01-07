@@ -401,7 +401,16 @@ window.onload = () => {
         });
     });
 
-    let tabs = 0;
+    let keydown = {};
+    const addKeydown = event => (keydown[event.key] = event.type === "keydown");
+    input.addEventListener("keydown", function (event) {
+        addKeydown(event);
+        console.log(keydown);
+    });
+    input.addEventListener("keyup", function (event) {
+        addKeydown(event);
+    });
+
     input.addEventListener("keydown", function (event) {
         let start = this.selectionStart;
         let end = this.selectionEnd;
