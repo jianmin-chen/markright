@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>markright</title>
         <link rel="stylesheet" href="/styles/base.css" />
         <link rel="stylesheet" href="/styles/hljs.css" />
@@ -152,12 +152,22 @@ Overall, it was a lot of fun building this! It was genuinely a great learning ex
             };
 
             window.onload = () => {
-                // Set up Split.js
-                Split(["#menu", "#input", "#output"], {
-                    gutterSize: 3,
-                    sizes: [20, 40, 40],
-                    minSize: [200, 300, 300]
-                });
+                if (window.innerWidth >= 992) {
+                    // Set up Split.js
+                    let sizes = localStorage.getItem("split-sizes");
+                    if (sizes) sizes = JSON.parse(sizes);
+                    else sizes = [14, 43, 43];
+                    Split(["#menu", "#input", "#output"], {
+                        gutterSize: 3,
+                        sizes,
+                        minSize: [200, 400, 400],
+                        onDragEnd: sizes =>
+                            localStorage.setItem(
+                                "split-sizes",
+                                JSON.stringify(sizes)
+                            )
+                    });
+                }
 
                 input = document.getElementById("input");
                 output = document.getElementById("output");

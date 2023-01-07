@@ -361,12 +361,19 @@ class Editor {
 }
 
 window.onload = () => {
-    // Set up Split.js
-    Split(["#menu", "#input", "#output"], {
-        gutterSize: 3,
-        sizes: [14, 43, 43],
-        minSize: [200, 400, 400]
-    });
+    if (window.innerWidth >= 992) {
+        // Set up Split.js
+        let sizes = localStorage.getItem("split-sizes");
+        if (sizes) sizes = JSON.parse(sizes);
+        else sizes = [14, 43, 43];
+        Split(["#menu", "#input", "#output"], {
+            gutterSize: 3,
+            sizes,
+            minSize: [200, 400, 400],
+            onDragEnd: sizes =>
+                localStorage.setItem("split-sizes", JSON.stringify(sizes))
+        });
+    }
 
     input = document.getElementById("input");
     output = document.getElementById("output");
