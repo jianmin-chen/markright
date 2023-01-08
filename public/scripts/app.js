@@ -4,7 +4,8 @@ let input,
     folderContextmenu,
     fileContextmenu,
     editor,
-    splitInstance;
+    splitInstance,
+    windowWidth;
 
 class Editor {
     constructor(input, output, menu, folderContextmenu, fileContextmenu) {
@@ -314,6 +315,9 @@ class Editor {
                     self.setActive(this.getAttribute("location"));
                     self.updateEditor();
                     self.updateFiletree();
+                    if (windowWidth < 992)
+                        document.getElementById("menu-wrapper").style.height =
+                            "0px"; // Close menu on mobile
                 });
                 fileButton.addEventListener("contextmenu", function (event) {
                     event.preventDefault();
@@ -367,28 +371,32 @@ class Editor {
 }
 
 const resize = () => {
-    try {
-        if (splitInstance) splitInstance.destroy();
-    } catch (err) {}
+    if (!windowWidth || windowWidth != window.innerWidth) {
+        // First time resizing, or window width has changed
+        try {
+            if (splitInstance) splitInstance.destroy();
+        } catch (err) {}
 
-    if (window.innerWidth >= 992) {
-        input.style.display = "block";
-        output.style.display = "block";
+        if (window.innerWidth >= 992) {
+            input.style.display = "block";
+            output.style.display = "block";
 
-        // Set up Split.js
-        let sizes = localStorage.getItem("split-sizes");
-        if (sizes) sizes = JSON.parse(sizes);
-        else sizes = [14, 43, 43];
-        splitInstance = Split(["#menu", "#input", "#output"], {
-            gutterSize: 3,
-            sizes,
-            minSize: [200, 400, 400],
-            onDragEnd: sizes =>
-                localStorage.setItem("split-sizes", JSON.stringify(sizes))
-        });
-    } else {
-        input.style.display = "block";
-        output.style.display = "none";
+            // Set up Split.js
+            let sizes = localStorage.getItem("split-sizes");
+            if (sizes) sizes = JSON.parse(sizes);
+            else sizes = [14, 43, 43];
+            splitInstance = Split(["#menu", "#input", "#output"], {
+                gutterSize: 3,
+                sizes,
+                minSize: [200, 400, 400],
+                onDragEnd: sizes =>
+                    localStorage.setItem("split-sizes", JSON.stringify(sizes))
+            });
+        } else {
+            input.style.display = "block";
+            output.style.display = "none";
+        }
+        windowWidth = window.innerWidth;
     }
 };
 
@@ -479,12 +487,16 @@ window.onload = () => {
         .getElementById("open-menu")
         .addEventListener("click", function (event) {
             const menuWrapper = document.getElementById("menu-wrapper");
-            if (
-                menuWrapper.style.display === "none" ||
-                !menuWrapper.style.display.length
-            )
-                menuWrapper.style.display = "block";
-            else menuWrapper.style.display = "none";
+            if (menuWrapper.style.height === "0px" || !menuWrapper.style.height)
+                menuWrapper.style.height =
+                    Array.prototype.reduce.call(
+                        menuWrapper.childNodes,
+                        function (p, c) {
+                            return p + (c.offsetHeight || 0);
+                        },
+                        0
+                    ) + "px";
+            else menuWrapper.style.height = "0px";
         });
 
     document

@@ -210,8 +210,9 @@
     }
 
     #menu-wrapper {
-        display: none;
-        height: 100%;
+        overflow: hidden;
+        height: 0;
+        transition: height 0.5s;
     }
 
     #mobile-menu {
