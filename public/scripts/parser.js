@@ -96,7 +96,11 @@ const splitBlock = (block, inner = false) => {
         else if (curr === "[") {
             let fragment = { type: "a", content: sliceUpTo("]") };
             if (block.charAt(0) === "(")
-                fragment.attributes = { href: sliceUpTo(")", true) };
+                fragment.attributes = {
+                    href: sliceUpTo(")", true),
+                    target: "_blank",
+                    rel: "noopener noreferrer"
+                };
             fragments.push(fragment);
         } else fragments.push({ type: "normal", content: takeNormal() });
     }

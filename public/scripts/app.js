@@ -488,14 +488,7 @@ window.onload = () => {
         .addEventListener("click", function (event) {
             const menuWrapper = document.getElementById("menu-wrapper");
             if (menuWrapper.style.height === "0px" || !menuWrapper.style.height)
-                menuWrapper.style.height =
-                    Array.prototype.reduce.call(
-                        menuWrapper.childNodes,
-                        function (p, c) {
-                            return p + (c.offsetHeight || 0);
-                        },
-                        0
-                    ) + "px";
+                menuWrapper.style.height = "100%";
             else menuWrapper.style.height = "0px";
         });
 

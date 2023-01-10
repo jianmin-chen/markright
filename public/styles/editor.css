@@ -202,17 +202,14 @@
 
 @media screen and (max-width: 991.98px) {
     #menu {
-        position: sticky;
-        top: 0;
-        left: 0;
         width: 100%;
         z-index: 999;
     }
 
     #menu-wrapper {
         overflow: hidden;
+        max-height: 100%;
         height: 0;
-        transition: height 0.5s;
     }
 
     #mobile-menu {
@@ -224,8 +221,9 @@
         border: 0;
         color: #94a3b8;
         cursor: pointer;
+        display: block;
         font-size: 2rem;
-        margin: 0 1rem 0.45rem 1rem;
+        margin: 0.25rem 1rem;
     }
 
     #mobile-tabs {
@@ -277,6 +275,17 @@
         display: -ms-flexbox;
         display: flex;
         height: 100vh;
+    }
+
+    #menu-wrapper > div {
+        overflow-y: auto;
+    }
+
+    #logout {
+        position: sticky;
+        top: 0;
+        left: 0;
+        z-index: 998;
     }
 
     #new {
