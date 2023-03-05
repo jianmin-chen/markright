@@ -1,3 +1,4 @@
+import { signOut, useSession } from "next-auth/react";
 import {
     Menubar,
     MenubarCheckboxItem,
@@ -11,7 +12,8 @@ import {
     MenubarSub,
     MenubarSubContent,
     MenubarSubTrigger,
-    MenubarTrigger
+    MenubarTrigger,
+    MenubarLabel
 } from "./ui/Menubar";
 import {
     Dialog,
@@ -26,13 +28,14 @@ import { useToast } from "../hooks/ui/useToast";
 
 export default function MenubarDemo({ preferences }) {
     const { toast } = useToast();
+    const { data: session } = useSession();
 
     return (
         <Dialog>
-            <Menubar className="backdrop-opacity-5 backdrop-invert bg-white/60 backdrop-saturate-150 backdrop-blur-50 rounded-none border-none px-3 py-0 h-fit space-x-0">
+            <Menubar className="backdrop-opacity-5 backdrop-invert bg-white/70 backdrop-saturate-150 backdrop-blur-50 rounded-none border-none px-3 py-0 h-fit space-x-0">
                 <MenubarMenu>
                     <MenubarTrigger className="leading-none px-1.5 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
-                        <b>markright</b>
+                        <b>{session && session.user.name}</b>
                     </MenubarTrigger>
                     <MenubarContent>
                         <a
@@ -41,18 +44,13 @@ export default function MenubarDemo({ preferences }) {
                             <MenubarItem>About</MenubarItem>
                         </a>
                         <MenubarItem
-                            onClick={() =>
-                                toast({
-                                    title: "Log out",
-                                    description: "Log out successful!"
-                                })
-                            }>
+                            onClick={() => signOut({ callbackUrl: "/" })}>
                             Sign out
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
                 <MenubarMenu>
-                    <MenubarTrigger className="leading-none px-1.5 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
+                    <MenubarTrigger className="leading-none px-1 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
                         Preferences
                     </MenubarTrigger>
                     <MenubarContent>
@@ -67,8 +65,16 @@ export default function MenubarDemo({ preferences }) {
                                 </MenubarItem>
                             </MenubarSubContent>
                         </MenubarSub>
+                        <MenubarSub>
+                            <MenubarSubTrigger>Background</MenubarSubTrigger>
+                            <MenubarSubContent>
+                                <MenubarCheckboxItem>
+                                    Random
+                                </MenubarCheckboxItem>
+                            </MenubarSubContent>
+                        </MenubarSub>
                         <MenubarSeparator />
-                        <MenubarItem disabled>Editor</MenubarItem>
+                        <MenubarLabel>Editor</MenubarLabel>
                         <MenubarSub>
                             <MenubarSubTrigger>Keybindings</MenubarSubTrigger>
                             <MenubarSubContent>
@@ -88,16 +94,10 @@ export default function MenubarDemo({ preferences }) {
                     </MenubarContent>
                 </MenubarMenu>
                 <MenubarMenu>
-                    <MenubarTrigger className="leading-none px-1.5 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
+                    <MenubarTrigger className="leading-none px-1 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
                         File
                     </MenubarTrigger>
                     <MenubarContent>
-                        <DialogTrigger asChild>
-                            <MenubarItem>
-                                New file <MenubarShortcut>⌘N</MenubarShortcut>
-                            </MenubarItem>
-                        </DialogTrigger>
-
                         <MenubarSub>
                             <MenubarSubTrigger>Download</MenubarSubTrigger>
                             <MenubarSubContent>
@@ -105,18 +105,26 @@ export default function MenubarDemo({ preferences }) {
                                 <MenubarItem>As Markdown</MenubarItem>
                             </MenubarSubContent>
                         </MenubarSub>
-                        <MenubarSeparator />
                         <MenubarItem>
                             Print... <MenubarShortcut>⌘P</MenubarShortcut>
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
                 <MenubarMenu>
-                    <MenubarTrigger className="leading-none px-1.5 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
+                    <MenubarTrigger className="leading-none px-1 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
                         View
                     </MenubarTrigger>
                     <MenubarContent>
-                        <MenubarItem>Toggle Fullscreen</MenubarItem>
+                        <MenubarItem
+                            onClick={() => {
+                                if (document) {
+                                    if (document.fullscreenElement)
+                                        document.body.exitFullscreen();
+                                    else document.body.requestFullscreen();
+                                }
+                            }}>
+                            Toggle Fullscreen
+                        </MenubarItem>
                         <MenubarSeparator />
                         <MenubarItem>Hide Sidebar</MenubarItem>
                     </MenubarContent>

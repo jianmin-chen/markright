@@ -1,3 +1,4 @@
+import { SessionProvider } from "next-auth/react";
 import { IBM_Plex_Sans, Inter } from "next/font/google";
 import { Toaster } from "../components/ui/Toaster";
 import "../styles/globals.scss";
@@ -14,11 +15,16 @@ const inter = Inter({
     subsets: ["latin"]
 });
 
-export default function App({ Component, pageProps }) {
+export default function App({
+    Component,
+    pageProps: { session, ...pageProps }
+}) {
     return (
-        <div className={inter.className}>
-            <Component {...pageProps} />
-            <Toaster />
-        </div>
+        <SessionProvider session={session}>
+            <div className={inter.className}>
+                <Component {...pageProps} />
+                <Toaster />
+            </div>
+        </SessionProvider>
     );
 }

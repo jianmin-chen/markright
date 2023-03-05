@@ -1,0 +1,12 @@
+.folder .extra,
+.file .extra {
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.folder:hover .extra,
+.folder:focus .extra,
+.file:hover .extra,
+.file:focus .extra {
+    opacity: 1;
+}
