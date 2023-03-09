@@ -19,15 +19,18 @@ export default NextAuth({
             return true;
         },
         async session({ session }) {
-            return {
-                ...session,
-                user: {
-                    ...session.user,
-                    _id: String(
-                        (await User.findOne({ email: session.user.email }))._id
-                    )
-                }
-            };
+            await dbConnect();
+            if (session)
+                return {
+                    ...session,
+                    user: {
+                        ...session.user,
+                        _id: String(
+                            (await User.findOne({ email: session.user.email }))
+                                ._id
+                        )
+                    }
+                };
         }
     }
 });

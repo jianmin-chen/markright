@@ -1,4 +1,4 @@
-import config from "../utils/config";
+import config from "../../utils/config";
 import AWS from "aws-sdk";
 import { v4 as uuid } from "uuid";
 
@@ -8,7 +8,7 @@ const S3 = new AWS.S3({
     secretAccessKey: config.AWS_SECRET
 });
 
-const get = async filename => {
+export async function get(filename) {
     const params = {
         Bucket: config.AWS_BUCKET,
         Key: filename
@@ -21,9 +21,9 @@ const get = async filename => {
             return resolve(data.Body.toString());
         });
     });
-};
+}
 
-const exists = async filename => {
+export async function exists(filename) {
     const params = {
         Bucket: config.AWS_BUCKET,
         Key: filename
@@ -36,9 +36,9 @@ const exists = async filename => {
             return resolve(true);
         });
     });
-};
+}
 
-const upload = async (filename, data) => {
+export async function upload(filename, data) {
     const params = {
         Bucket: config.AWS_BUCKET,
         Key: filename,
@@ -52,10 +52,4 @@ const upload = async (filename, data) => {
             return resolve(data);
         });
     });
-};
-
-export default {
-    get,
-    exists,
-    upload
-};
+}

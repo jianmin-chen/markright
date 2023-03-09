@@ -16,6 +16,10 @@ import {
 } from "../components/ui/tabs";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/Avatar";
 import Files from "../components/Files/Files";
+import dbConnect from "../database/connect";
+import User from "../database/services/user.service";
+import { useResizeDetector } from "react-resize-detector";
+import { downloadMarkdown, downloadHTML } from "../utils/markdownUtils";
 
 const AceEditor = dynamic(() => import("../components/AceEditor"), {
     ssr: false
@@ -36,21 +40,20 @@ const ibmPlexMono = IBM_Plex_Mono({
     subsets: ["latin"]
 });
 
-export default function Index() {
+export default function Index({ files }) {
     const session = useSession();
     const [value, setValue] = useState("");
     const [outputScroll, setOutputScroll] = useState(false);
     const input = useRef(null);
     const output = useRef(null);
 
+    const [showSidebar, setShowSidebar] = useState(true);
+    const { width, height, ref } = useResizeDetector();
+
     const [editorOptions, setEditorOptions] = useState({
         keyboardHandler: "vim",
         theme: "github"
     });
-
-    useEffect(() => {
-        console.log(session);
-    }, [session]);
 
     useEffect(() => {
         document.querySelectorAll(".prose pre").forEach(el => {
@@ -59,45 +62,72 @@ export default function Index() {
     }, [value]);
 
     return (
-        <div className="bg-[url(https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2074&q=80)] flex flex-col min-h-screen max-h-screen overflow-hidden">
+        <div className="bg-[url(https://images.unsplash.com/photo-1533470192478-9897d90d5461?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2135&q=80)] flex flex-col min-h-screen max-h-screen overflow-hidden">
             <div>
-                <Menu />
+                <Menu
+                    sidebar={{
+                        sidebar: showSidebar,
+                        showSidebar: setShowSidebar
+                    }}
+                    downloads={{
+                        downloadMarkdown: () => downloadMarkdown(value),
+                        downloadHTML: () => downloadHTML(value)
+                    }}
+                    keyboardHandler={{
+                        value: editorOptions.keyboardHandler,
+                        change: choice => {
+                            let newOptions = editorOptions;
+                            newOptions.keyboardHandler = choice;
+                            setEditorOptions(newOptions);
+                        }
+                    }}
+                />
             </div>
             <div className="m-2 rounded-md shadow-md bg-white flex-1 grid grid-cols-24 overflow-hidden h-full">
-                <div className="bg-neutral-100 col-span-4 border-r">
-                    <Tabs defaultValue="outline">
-                        <TabsList className="bg-gray-200 mx-auto w-full rounded-none p-0">
-                            <TabsTrigger
-                                className="data-[state=active]:bg-neutral-100 w-full rounded-none !shadow-none"
+                {showSidebar === true && (
+                    <div className="bg-neutral-100 col-span-4 border-r">
+                        <Tabs defaultValue="files">
+                            <TabsList className="bg-gray-200 mx-auto w-full rounded-none p-0">
+                                <TabsTrigger
+                                    className="data-[state=active]:bg-neutral-100 w-full rounded-none !shadow-none"
+                                    value="files">
+                                    Files
+                                </TabsTrigger>
+                                <TabsTrigger
+                                    className="data-[state=active]:bg-neutral-100 w-full rounded-none !shadow-none"
+                                    value="outline">
+                                    Outline
+                                </TabsTrigger>
+                            </TabsList>
+                            <TabsContent
+                                className="border-none flex flex-col gap-y-4 p-0"
                                 value="files">
-                                Files
-                            </TabsTrigger>
-                            <TabsTrigger
-                                className="data-[state=active]:bg-neutral-100 w-full rounded-none !shadow-none"
+                                <Files
+                                    initialFiles={files}
+                                    openFile={() => {}}
+                                />
+                            </TabsContent>
+                            <TabsContent
+                                className="border-none"
                                 value="outline">
-                                Outline
-                            </TabsTrigger>
-                        </TabsList>
-                        <TabsContent
-                            className="border-none flex flex-col gap-y-4 p-0"
-                            value="files">
-                            <Files />
-                        </TabsContent>
-                        <TabsContent className="border-none" value="outline">
-                            <Outline
-                                value={value}
-                                onClick={line => {
-                                    // Scroll to heading
-                                    if (input.current) {
-                                        let editor = input.current.editor;
-                                        editor.gotoLine(line + 1);
-                                    }
-                                }}
-                            />
-                        </TabsContent>
-                    </Tabs>
-                </div>
-                <div className="col-span-20 h-full overflow-hidden">
+                                <Outline
+                                    value={value}
+                                    onClick={line => {
+                                        // Scroll to heading
+                                        if (input.current) {
+                                            let editor = input.current.editor;
+                                            editor.gotoLine(line + 1);
+                                        }
+                                    }}
+                                />
+                            </TabsContent>
+                        </Tabs>
+                    </div>
+                )}
+                <div
+                    className={`${
+                        showSidebar ? "col-span-20" : "col-span-24"
+                    } h-full overflow-hidden`}>
                     <div className="grid grid-cols-2 w-full h-full overflow-hidden">
                         <div className="border-r h-full">
                             <Tabs
@@ -127,7 +157,8 @@ export default function Index() {
                                     value="0"></TabsContent>
                                 <TabsContent
                                     className="border-none flex-1 p-0 h-full overflow-auto"
-                                    value="1">
+                                    value="1"
+                                    ref={ref}>
                                     <AceEditor
                                         options={editorOptions}
                                         value={value}
@@ -155,6 +186,8 @@ export default function Index() {
                                                 }
                                             }
                                         }}
+                                        width={width}
+                                        height={height}
                                     />
                                 </TabsContent>
                             </Tabs>
@@ -187,6 +220,7 @@ export default function Index() {
                                     value="0"></TabsContent>
                                 <TabsContent
                                     className="border-none flex-1 p-0 h-full overflow-auto"
+                                    id="output"
                                     ref={output}
                                     onMouseEnter={() => setOutputScroll(true)}
                                     onMouseLeave={() => setOutputScroll(false)}
@@ -244,5 +278,13 @@ export async function getServerSideProps({ req, res }) {
     const session = await getServerSession(req, res);
     if (!session) return { redirect: { destination: "/" } };
 
-    return { props: {} };
+    // Get files
+    await dbConnect();
+    const user = await User.findOne({ email: session.user.email });
+
+    return {
+        props: {
+            files: user.filesystem
+        }
+    };
 }

@@ -25,10 +25,20 @@ import {
 } from "./ui/dialog";
 import { Input } from "./ui/Input";
 import { useToast } from "../hooks/ui/useToast";
+import { useEffect } from "react";
 
-export default function MenubarDemo({ preferences }) {
+export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
     const { toast } = useToast();
     const { data: session } = useSession();
+
+    const toggleFullscreen = () => {
+        if (document) {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else document.body.requestFullscreen();
+        }
+    };
+
+    const toggleSidebar = () => sidebar.showSidebar(!sidebar.sidebar);
 
     return (
         <Dialog>
@@ -76,17 +86,52 @@ export default function MenubarDemo({ preferences }) {
                         <MenubarSeparator />
                         <MenubarLabel>Editor</MenubarLabel>
                         <MenubarSub>
+                            <MenubarSubTrigger>Main theme</MenubarSubTrigger>
+                            <MenubarSubContent>
+                                <MenubarCheckboxItem checked>
+                                    GitHub
+                                </MenubarCheckboxItem>
+                                <MenubarItem inset disabled>
+                                    More coming soon!
+                                </MenubarItem>
+                            </MenubarSubContent>
+                        </MenubarSub>
+                        <MenubarSub>
                             <MenubarSubTrigger>Keybindings</MenubarSubTrigger>
                             <MenubarSubContent>
-                                <MenubarCheckboxItem>None</MenubarCheckboxItem>
-                                <MenubarCheckboxItem>Emacs</MenubarCheckboxItem>
-                                <MenubarCheckboxItem>
+                                <MenubarCheckboxItem
+                                    checked={!keyboardHandler.value}
+                                    onClick={() => keyboardHandler.change("")}>
+                                    None
+                                </MenubarCheckboxItem>
+                                <MenubarCheckboxItem
+                                    checked={keyboardHandler.value === "emacs"}
+                                    onClick={() =>
+                                        keyboardHandler.change("emacs")
+                                    }>
+                                    Emacs
+                                </MenubarCheckboxItem>
+                                <MenubarCheckboxItem
+                                    checked={
+                                        keyboardHandler.value === "sublime"
+                                    }
+                                    onClick={() =>
+                                        keyboardHandler.change("sublime")
+                                    }>
                                     Sublime
                                 </MenubarCheckboxItem>
-                                <MenubarCheckboxItem checked>
+                                <MenubarCheckboxItem
+                                    checked={keyboardHandler.value === "vim"}
+                                    onClick={() =>
+                                        keyboardHandler.change("vim")
+                                    }>
                                     Vim
                                 </MenubarCheckboxItem>
-                                <MenubarCheckboxItem>
+                                <MenubarCheckboxItem
+                                    checked={keyboardHandler.value === "vs"}
+                                    onClick={() =>
+                                        keyboardHandler.change("vs")
+                                    }>
                                     VS Code
                                 </MenubarCheckboxItem>
                             </MenubarSubContent>
@@ -101,12 +146,18 @@ export default function MenubarDemo({ preferences }) {
                         <MenubarSub>
                             <MenubarSubTrigger>Download</MenubarSubTrigger>
                             <MenubarSubContent>
-                                <MenubarItem>As HTML</MenubarItem>
-                                <MenubarItem>As Markdown</MenubarItem>
+                                <MenubarItem onClick={downloads.downloadHTML}>
+                                    As HTML
+                                </MenubarItem>
+                                <MenubarItem
+                                    onClick={downloads.downloadMarkdown}>
+                                    As Markdown
+                                </MenubarItem>
                             </MenubarSubContent>
                         </MenubarSub>
-                        <MenubarItem>
-                            Print... <MenubarShortcut>⌘P</MenubarShortcut>
+                        <MenubarItem onClick={() => window.print()}>
+                            Print/Save as PDF{" "}
+                            <MenubarShortcut>⌘P</MenubarShortcut>
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
@@ -115,18 +166,13 @@ export default function MenubarDemo({ preferences }) {
                         View
                     </MenubarTrigger>
                     <MenubarContent>
-                        <MenubarItem
-                            onClick={() => {
-                                if (document) {
-                                    if (document.fullscreenElement)
-                                        document.body.exitFullscreen();
-                                    else document.body.requestFullscreen();
-                                }
-                            }}>
+                        <MenubarItem onClick={toggleFullscreen}>
                             Toggle Fullscreen
                         </MenubarItem>
                         <MenubarSeparator />
-                        <MenubarItem>Hide Sidebar</MenubarItem>
+                        <MenubarItem onClick={toggleSidebar}>
+                            Toggle Sidebar
+                        </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>
             </Menubar>

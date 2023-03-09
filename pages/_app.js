@@ -1,3 +1,5 @@
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import { SessionProvider } from "next-auth/react";
 import { IBM_Plex_Sans, Inter } from "next/font/google";
 import { Toaster } from "../components/ui/Toaster";
@@ -21,10 +23,12 @@ export default function App({
 }) {
     return (
         <SessionProvider session={session}>
-            <div className={inter.className}>
-                <Component {...pageProps} />
-                <Toaster />
-            </div>
+            <DndProvider backend={HTML5Backend}>
+                <div className={inter.className}>
+                    <Component {...pageProps} />
+                    <Toaster />
+                </div>
+            </DndProvider>
         </SessionProvider>
     );
 }

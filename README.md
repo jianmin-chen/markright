@@ -4,6 +4,7 @@ TODO for design:
 * Functionality for menubar
 * New file design
 * Draggable tabs
+* Encrypt folder names too (smack, sigh)
 
 Final TODO:
 

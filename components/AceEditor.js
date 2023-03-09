@@ -5,7 +5,6 @@ import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/keybinding-vscode";
 import "ace-builds/src-noconflict/keybinding-vim";
 import { IBM_Plex_Mono } from "next/font/google";
-import { useRef } from "react";
 
 const ibmPlexMono = IBM_Plex_Mono({
     weight: "400",
@@ -17,14 +16,16 @@ export default function Editor({
     value,
     setValue,
     onScroll,
-    assignRef
+    assignRef,
+    width,
+    height
 }) {
     return (
         <AceEditor
             {...options}
             mode="markdown"
-            width="100%"
-            height="100%"
+            width={width}
+            height={height}
             onChange={setValue}
             value={value}
             fontSize={18}

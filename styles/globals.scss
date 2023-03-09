@@ -18,3 +18,17 @@ input:not(.ui-input) {
 .ace_dialog {
     @apply border-slate-200;
 }
+
+@media print {
+    #output {
+        background-color: white;
+        display: block;
+        width: auto;
+        height: auto;
+        overflow: visible;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 9999;
+    }
+}
