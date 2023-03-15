@@ -52,6 +52,18 @@ if (!NEXTAUTH_SECRET)
         "Please define the NEXTAUTH_SECRET environment variable inside .env"
     );
 
+const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
+if (!UNSPLASH_ACCESS_KEY)
+    throw new Error(
+        "Please define the UNSPLASH_ACCESS_KEY environment variable inside .env"
+    );
+
+const UNSPLASH_SECRET_KEY = process.env.UNSPLASH_SECRET_KEY;
+if (!UNSPLASH_SECRET_KEY)
+    throw new Error(
+        "Please define the UNSPLASH_SECRET_KEY environment variable inside .env"
+    );
+
 export default {
     AWS_ENDPOINT,
     AWS_ID,
@@ -61,5 +73,7 @@ export default {
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
     MONGODB_URI,
-    NEXTAUTH_SECRET
+    NEXTAUTH_SECRET,
+    UNSPLASH_ACCESS_KEY,
+    UNSPLASH_SECRET_KEY
 };

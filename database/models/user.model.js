@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
         default:
             "https://images.unsplash.com/photo-1533470192478-9897d90d5461?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2135&q=80"
     },
+    editorSettings: {
+        type: Object
+    },
     filesystem: {
         type: [
             {
@@ -26,45 +29,22 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.methods.addFolder = async function (location) {
+    // Traverse down filesystem, adding folder where it needs to be
     const traverse = location.split("/");
     if (traverse.length === 1) {
-        // Directly push, only if doesn't exist yet
+        // Directly push
         if (
             this.filesystem.find(
                 x => x.type === "folder" && x.name === location
             )
         )
-            return {
-                success: false,
-                reason: `Folder ${location} already exists`
-            };
+            throw new Error(`Folder ${location} already exists`);
         this.filesystem.push({
             type: "folder",
             name: location,
             content: []
         });
-        await this.save();
-        return { success: true };
     }
-    let filesystem = this.filesystem;
-    let steps = [];
-    for (let i = 0; i < traverse.length - 1; i++) {
-        let route = traverse[i];
-        let location = filesystem.filter((x, index) => {
-            if (x.name === route) {
-                if (x.type === "file")
-                    return { success: false, reason: `${route} is a file` };
-                steps.push(index);
-                return true;
-            }
-            return false;
-        });
-        if (!location.length)
-            return { success: false, reason: `Folder ${route} not found` };
-        filesystem = location;
-    }
-    console.log(steps);
-    return { success: true };
 };
 
 userSchema.methods.addFile = async function (location) {

@@ -20,6 +20,14 @@ input:not(.ui-input) {
 }
 
 @media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #output * {
+        visibility: visible;
+    }
+
     #output {
         background-color: white;
         display: block;
@@ -30,5 +38,6 @@ input:not(.ui-input) {
         top: 0;
         left: 0;
         z-index: 9999;
+        @apply prose prose-slate prose-2xl;
     }
 }

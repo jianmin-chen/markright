@@ -23,9 +23,11 @@ import {
     DialogTitle,
     DialogTrigger
 } from "./ui/dialog";
+import { Label } from "./ui/Label";
 import { Input } from "./ui/Input";
 import { useToast } from "../hooks/ui/useToast";
 import { useEffect } from "react";
+import Unsplash from "./Unsplash";
 
 export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
     const { toast } = useToast();
@@ -75,14 +77,6 @@ export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
                                 </MenubarItem>
                             </MenubarSubContent>
                         </MenubarSub>
-                        <MenubarSub>
-                            <MenubarSubTrigger>Background</MenubarSubTrigger>
-                            <MenubarSubContent>
-                                <MenubarCheckboxItem>
-                                    Random
-                                </MenubarCheckboxItem>
-                            </MenubarSubContent>
-                        </MenubarSub>
                         <MenubarSeparator />
                         <MenubarLabel>Editor</MenubarLabel>
                         <MenubarSub>
@@ -100,37 +94,57 @@ export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
                             <MenubarSubTrigger>Keybindings</MenubarSubTrigger>
                             <MenubarSubContent>
                                 <MenubarCheckboxItem
-                                    checked={!keyboardHandler.value}
-                                    onClick={() => keyboardHandler.change("")}>
+                                    checked={!keyboardHandler.keyboardHandler}
+                                    onClick={() =>
+                                        keyboardHandler.setKeyboardHandler("")
+                                    }>
                                     None
                                 </MenubarCheckboxItem>
                                 <MenubarCheckboxItem
-                                    checked={keyboardHandler.value === "emacs"}
+                                    checked={
+                                        keyboardHandler.keyboardHandler ===
+                                        "emacs"
+                                    }
                                     onClick={() =>
-                                        keyboardHandler.change("emacs")
+                                        keyboardHandler.setKeyboardHandler(
+                                            "emacs"
+                                        )
                                     }>
                                     Emacs
                                 </MenubarCheckboxItem>
                                 <MenubarCheckboxItem
                                     checked={
-                                        keyboardHandler.value === "sublime"
+                                        keyboardHandler.keyboardHandler ===
+                                        "sublime"
                                     }
                                     onClick={() =>
-                                        keyboardHandler.change("sublime")
+                                        keyboardHandler.setKeyboardHandler(
+                                            "sublime"
+                                        )
                                     }>
                                     Sublime
                                 </MenubarCheckboxItem>
                                 <MenubarCheckboxItem
-                                    checked={keyboardHandler.value === "vim"}
+                                    checked={
+                                        keyboardHandler.keyboardHandler ===
+                                        "vim"
+                                    }
                                     onClick={() =>
-                                        keyboardHandler.change("vim")
+                                        keyboardHandler.setKeyboardHandler(
+                                            "vim"
+                                        )
                                     }>
                                     Vim
                                 </MenubarCheckboxItem>
                                 <MenubarCheckboxItem
-                                    checked={keyboardHandler.value === "vs"}
+                                    checked={
+                                        keyboardHandler.keyboardHandler ===
+                                        "vscode"
+                                    }
                                     onClick={() =>
-                                        keyboardHandler.change("vs")
+                                        keyboardHandler.setKeyboardHandler(
+                                            "vscode"
+                                        )
                                     }>
                                     VS Code
                                 </MenubarCheckboxItem>
