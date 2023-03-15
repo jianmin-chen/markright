@@ -12,37 +12,31 @@ export default async function handler(req, res) {
         });
 
     const { method } = req;
-    if (method !== "POST")
-        return res.status(400).json({
-            success: false,
-            reason: "Invalid request method"
-        });
+    if (method === "POST") {
+        const { location } = req.body;
+        if (!location)
+            return res.status(400).json({
+                success: false,
+                reason: "Location not provided"
+            });
 
-    const { location } = req.body;
-    if (!location)
-        return res.status(400).json({
-            success: false,
-            reason: "Location not provided"
-        });
-
-    try {
-        await dbConnect();
-        const user = await User.findOne({ email: session.user.email });
-        const run = await user.addFolder(location);
-        if (run.success)
+        try {
+            await dbConnect();
+            const user = await User.findOne({ email: session.user.email });
+            await user.addFile(location);
             return res.status(200).json({
                 success: true,
                 user
             });
-        else
-            return res.status(200).json({
+        } catch (err) {
+            return res.status(500).json({
                 success: false,
-                reason: run.reason
+                reason: err.message
             });
-    } catch (err) {
-        return res.status(500).json({
+        }
+    } else
+        return res.status(400).json({
             success: false,
-            reason: err.message
+            reason: "Invalid request method"
         });
-    }
 }

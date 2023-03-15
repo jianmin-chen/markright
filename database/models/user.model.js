@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { v4 as uuid } from "uuid";
+import { encrypt, decrypt } from "../../utils/filesystem";
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -28,26 +29,46 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-userSchema.methods.addFolder = async function (location) {
-    // Traverse down filesystem, adding folder where it needs to be
-    const traverse = location.split("/");
-    if (traverse.length === 1) {
-        // Directly push
-        if (
-            this.filesystem.find(
-                x => x.type === "folder" && x.name === location
-            )
-        )
-            throw new Error(`Folder ${location} already exists`);
-        this.filesystem.push({
-            type: "folder",
-            name: location,
-            content: []
-        });
+const decryptObj = function (arr, password) {
+    const decrypted = [];
+    for (let i = 0; i < arr.length; i++) {
+        const f = arr[i];
+        if (f.type === "file")
+            decrypted.push({
+                ...f,
+                name: decrypt(f.name, password)
+            });
+        // { name, type, content }
+        else
+            decrypted.push({
+                type: "folder",
+                name: decrypt(f.name, password),
+                content: decryptObj(f.content, password)
+            });
     }
 };
 
-userSchema.methods.addFile = async function (location) {
+userSchema.methods.addFolder = async function (location, password) {
+    // TODO: OVER HERE!
+    let encrypted = this.filesystem;
+    let decrypted = decryptObj(this.filesystem, password);
+    // Traverse down filesystem, adding file where it needs to be
+    const traverse = location.split("/");
+    const steps = [];
+    for (let i = 0; i < traverse.length - 1; i++) {
+        let route = traverse[i];
+        let location = filesystem.filter(x => {
+            if (x.name === route) {
+                if (x.type === "file") throw new Error(`${route} is a file`);
+                return true;
+            }
+            return false;
+        });
+        if (!location.length) throw new Error(`Folder ${route} not found`);
+    }
+};
+
+userSchema.methods.addFile = async function (location, password) {
     // Traverse down filesystem, adding file where it needs to be
     const traverse = location.split("/");
     if (traverse.length === 1) {
@@ -84,11 +105,16 @@ userSchema.methods.addFile = async function (location) {
 
     await upload(`${id}.md`, "");
 
-    filesystem.content.push({
-        type: "file",
-        name: traverse[traverse.length - 1],
-        content: `${id}.md`
-    });
+    if (
+        filesystem.content.find(
+            x => x.type === "folder" && x.name === traverse[traverse.length - 1]
+        )
+    )
+        filesystem.content.push({
+            type: "file",
+            name: traverse[traverse.length - 1],
+            content: `${id}.md`
+        });
 
     // Using mutator so need to update
     this.markModified("filesystem");

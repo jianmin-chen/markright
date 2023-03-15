@@ -30,6 +30,7 @@ export default function Editor({
             value={value}
             fontSize={18}
             showGutter={false}
+            showPrintMargin={false}
             wrapEnabled={true}
             setOptions={{
                 enableBasicAutocompletion: true,

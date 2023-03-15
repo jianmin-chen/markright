@@ -40,6 +40,12 @@ if (!GOOGLE_CLIENT_SECRET)
         "Please define the GOOGLE_CLIENT_SECRET environment variable inside .env"
     );
 
+const IV_LENGTH = process.env.IV_LENGTH;
+if (!IV_LENGTH)
+    throw new Error(
+        "Please define the IV_LENGTH environment variable inside .env"
+    );
+
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI)
     throw new Error(
@@ -72,6 +78,7 @@ export default {
     CRYPTO_ALGORITHM,
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
+    IV_LENGTH: Number(IV_LENGTH),
     MONGODB_URI,
     NEXTAUTH_SECRET,
     UNSPLASH_ACCESS_KEY,

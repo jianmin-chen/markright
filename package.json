@@ -34,6 +34,7 @@
     "next-auth": "^4.20.1",
     "react": "18.2.0",
     "react-ace": "^10.1.0",
+    "react-beautiful-dnd": "^13.1.1",
     "react-calendar": "^4.0.0",
     "react-datepicker": "^4.10.0",
     "react-dnd": "^16.0.1",
