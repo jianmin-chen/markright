@@ -1,11 +1,14 @@
 import { getServerSession } from "next-auth/next";
+import { getToken } from "next-auth/jwt";
 import authOptions from "../auth/[...nextauth]";
 import dbConnect from "../../../database/connect";
 import User from "../../../database/services/user.service";
+import { encrypt, decrypt } from "../../../utils/filesystem";
 
 export default async function handler(req, res) {
     const session = await getServerSession(req, res, authOptions);
-    if (!session || !session.user)
+    const { sub } = await getToken({ req });
+    if (!session || !session.user || !sub)
         return res.status(401).json({
             success: false,
             reason: "Not logged in"
@@ -21,19 +24,16 @@ export default async function handler(req, res) {
             });
 
         try {
+            const encrypted = Buffer.from(encrypt("hi", sub));
+            console.log(encrypted, decrypt(encrypted, sub));
+            return res.status(200);
             await dbConnect();
             const user = await User.findOne({ email: session.user.email });
-            const run = await user.addFolder(location);
-            if (run.success)
-                return res.status(200).json({
-                    success: true,
-                    user
-                });
-            else
-                return res.status(200).json({
-                    success: false,
-                    reason: run.reason
-                });
+            await user.addFolder(location, sub);
+            return res.status(200).json({
+                success: true,
+                filesystem: user.decryptObj(user.filesystem, sub)
+            });
         } catch (err) {
             return res.status(500).json({
                 success: false,

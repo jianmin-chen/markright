@@ -47,23 +47,21 @@ function File({
     return (
         <>
             <button
-                className={`file w-full max-w-full hover:bg-neutral-200 rounded-md py-1 px-3 flex justify-between items-center ${styles.file} ${className} `}>
-                <span className="min-w-0 flex gap-x-1 items-center">
-                    <FileIcon className="w-4 h-4" />
+                className={`file flex w-full max-w-full items-center justify-between rounded-md py-1 px-3 hover:bg-neutral-200 ${styles.file} ${className} `}>
+                <span className="flex min-w-0 items-center gap-x-1">
+                    <FileIcon className="h-4 w-4" />
                     <span className="truncate">{name}</span>
                 </span>
                 <span className={`${styles.extra} flex items-center`}>
                     <DropdownMenu>
-                        <DropdownMenuTrigger className="hover:bg-neutral-300 px-1 py-0.5 rounded-md">
-                            <MoreHorizontal className="w-4 h-4" />
+                        <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300">
+                            <MoreHorizontal className="h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuItem>Make public</DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem>Profile</DropdownMenuItem>
-                            <DropdownMenuItem>Billing</DropdownMenuItem>
-                            <DropdownMenuItem>Team</DropdownMenuItem>
-                            <DropdownMenuItem>Subscription</DropdownMenuItem>
+                            <DropdownMenuItem>Rename</DropdownMenuItem>
+                            <DropdownMenuItem>Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </span>
@@ -110,22 +108,22 @@ function Folder({
     return (
         <>
             <div
-                className={`w-full cursor-pointer folder hover:bg-neutral-200 rounded-md py-1 px-3 flex justify-between items-center ${styles.folder}`}
+                className={`folder flex w-full cursor-pointer items-center justify-between rounded-md py-1 px-3 hover:bg-neutral-200 ${styles.folder}`}
                 onClick={() => setToggle(!toggle)}>
-                <span className="flex gap-x-1 items-center">
+                <span className="flex items-center gap-x-1">
                     {content.length > 0 &&
                         (toggle ? (
-                            <ChevronDown className="w-4 h-4" />
+                            <ChevronDown className="h-4 w-4" />
                         ) : (
-                            <ChevronRight className="w-4 h-4" />
+                            <ChevronRight className="h-4 w-4" />
                         ))}
-                    <FolderClosed className="w-4 h-4" />
+                    <FolderClosed className="h-4 w-4" />
                     <span className="truncate">{name}</span>
                 </span>
                 <span className={`${styles.extra} flex`}>
                     <DropdownMenu>
-                        <DropdownMenuTrigger className="hover:bg-neutral-300 px-1 py-0.5 rounded-md">
-                            <MoreHorizontal className="w-4 h-4" />
+                        <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300">
+                            <MoreHorizontal className="h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             <DropdownMenuItem>New folder</DropdownMenuItem>
@@ -135,28 +133,28 @@ function Folder({
                         </DropdownMenuContent>
                     </DropdownMenu>
                     <button
-                        className="hover:bg-neutral-300 px-1 py-0.5 rounded-md"
+                        className="rounded-md px-1 py-0.5 hover:bg-neutral-300"
                         onClick={event => {
                             event.stopPropagation();
                             setNameFile(true);
                         }}>
-                        <Plus className="w-4 h-4" />
+                        <Plus className="h-4 w-4" />
                     </button>
                 </span>
             </div>
             {nameFile === true && (
                 <form
-                    className={`shadow-md border-blue-500 border pl-5 w-full max-w-full rounded-md py-1 px-3 flex justify-between items-center`}
+                    className={`flex w-full max-w-full items-center justify-between rounded-md border border-blue-500 py-1 px-3 pl-5 shadow-md`}
                     onSubmit={event => {
                         event.preventDefault();
                         createFile(event.target.file.value);
                         event.target.reset();
                         setNameFile(false);
                     }}>
-                    <span className="flex gap-x-1 items-center min-w-0 ">
-                        <FileIcon className="w-4 h-4" />
+                    <span className="flex min-w-0 items-center gap-x-1 ">
+                        <FileIcon className="h-4 w-4" />
                         <input
-                            className="bg-transparent flex-1 max-w-full"
+                            className="max-w-full flex-1 bg-transparent"
                             autoComplete="off"
                             autoFocus={true}
                             name="file"
@@ -180,7 +178,7 @@ function Folder({
                 </form>
             )}
             {toggle === true && content.length > 0 && (
-                <div className="pl-5 flex flex-col w-full">
+                <div className="flex w-full flex-col pl-5">
                     {content.map((file, idx) => {
                         if (file.type === "folder")
                             return (
@@ -210,9 +208,10 @@ export default function Files({ initialFiles, openFile }) {
     const [open, setOpen] = useState(false);
     const { toast } = useToast();
 
-    const createFolder = event => {
-        event.preventDefault();
-        const folder = event.target.folder.value;
+    // Toggle new folder creation
+    const [nameFolder, setNameFolder] = useState(false);
+
+    const createFolder = folder => {
         if (!folder) {
             toast({
                 variant: "destructive",
@@ -229,40 +228,59 @@ export default function Files({ initialFiles, openFile }) {
         }
 
         post({
-            route: "/api/filesystem/addFolder",
+            route: "/api/filesystem/folder",
             data: { location: folder }
         })
             .then(json => {
-                setFiles(json.user.filesystem);
+                console.log(json);
+                setFiles(json.filesystem);
                 setOpen(false);
             })
-            .catch(err => catchError({ toast, err }));
+            .catch(err => console.log(err));
     };
 
     return (
-        <div className="flex flex-col py-7 px-2 items-center">
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger className="file w-full max-w-full hover:bg-neutral-200 rounded-md py-1 px-3 flex gap-x-1 items-center">
-                    <PlusCircle className="h-4 w-4" /> Add a folder
-                </DialogTrigger>
-                <DialogContent>
-                    <form onSubmit={createFolder}>
-                        <DialogHeader>
-                            <DialogTitle>New folder</DialogTitle>
-                        </DialogHeader>
-                        <div className="py-4">
-                            <Input
-                                autoComplete="off"
-                                name="folder"
-                                placeholder="Name of folder?"
-                            />
-                        </div>
-                        <DialogFooter>
-                            <Button type="submit">Create folder</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
+        <div className="flex flex-col items-center py-7 px-2">
+            <button
+                className="file flex w-full max-w-full items-center gap-x-1 rounded-md py-1 px-3 hover:bg-neutral-200"
+                onClick={() => setNameFolder(true)}>
+                <PlusCircle className="h-4 w-4" /> Add a folder
+            </button>
+            {nameFolder === true && (
+                <form
+                    className={`flex w-full max-w-full items-center justify-between rounded-md border border-blue-500 py-1 px-3 pl-5 shadow-md`}
+                    onSubmit={event => {
+                        event.preventDefault();
+                        createFolder(event.target.file.value);
+                        event.target.reset();
+                        setNameFolder(false);
+                    }}>
+                    <span className="flex min-w-0 items-center gap-x-1 ">
+                        <FileIcon className="h-4 w-4" />
+                        <input
+                            className="max-w-full flex-1 bg-transparent"
+                            autoComplete="off"
+                            autoFocus={true}
+                            name="file"
+                            onBlur={event => {
+                                if (!event.target.value.length) {
+                                    setNameFolder(false);
+                                    return;
+                                }
+                                createFolder(event.target.value);
+                                event.target.value = "";
+                                setNameFolder(false);
+                            }}
+                            placeholder="Untitled folder"
+                            required
+                            title="New folder"
+                        />
+                    </span>
+                    <button
+                        className="visibility-hidden"
+                        type="submit"></button>
+                </form>
+            )}
             {files.map((file, idx) => {
                 if (file.type === "folder")
                     return (

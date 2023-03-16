@@ -1,3 +1,4 @@
+// TODO: Rewrite for new version of AWS
 import config from "../../utils/config";
 import AWS from "aws-sdk";
 import { v4 as uuid } from "uuid";

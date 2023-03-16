@@ -17,7 +17,6 @@ function createCredentials(password) {
 }
 
 export function encrypt(data, password) {
-    data = Buffer.from(data, "utf-8").toString("hex");
     const [key, iv] = createCredentials(password);
     const cipher = crypto.createCipheriv(CRYPTO_ALGORITHM, key, iv);
     return Buffer.concat([cipher.update(data), cipher.final()]);
@@ -30,5 +29,5 @@ export function decrypt(data, password) {
         decipher.update(data),
         decipher.final()
     ]).toString("utf-8");
-    return Buffer.from(hex, "hex").toString("utf-8");
+    return hex;
 }

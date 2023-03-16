@@ -21,10 +21,9 @@ export default function Outline({ value, onClick }) {
             {toc(value).map((x, idx) => (
                 <p
                     className={`!mt-0 !mb-1 cursor-pointer no-underline`}
-                    key={x.line}>
-                    <a
-                        className="no-underline"
-                        onClick={() => onClick(x.line + 1)}>
+                    key={x.line}
+                    onClick={() => onClick(x.line + 1)}>
+                    <a className="no-underline">
                         <b className="font-extrabold">{x.type}</b> {x.heading}
                     </a>
                 </p>

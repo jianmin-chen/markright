@@ -18,6 +18,7 @@ import dbConnect from "../database/connect";
 import User from "../database/services/user.service";
 import { downloadMarkdown, downloadHTML } from "../utils/markdownUtils";
 import { useRouter } from "next/router";
+import { getToken } from "next-auth/jwt";
 
 const Workspace = dynamic(() => import("../components/Workspace"), {
     ssr: false
@@ -27,6 +28,7 @@ export default function Index({ files }) {
     const session = useSession();
     const router = useRouter();
 
+    const docRef = useRef(null);
     const [value, setValue] = useState("");
 
     const [showSidebar, setShowSidebar] = useState(true);
@@ -62,9 +64,9 @@ export default function Index({ files }) {
             </div>
             <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md bg-white shadow-md">
                 {showSidebar === true && (
-                    <div className="col-span-4 border-r bg-neutral-100">
+                    <div className="col-span-4 flex h-full flex-col overflow-auto border-r bg-neutral-100">
                         <Tabs defaultValue="files">
-                            <TabsList className="mx-auto w-full rounded-none bg-gray-200 p-0">
+                            <TabsList className="sticky top-0 mx-auto w-full flex-1 rounded-none bg-gray-200 p-0">
                                 <TabsTrigger
                                     className="w-full rounded-none !shadow-none data-[state=active]:bg-neutral-100"
                                     value="files">
@@ -91,9 +93,9 @@ export default function Index({ files }) {
                                     value={value}
                                     onClick={line => {
                                         // Scroll to heading
-                                        if (input.current) {
-                                            let editor = input.current.editor;
-                                            editor.gotoLine(line);
+                                        if (docRef.current) {
+                                            let editor = docRef.current.editor;
+                                            if (editor) editor.gotoLine(line);
                                         }
                                     }}
                                 />
@@ -111,6 +113,7 @@ export default function Index({ files }) {
                             setValue={setValue}
                             keyboardHandler={keyboardHandler}
                             aceTheme={aceTheme}
+                            docRef={docRef}
                         />
                     </div>
                 </div>
@@ -121,7 +124,8 @@ export default function Index({ files }) {
 
 export async function getServerSideProps({ req, res }) {
     const session = await getServerSession(req, res);
-    if (!session) return { redirect: { destination: "/login" } };
+    const { sub } = await getToken({ req });
+    if (!session || !sub) return { redirect: { destination: "/login" } };
 
     // Get files
     await dbConnect();
@@ -129,7 +133,7 @@ export async function getServerSideProps({ req, res }) {
 
     return {
         props: {
-            files: user.filesystem
+            files: user.decryptObj(user.filesystem, sub)
         }
     };
 }

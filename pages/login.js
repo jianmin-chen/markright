@@ -5,10 +5,12 @@ import { Button } from "../components/ui/Button";
 
 export default function Login() {
     return (
-        <div className="flex flex-col w-full h-screen justify-center items-center">
-            <Button variant="outline" onClick={() => signIn("google")}>
-                Sign in with Google
-            </Button>
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
+            <div className="flex h-screen w-full flex-col items-center justify-center">
+                <Button variant="outline" onClick={() => signIn("google")}>
+                    Sign in with Google
+                </Button>
+            </div>
         </div>
     );
 }

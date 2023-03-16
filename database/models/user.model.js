@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-const decryptObj = function (arr, password) {
+userSchema.methods.decryptObj = function (arr, password) {
     const decrypted = [];
     for (let i = 0; i < arr.length; i++) {
         const f = arr[i];
@@ -43,83 +43,59 @@ const decryptObj = function (arr, password) {
             decrypted.push({
                 type: "folder",
                 name: decrypt(f.name, password),
-                content: decryptObj(f.content, password)
+                content: this.decryptObj(f.content, password)
             });
     }
+    return decrypted;
 };
 
 userSchema.methods.addFolder = async function (location, password) {
-    // TODO: OVER HERE!
-    let encrypted = this.filesystem;
-    let decrypted = decryptObj(this.filesystem, password);
-    // Traverse down filesystem, adding file where it needs to be
-    const traverse = location.split("/");
-    const steps = [];
-    for (let i = 0; i < traverse.length - 1; i++) {
-        let route = traverse[i];
-        let location = filesystem.filter(x => {
-            if (x.name === route) {
-                if (x.type === "file") throw new Error(`${route} is a file`);
-                return true;
-            }
-            return false;
-        });
-        if (!location.length) throw new Error(`Folder ${route} not found`);
-    }
-};
-
-userSchema.methods.addFile = async function (location, password) {
-    // Traverse down filesystem, adding file where it needs to be
     const traverse = location.split("/");
     if (traverse.length === 1) {
         // Directly push
-        if (this.filesystem.find(x => x.type === "file" && x.name === location))
-            throw new Error(`File ${location} already exists`);
         this.filesystem.push({
-            type: "file",
-            name: location,
-            content
+            type: "folder",
+            name: Buffer.from(encrypt(location, password)),
+            content: []
         });
         return await this.save();
     }
-    let filesystem = this.filesystem;
+    let encrypted = this.filesystem;
+    let decrypted = this.decryptObj(this.filesystem, password);
+    // Traverse down filesystem, adding file where it needs to be
     for (let i = 0; i < traverse.length - 1; i++) {
         let route = traverse[i];
-        let location = filesystem.filter(x => {
+        let step;
+        let location = filesystem.filter((x, index) => {
             if (x.name === route) {
                 if (x.type === "file") throw new Error(`${route} is a file`);
+                step = index;
                 return true;
             }
             return false;
         });
         if (!location.length) throw new Error(`Folder ${route} not found`);
-        filesystem = location[0];
+        decrypted = location[0];
+        encrypted = encrypted[step];
     }
-
-    // Create file in AWS
-    let id = uuid();
-    while (await exists(`${id}.md`)) {
-        // Keep generating unique IDs
-        id = uuid();
-    }
-
-    await upload(`${id}.md`, "");
 
     if (
-        filesystem.content.find(
+        !decrypted.content.find(
             x => x.type === "folder" && x.name === traverse[traverse.length - 1]
         )
     )
-        filesystem.content.push({
-            type: "file",
-            name: traverse[traverse.length - 1],
-            content: `${id}.md`
+        encrypted.content.push({
+            type: "folder",
+            name: encrypt(traverse[traverse.length - 1], password),
+            content: []
         });
 
     // Using mutator so need to update
     this.markModified("filesystem");
     return await this.save();
 };
+
+userSchema.methods.addFile = async function (location, password) {};
 
 userSchema.methods.getFile = async function (location, secret) {
     // Traverse down filesystem, getting file from AWS and getting it when found
