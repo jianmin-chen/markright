@@ -1,7 +1,6 @@
 // TODO: Rewrite for new version of AWS
 import config from "../../utils/config";
 import AWS from "aws-sdk";
-import { v4 as uuid } from "uuid";
 
 const S3 = new AWS.S3({
     endpoint: new AWS.Endpoint(config.AWS_ENDPOINT),
@@ -39,7 +38,7 @@ export async function exists(filename) {
     });
 }
 
-export async function upload(filename, data) {
+export async function upload(filename, data = "") {
     const params = {
         Bucket: config.AWS_BUCKET,
         Key: filename,

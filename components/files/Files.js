@@ -9,7 +9,7 @@ import {
     PlusCircle
 } from "lucide-react";
 import { Button } from "../ui/Button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -42,14 +42,16 @@ function File({
     toast,
     location,
     updateFilesystem,
-    openFile
+    openFile,
+    isPublic
 }) {
+    console.log(isPublic);
     return (
         <>
             <button
                 className={`file flex w-full max-w-full items-center justify-between rounded-md py-1 px-3 hover:bg-neutral-200 ${styles.file} ${className} `}>
                 <span className="flex min-w-0 items-center gap-x-1">
-                    <FileIcon className="h-4 w-4" />
+                    <FileIcon className="h-4 w-4 shrink-0" />
                     <span className="truncate">{name}</span>
                 </span>
                 <span className={`${styles.extra} flex items-center`}>
@@ -61,7 +63,9 @@ function File({
                             <DropdownMenuItem>Make public</DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem>Rename</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-500">
+                                Delete
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </span>
@@ -76,17 +80,12 @@ function Folder({
     toast,
     location,
     updateFilesystem,
-    openFile
+    openFile,
+    setFiles
 }) {
     const [toggle, setToggle] = useState(false);
     const [nameFile, setNameFile] = useState(false);
-
-    const createFolder = event => {
-        event.preventDefault();
-        const folder = event.target.folder.value;
-        if (!folder) {
-        }
-    };
+    const [nameFolder, setNameFolder] = useState(false);
 
     const createFile = file => {
         if (!file) {
@@ -96,13 +95,49 @@ function Folder({
                 description: "Make sure you fill out the name of the file!"
             });
             return;
+        } else if (file.includes("/")) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "No slashes allowed in file names. Try again!"
+            });
         }
+
         post({
-            route: "/api/filesystem/addFile",
+            route: "/api/filesystem/file",
             data: { location: `${location}/${file}` }
         }).then(json => {
-            updateFilesystem(json.user.filesystem);
+            setFiles(json.filesystem);
+            setToggle(true);
         });
+    };
+
+    const createFolder = folder => {
+        if (!folder) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "Make sure you fill out the name of the folder!"
+            });
+            return;
+        } else if (folder.includes("/")) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Something went wrong.",
+                description: "No slashes allowed in folder names. Try again?"
+            });
+            return;
+        }
+
+        post({
+            route: "/api/filesystem/folder",
+            data: { location: `${location}/${folder}` }
+        })
+            .then(json => {
+                setFiles(json.filesystem);
+                setToggle(true);
+            })
+            .catch(err => console.log(err));
     };
 
     return (
@@ -117,7 +152,7 @@ function Folder({
                         ) : (
                             <ChevronRight className="h-4 w-4" />
                         ))}
-                    <FolderClosed className="h-4 w-4" />
+                    <FolderClosed className="h-4 w-4 shrink-0" />
                     <span className="truncate">{name}</span>
                 </span>
                 <span className={`${styles.extra} flex`}>
@@ -126,7 +161,15 @@ function Folder({
                             <MoreHorizontal className="h-4 w-4" />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            <DropdownMenuItem>New folder</DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={event => {
+                                    event.stopPropagation();
+                                    setNameFolder(true);
+                                }}>
+                                New folder
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>Rename</DropdownMenuItem>
                             <DropdownMenuItem className="text-red-500">
                                 Delete
                             </DropdownMenuItem>
@@ -142,7 +185,7 @@ function Folder({
                     </button>
                 </span>
             </div>
-            {nameFile === true && (
+            {(nameFile || nameFolder) && (
                 <form
                     className={`flex w-full max-w-full items-center justify-between rounded-md border border-blue-500 py-1 px-3 pl-5 shadow-md`}
                     onSubmit={event => {
@@ -161,13 +204,23 @@ function Folder({
                             onBlur={event => {
                                 if (!event.target.value.length) {
                                     setNameFile(false);
+                                    setNameFolder(false);
                                     return;
                                 }
-                                createFile(event.target.value);
                                 event.target.value = "";
-                                setNameFile(false);
+                                if (nameFile) {
+                                    createFile(event.target.value);
+                                    setNameFile(false);
+                                } else {
+                                    console.log(
+                                        `${location}/${event.target.value}`
+                                    );
+                                    setNameFolder(false);
+                                }
                             }}
-                            placeholder="Untitled"
+                            placeholder={`Untitled ${
+                                nameFile ? "file" : "folder"
+                            }`}
                             required
                             title="New file"
                         />
@@ -188,6 +241,7 @@ function Folder({
                                     location={`${location}/${file.name}`}
                                 />
                             );
+                        console.log(file);
                         return (
                             <File
                                 {...file}
@@ -205,7 +259,6 @@ function Folder({
 
 export default function Files({ initialFiles, openFile }) {
     const [files, setFiles] = useState(initialFiles);
-    const [open, setOpen] = useState(false);
     const { toast } = useToast();
 
     // Toggle new folder creation
@@ -232,7 +285,6 @@ export default function Files({ initialFiles, openFile }) {
             data: { location: folder }
         })
             .then(json => {
-                console.log(json);
                 setFiles(json.filesystem);
                 setOpen(false);
             })
@@ -291,6 +343,7 @@ export default function Files({ initialFiles, openFile }) {
                             location={file.name}
                             updateFilesystem={setFiles}
                             openFile={openFile}
+                            setFiles={setFiles}
                         />
                     );
                 return (
@@ -302,6 +355,7 @@ export default function Files({ initialFiles, openFile }) {
                         location={file.name}
                         updateFilesystem={setFiles}
                         openFile={openFile}
+                        setFiles={setFiles}
                     />
                 );
             })}

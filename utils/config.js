@@ -16,7 +16,7 @@ if (!AWS_SECRET)
         "Please define the AWS_SECRET environment variable inside .env"
     );
 
-const AWS_BUCKET = process.env.AWS_SECRET;
+const AWS_BUCKET = process.env.AWS_BUCKET;
 if (!AWS_BUCKET)
     throw new Error(
         "Please define the AWS_BUCKET environment variable inside .env"

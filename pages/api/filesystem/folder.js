@@ -7,8 +7,8 @@ import { encrypt, decrypt } from "../../../utils/filesystem";
 
 export default async function handler(req, res) {
     const session = await getServerSession(req, res, authOptions);
-    const { sub } = await getToken({ req });
-    if (!session || !session.user || !sub)
+    const token = await getToken({ req });
+    if (!session || !session.user || !token)
         return res.status(401).json({
             success: false,
             reason: "Not logged in"
@@ -24,15 +24,12 @@ export default async function handler(req, res) {
             });
 
         try {
-            const encrypted = Buffer.from(encrypt("hi", sub));
-            console.log(encrypted, decrypt(encrypted, sub));
-            return res.status(200);
             await dbConnect();
             const user = await User.findOne({ email: session.user.email });
-            await user.addFolder(location, sub);
+            await user.addFolder(location, token.sub);
             return res.status(200).json({
                 success: true,
-                filesystem: user.decryptObj(user.filesystem, sub)
+                filesystem: user.decryptObj(user.filesystem, token.sub)
             });
         } catch (err) {
             return res.status(500).json({

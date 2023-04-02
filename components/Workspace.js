@@ -73,28 +73,8 @@ export default function Workspace({
     };
 
     // Left and right columns
-    const [left, setLeft] = useState([
-        {
-            filename: "How I rebuilt my blog.",
-            type: "input",
-            content: "",
-            location: ""
-        },
-        {
-            filename: "Rebuilding a Markdown parser. Bro, I'm just telling you",
-            type: "input",
-            content: "",
-            location: ""
-        }
-    ]);
-    const [right, setRight] = useState([
-        { filename: "How I rebuilt my blog.", type: "output", content: "" },
-        {
-            filename: "Rebuilding a Markdown parser.",
-            type: "output",
-            content: ""
-        }
-    ]);
+    const [left, setLeft] = useState([]);
+    const [right, setRight] = useState([]);
     const [activeLeft, setActiveLeft] = useState(0);
     const [activeRight, setActiveRight] = useState(0);
 

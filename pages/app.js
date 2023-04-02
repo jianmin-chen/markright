@@ -24,7 +24,7 @@ const Workspace = dynamic(() => import("../components/Workspace"), {
     ssr: false
 });
 
-export default function Index({ files }) {
+export default function Index({ files, background }) {
     const session = useSession();
     const router = useRouter();
 
@@ -48,7 +48,12 @@ export default function Index({ files }) {
     }, []);
 
     return (
-        <div className="flex max-h-screen min-h-screen flex-col overflow-hidden bg-[url(https://images.unsplash.com/photo-1559827260-dc66d52bef19?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80)]">
+        <div
+            className={`flex max-h-screen min-h-screen flex-col overflow-hidden`}
+            style={{
+                backgroundImage: `url("${background}")`,
+                backgroundSize: "cover"
+            }}>
             <div>
                 <Menu
                     sidebar={{
@@ -124,8 +129,8 @@ export default function Index({ files }) {
 
 export async function getServerSideProps({ req, res }) {
     const session = await getServerSession(req, res);
-    const { sub } = await getToken({ req });
-    if (!session || !sub) return { redirect: { destination: "/login" } };
+    const token = await getToken({ req });
+    if (!session || !token) return { redirect: { destination: "/login" } };
 
     // Get files
     await dbConnect();
@@ -133,7 +138,8 @@ export async function getServerSideProps({ req, res }) {
 
     return {
         props: {
-            files: user.decryptObj(user.filesystem, sub)
+            files: user.decryptObj(user.filesystem, token.sub, { safe: true }),
+            background: user.background
         }
     };
 }
