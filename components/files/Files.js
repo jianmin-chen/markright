@@ -35,7 +35,7 @@ import { post } from "../../utils/fetch";
 import catchError from "../../utils/logging";
 
 function File({
-    name,
+    name: initialName,
     content,
     active,
     className,
@@ -45,30 +45,105 @@ function File({
     openFile,
     isPublic
 }) {
-    console.log(isPublic);
+    const [name, setName] = useState(initialName);
+    const [rename, setRename] = useState(false);
+    const [publicState, setPublicState] = useState(isPublic);
+
+    const togglePublic = isPublic => {
+        post({
+            route: "/api/filesystem/public",
+            data: { location, isPublic: publicState }
+        })
+            .then(res => setPublicState(isPublic))
+            .catch(err =>
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: err
+                })
+            );
+    };
+
+    const renameFile = filename => {};
+
     return (
         <>
             <button
-                className={`file flex w-full max-w-full items-center justify-between rounded-md py-1 px-3 hover:bg-neutral-200 ${styles.file} ${className} `}>
-                <span className="flex min-w-0 items-center gap-x-1">
-                    <FileIcon className="h-4 w-4 shrink-0" />
-                    <span className="truncate">{name}</span>
-                </span>
-                <span className={`${styles.extra} flex items-center`}>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300">
-                            <MoreHorizontal className="h-4 w-4" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem>Make public</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>Rename</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-500">
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </span>
+                className={`file flex w-full max-w-full items-center justify-between rounded-md py-1 px-3 ${
+                    !rename && "hover:bg-neutral-200"
+                } ${styles.file} ${className} `}>
+                {rename ? (
+                    <form
+                        className="flex w-full max-w-full items-center justify-between rounded-md border border-blue-500 py-1 px-3 pl-5 shadow-md"
+                        onSubmit={event => {
+                            event.preventDefault();
+                            if (
+                                event.target.file.value.length &&
+                                event.target.file.value !== name
+                            ) {
+                                renameFile(event.target.file.value);
+                            }
+                            event.target.reset();
+                            setRename(false);
+                        }}>
+                        <span className="flex min-w-0 items-center gap-x-1">
+                            <FileIcon className="h-4 w-4 shrink-0" />
+                            <input
+                                className="max-w-full flex-1 bg-transparent"
+                                autoComplete="off"
+                                autoFocus={true}
+                                name="file"
+                                onBlur={event => {
+                                    if (
+                                        !event.target.value.length ||
+                                        event.target.value === name
+                                    ) {
+                                        setRename(false);
+                                        return;
+                                    }
+                                    event.target.value = "";
+                                    renameFile(event.target.value);
+                                    setRename(false);
+                                }}
+                                required
+                                title="Rename file"
+                                defaultValue={name}
+                            />
+                        </span>
+                    </form>
+                ) : (
+                    <>
+                        <span className="flex min-w-0 items-center gap-x-1">
+                            <FileIcon className="h-4 w-4 shrink-0" />
+                            <span className="truncate">{name}</span>
+                        </span>
+                        <span className={`${styles.extra} flex items-center`}>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            togglePublic(!publicState)
+                                        }>
+                                        {publicState
+                                            ? "Make private"
+                                            : "Make public"}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                        onClick={() => setRename(true)}>
+                                        Rename
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="text-red-500">
+                                        Delete
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </span>
+                    </>
+                )}
             </button>
         </>
     );
@@ -137,7 +212,13 @@ function Folder({
                 setFiles(json.filesystem);
                 setToggle(true);
             })
-            .catch(err => console.log(err));
+            .catch(err =>
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: err
+                })
+            );
     };
 
     return (
@@ -195,7 +276,7 @@ function Folder({
                         setNameFile(false);
                     }}>
                     <span className="flex min-w-0 items-center gap-x-1 ">
-                        <FileIcon className="h-4 w-4" />
+                        <FileIcon className="h-4 w-4 shrink-0" />
                         <input
                             className="max-w-full flex-1 bg-transparent"
                             autoComplete="off"
@@ -241,7 +322,6 @@ function Folder({
                                     location={`${location}/${file.name}`}
                                 />
                             );
-                        console.log(file);
                         return (
                             <File
                                 {...file}
@@ -288,7 +368,13 @@ export default function Files({ initialFiles, openFile }) {
                 setFiles(json.filesystem);
                 setOpen(false);
             })
-            .catch(err => console.log(err));
+            .catch(err =>
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: err
+                })
+            );
     };
 
     return (
@@ -308,7 +394,7 @@ export default function Files({ initialFiles, openFile }) {
                         setNameFolder(false);
                     }}>
                     <span className="flex min-w-0 items-center gap-x-1 ">
-                        <FileIcon className="h-4 w-4" />
+                        <FileIcon className="h-4 w-4 shrink-0" />
                         <input
                             className="max-w-full flex-1 bg-transparent"
                             autoComplete="off"

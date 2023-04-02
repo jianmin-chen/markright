@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import seedrandom from "seedrandom";
 import { v4 as uuid } from "uuid";
 import { encrypt, decrypt } from "../../utils/filesystem";
-import { upload, get } from "../aws/aws";
+import { upload, get, crypt, del } from "../aws/aws";
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -48,7 +48,7 @@ userSchema.methods.decryptObj = function (arr, password, options = {}) {
             decrypted.push({
                 type: "folder",
                 name: decrypt(f.name, password),
-                content: this.decryptObj(f.content, password)
+                content: this.decryptObj(f.content, password, options)
             });
     }
     return decrypted;
@@ -122,8 +122,7 @@ userSchema.methods.addFile = async function (location, password) {
             type: "folder",
             name: encrypt(location, password),
             isPublic: false,
-            storage,
-            content: ""
+            storage
         });
         return await this.save();
     }
@@ -157,8 +156,7 @@ userSchema.methods.addFile = async function (location, password) {
             type: "file",
             name: encrypt(traverse[traverse.length - 1], password),
             isPublic: false,
-            storage,
-            content: ""
+            storage
         });
     } else
         throw new Error(`File ${traverse[traverse.length - 1]} already exists`);
@@ -205,7 +203,7 @@ userSchema.methods.renameFile = async function (location, name, password) {
     if (traverse.length === 1) {
         if (decrypted.find(x => x.type === "file" && x.name === location))
             throw new Error(`${location} already exists`);
-        // Move storage
+        // Move storage so that collisions don't occur
     }
 };
 
@@ -244,16 +242,62 @@ userSchema.methods.updateFile = async function (location, content, password) {
 
 userSchema.methods.deleteFile = async function (location, password) {
     // Traverse down filesystem, deleting and unlinking file
+    const traverse = location.split("/");
+    let decrypted = this.decryptObj(this.filesystem, password);
+    if (traverse.length === 1) {
+        const index = decrypted.findIndex(
+            x => x.type === "file" && x === location
+        );
+        if (index < 0) throw new Error(`File ${location} not found`);
+        await del(this.filesystem[index].storage);
+        delete this.filesystem[index];
+        return await this.save();
+    }
+    let encrypted = this.filesystem;
+    for (let i = 0; i < traverse.length - 1; i++) {
+        let route = traverse[i];
+        let step;
+        let location = decrypted.filter((x, index) => {
+            if (x.name === route) {
+                if (x.type === "file") return false;
+                step = index;
+                return true;
+            }
+            return false;
+        });
+        if (!location.length) throw new Error(`Folder ${route} not found`);
+        decrypted = location[0];
+        encrypted = encrypted[step];
+    }
+    const index = decrypted.content.findIndex(
+        x => x.type === "file" && x.name === traverse[traverse.length - 1]
+    );
+    if (index < 0) throw new Error(`File ${location} doesn't exist`);
+    await del(encrypted.content[index].storage);
+    delete encrypted.content[index];
+    this.markModified("filesystem");
+    return await this.save();
 };
 
-userSchema.methods.toggleFilePublic = async function (location, isPublic) {
+userSchema.methods.toggleFilePublic = async function (
+    location,
+    isPublic,
+    password
+) {
     // Traverse down filesystem, making file public
     const traverse = location.split("/");
     let decrypted = this.decryptObj(this.filesystem, password);
     if (traverse.length === 1) {
-        const index = decrypted.find(x => x.type === "file" && x === location);
-        if (!index) throw new Error(`${location} not found`);
-        this.filesystem[index].public = isPublic;
+        const index = decrypted.findIndex(
+            x => x.type === "file" && x === location
+        );
+        if (index < 0) throw new Error(`File ${location} not found`);
+        if (this.filesystem[index].isPublic === isPublic) return this;
+        this.filesystem[index].isPublic = isPublic;
+        // If isPublic, decrypt content, otherwise encrypt content at location
+        if (isPublic)
+            await crypt(this.filesysem[index].storage, "decrypt", password);
+        else await crypt(this.filesystem[index].storage, "encrypt", password);
         return await this.save();
     }
     let encrypted = this.filesystem;
@@ -273,12 +317,17 @@ userSchema.methods.toggleFilePublic = async function (location, isPublic) {
         encrypted = encrypted[step];
     }
     // Now get the file in encrypted
-    const fileIdx = decrypted.content.find(
+    const index = decrypted.content.findIndex(
         x => x.type === "file" && x.name === traverse[traverse.length - 1]
     );
-    if (!fileIdx) throw new Error(`File ${location} doesn't exist`);
-    encrypted[fileIdx].public = isPublic;
+    if (index < 0) throw new Error(`File ${location} doesn't exist`);
+    if (encrypted.content[index].isPublic === isPublic) return this;
+    encrypted.content[index].isPublic = isPublic;
     this.markModified("filesystem");
+    // If isPublic, decrypt content, otherwise encrypt content at location
+    if (isPublic)
+        await crypt(encrypted.content[index].storage, "decrypt", password);
+    else await crypt(encrypted.content[index].storage, "encrypt", password);
     return await this.save();
 };
 

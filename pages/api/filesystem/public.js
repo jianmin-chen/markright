@@ -14,25 +14,21 @@ export default async function handler(req, res) {
         });
 
     const { method } = req;
-    // C: POST
-    // R: GET
-    // U: PATCH
-    // D: DELETE
     if (method === "POST") {
-        const { location } = req.body;
-        if (!location)
+        const { location, isPublic } = req.body;
+        console.log(location, isPublic);
+        if (!location || !isPublic)
             return res.status(400).json({
                 success: false,
-                reason: "Location not provided"
+                reason: "Location or public/private not provided"
             });
 
         try {
             await dbConnect();
             const user = await User.findOne({ email: session.user.email });
-            await user.addFile(location, token.sub);
+            await user.toggleFilePublic(location, isPublic, token.sub);
             return res.status(200).json({
-                success: true,
-                filesystem: user.decryptObj(user.filesystem, token.sub)
+                success: true
             });
         } catch (err) {
             return res.status(500).json({
@@ -40,9 +36,10 @@ export default async function handler(req, res) {
                 reason: err.message
             });
         }
-    } else
+    } else {
         return res.status(400).json({
             success: false,
             reason: "Invalid request method"
         });
+    }
 }

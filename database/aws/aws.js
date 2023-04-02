@@ -1,6 +1,7 @@
 // TODO: Rewrite for new version of AWS
 import config from "../../utils/config";
 import AWS from "aws-sdk";
+import { decrypt, encrypt } from "../../utils/filesystem";
 
 const S3 = new AWS.S3({
     endpoint: new AWS.Endpoint(config.AWS_ENDPOINT),
@@ -48,6 +49,31 @@ export async function upload(filename, data = "") {
     // Upload files to AWS
     return new Promise((resolve, reject) => {
         S3.upload(params, (err, data) => {
+            if (err) return reject(err);
+            return resolve(data);
+        });
+    });
+}
+
+export async function crypt(filename, type, password) {
+    const content = await get(filename);
+    return await upload(
+        filename,
+        type === "encrypt"
+            ? encrypt(content, password)
+            : decrypt(content, password)
+    );
+}
+
+export async function del(filename) {
+    const params = {
+        Bucket: config.AWS_BUCKET,
+        Key: filename,
+        Body: data
+    };
+
+    return new Promise((resolve, reject) => {
+        S3.deleteObject(params, (err, data) => {
             if (err) return reject(err);
             return resolve(data);
         });
