@@ -14,13 +14,9 @@ export default async function handler(req, res) {
         });
 
     const { method } = req;
-    // C: POST
-    // R: GET
-    // U: PATCH
-    // D: DELETE
     if (method === "POST") {
         const { location } = req.body;
-        if (!location)
+        if (!location || !location.length)
             return res.status(400).json({
                 success: false,
                 reason: "Location not provided"
@@ -29,10 +25,10 @@ export default async function handler(req, res) {
         try {
             await dbConnect();
             const user = await User.findOne({ email: session.user.email });
-            await user.addFile(location, token.sub);
+            await user.addFolder(location, token.sub);
             return res.status(200).json({
                 success: true,
-                filesystem: user.decryptObj(user.filesystem, token.sub)
+                filesystem: user.decryptObj(user.filesystem, token.sub, true)
             });
         } catch (err) {
             return res.status(500).json({

@@ -1,4 +1,4 @@
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
 import { getToken } from "next-auth/jwt";
 import authOptions from "../auth/[...nextauth]";
 import dbConnect from "../../../database/connect";
@@ -15,31 +15,36 @@ export default async function handler(req, res) {
 
     const { method } = req;
     if (method === "POST") {
-        const { location, isPublic } = req.body;
-        console.log(location, isPublic);
-        if (!location || !isPublic)
+        const { oldLocation, newLocation } = req.body;
+        if (
+            !oldLocation ||
+            !newLocation ||
+            !oldLocation.length ||
+            !newLocation.length
+        )
             return res.status(400).json({
                 success: false,
-                reason: "Location or public/private not provided"
+                reason: "Location not provided"
             });
 
         try {
             await dbConnect();
             const user = await User.findOne({ email: session.user.email });
-            await user.toggleFilePublic(location, isPublic, token.sub);
-            return res.status(200).json({
-                success: true
-            });
+            const info = await user.renameFile(
+                oldLocation,
+                newLocation,
+                token.sub
+            );
+            return res.status(200).json({ success: true, info });
         } catch (err) {
             return res.status(500).json({
                 success: false,
                 reason: err.message
             });
         }
-    } else {
+    } else
         return res.status(400).json({
             success: false,
             reason: "Invalid request method"
         });
-    }
 }

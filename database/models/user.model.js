@@ -106,18 +106,22 @@ userSchema.methods.addFolder = async function (location, password) {
     return await this.save();
 };
 
-userSchema.methods.renameFile = async function (location, name, password) {};
+userSchema.methods.renameFolder = async function (
+    oldLocation,
+    newLocation,
+    password
+) {};
 
-userSchema.methods.deleteFile = async function (location, password) {};
+userSchema.methods.deleteFolder = async function (location, password) {};
 
-userSchema.methods.addFile = async function (location, password) {
+userSchema.methods.addFile = async function (location, password, content = "") {
     const traverse = location.split("/");
     let decrypted = this.decryptObj(this.filesystem, password);
     if (traverse.length === 1) {
         if (decrypted.find(x => x.type === "file" && x.name === location))
             throw new Error(`${location} already exists`);
         const storage = seedrandom(`${this._id}${location}`).int32() + ".md";
-        await upload(storage);
+        await upload(storage, content);
         this.filesystem.push({
             type: "folder",
             name: encrypt(location, password),
@@ -151,7 +155,7 @@ userSchema.methods.addFile = async function (location, password) {
     ) {
         // Create new file in AWS
         const storage = seedrandom(`${this._id}${location}`).int32() + ".md";
-        await upload(storage);
+        await upload(storage, content);
         encrypted.content.push({
             type: "file",
             name: encrypt(traverse[traverse.length - 1], password),
@@ -197,14 +201,43 @@ userSchema.methods.getFile = async function (location, password) {
     return decrypt(await get(decrypted[index].storage), password);
 };
 
-userSchema.methods.renameFile = async function (location, name, password) {
+userSchema.methods.getFileMeta = async function (location, password) {
     const traverse = location.split("/");
     let decrypted = this.decryptObj(this.filesystem, password);
     if (traverse.length === 1) {
-        if (decrypted.find(x => x.type === "file" && x.name === location))
-            throw new Error(`${location} already exists`);
-        // Move storage so that collisions don't occur
+        const index = decrypted.find(x => x.type === "file" && x === location);
+        if (!index) throw new Error(`${location} not found`);
+        return this.filesystem[index];
     }
+    for (let i = 0; i < traverse.length - 1; i++) {
+        let route = traverse[i];
+        let location = decrypted.filter(x => {
+            if (x.name === route) {
+                if (x.type === "file") return false;
+                return true;
+            }
+        });
+        if (!location.length) throw new Error(`Folder ${route} not found`);
+        decrypted = location[0];
+    }
+
+    const file = decrypted.content.find(
+        x => x.type === "file" && x.name === traverse[traverse.length - 1]
+    );
+    if (!index)
+        throw new Error(`File ${traverse[traverse.length - 1]} doesn't exist`);
+    return file;
+};
+
+userSchema.methods.renameFile = async function (
+    oldLocation,
+    newLocation,
+    password
+) {
+    const content = this.getFile(oldLocation, password);
+    await this.deleteFile(oldLocation, password);
+    await this.addFile(newLocation, password, content);
+    await this.getFileMeta(newLocation, password);
 };
 
 userSchema.methods.updateFile = async function (location, content, password) {

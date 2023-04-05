@@ -40,19 +40,20 @@ function File({
     active,
     className,
     toast,
-    location,
+    location: initialLocation,
     updateFilesystem,
     openFile,
     isPublic
 }) {
     const [name, setName] = useState(initialName);
+    const [location, setLocation] = useState(initialLocation);
     const [rename, setRename] = useState(false);
     const [publicState, setPublicState] = useState(isPublic);
 
     const togglePublic = isPublic => {
         post({
-            route: "/api/filesystem/public",
-            data: { location, isPublic: publicState }
+            route: "/api/file/public",
+            data: { location, isPublic }
         })
             .then(res => setPublicState(isPublic))
             .catch(err =>
@@ -64,7 +65,25 @@ function File({
             );
     };
 
-    const renameFile = filename => {};
+    const renameFile = filename => {
+        const traversed = location.split("/");
+        const updatedFilename =
+            traversed.slice(0, traversed.length - 1) + "/" + filename;
+        post({
+            route: "/api/file/rename",
+            data: { oldLocation: name, newLocation: updatedFilename }
+        })
+            .then(res => {
+                console.log(res);
+            })
+            .catch(err =>
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: err
+                })
+            );
+    };
 
     return (
         <>
@@ -86,10 +105,10 @@ function File({
                             event.target.reset();
                             setRename(false);
                         }}>
-                        <span className="flex min-w-0 items-center gap-x-1">
+                        <span className="flex min-w-0 max-w-full items-center gap-x-1 overflow-hidden">
                             <FileIcon className="h-4 w-4 shrink-0" />
                             <input
-                                className="max-w-full flex-1 bg-transparent"
+                                className="max-w-full flex-1 overflow-auto bg-transparent"
                                 autoComplete="off"
                                 autoFocus={true}
                                 name="file"
@@ -179,7 +198,7 @@ function Folder({
         }
 
         post({
-            route: "/api/filesystem/file",
+            route: "/api/file/create",
             data: { location: `${location}/${file}` }
         }).then(json => {
             setFiles(json.filesystem);
@@ -205,7 +224,7 @@ function Folder({
         }
 
         post({
-            route: "/api/filesystem/folder",
+            route: "/api/folder/create",
             data: { location: `${location}/${folder}` }
         })
             .then(json => {
@@ -361,7 +380,7 @@ export default function Files({ initialFiles, openFile }) {
         }
 
         post({
-            route: "/api/filesystem/folder",
+            route: "/api/folder/create",
             data: { location: folder }
         })
             .then(json => {
@@ -394,7 +413,7 @@ export default function Files({ initialFiles, openFile }) {
                         setNameFolder(false);
                     }}>
                     <span className="flex min-w-0 items-center gap-x-1 ">
-                        <FileIcon className="h-4 w-4 shrink-0" />
+                        <FolderClosed className="h-4 w-4 shrink-0" />
                         <input
                             className="max-w-full flex-1 bg-transparent"
                             autoComplete="off"
