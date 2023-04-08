@@ -67,11 +67,31 @@ function File({
 
     const renameFile = filename => {
         const traversed = location.split("/");
-        const updatedFilename =
-            traversed.slice(0, traversed.length - 1) + "/" + filename;
         post({
             route: "/api/file/rename",
-            data: { oldLocation: name, newLocation: updatedFilename }
+            data: {
+                oldLocation:
+                    traversed.slice(0, traversed.length - 1) + "/" + name,
+                newLocation:
+                    traversed.slice(0, traversed.length - 1) + "/" + filename
+            }
+        })
+            .then(res => {
+                console.log(res);
+            })
+            .catch(err =>
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: err
+                })
+            );
+    };
+
+    const deleteSelf = () => {
+        post({
+            route: "/api/file/delete",
+            data: { location }
         })
             .then(res => {
                 console.log(res);
@@ -90,7 +110,10 @@ function File({
             <button
                 className={`file flex w-full max-w-full items-center justify-between rounded-md py-1 px-3 ${
                     !rename && "hover:bg-neutral-200"
-                } ${styles.file} ${className} `}>
+                } ${styles.file} ${className} `}
+                onClick={() => {
+                    openFile(name, location);
+                }}>
                 {rename ? (
                     <form
                         className="flex w-full max-w-full items-center justify-between rounded-md border border-blue-500 py-1 px-3 pl-5 shadow-md"
@@ -143,19 +166,28 @@ function File({
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
                                     <DropdownMenuItem
-                                        onClick={() =>
-                                            togglePublic(!publicState)
-                                        }>
+                                        onClick={event => {
+                                            event.stopPropagation();
+                                            togglePublic(!publicState);
+                                        }}>
                                         {publicState
                                             ? "Make private"
                                             : "Make public"}
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
-                                        onClick={() => setRename(true)}>
+                                        onClick={event => {
+                                            event.stopPropagation();
+                                            setRename(true);
+                                        }}>
                                         Rename
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem className="text-red-500">
+                                    <DropdownMenuItem
+                                        className="text-red-500"
+                                        onClick={event => {
+                                            event.stopPropagation();
+                                            deleteSelf();
+                                        }}>
                                         Delete
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>

@@ -16,6 +16,7 @@ export default function Editor({
     value,
     setValue,
     onScroll,
+    onBlur,
     assignRef,
     width,
     height
@@ -26,6 +27,7 @@ export default function Editor({
             mode="markdown"
             width={width}
             height={height}
+            onBlur={onBlur}
             onChange={setValue}
             value={value}
             fontSize={18}

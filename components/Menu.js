@@ -44,9 +44,9 @@ export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
 
     return (
         <Dialog>
-            <Menubar className="backdrop-opacity-5 backdrop-invert bg-white/70 backdrop-saturate-150 backdrop-blur-50 rounded-none border-none px-3 py-0 h-fit space-x-0">
+            <Menubar className="backdrop-blur-50 h-fit space-x-0 rounded-none border-none bg-white/70 px-3 py-0 backdrop-invert backdrop-opacity-5 backdrop-saturate-150">
                 <MenubarMenu>
-                    <MenubarTrigger className="leading-none px-1.5 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
+                    <MenubarTrigger className="px-1.5 py-2 leading-none hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
                         <b>{session && session.user.name}</b>
                     </MenubarTrigger>
                     <MenubarContent>
@@ -62,7 +62,7 @@ export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
                     </MenubarContent>
                 </MenubarMenu>
                 <MenubarMenu>
-                    <MenubarTrigger className="leading-none px-1 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
+                    <MenubarTrigger className="px-1 py-2 leading-none hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
                         Preferences
                     </MenubarTrigger>
                     <MenubarContent>
@@ -153,7 +153,7 @@ export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
                     </MenubarContent>
                 </MenubarMenu>
                 <MenubarMenu>
-                    <MenubarTrigger className="leading-none px-1 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
+                    <MenubarTrigger className="px-1 py-2 leading-none hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
                         File
                     </MenubarTrigger>
                     <MenubarContent>
@@ -176,7 +176,7 @@ export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
                     </MenubarContent>
                 </MenubarMenu>
                 <MenubarMenu>
-                    <MenubarTrigger className="leading-none px-1 py-2 data-[state=open]:bg-transparent hover:bg-transparent focus:bg-transparent">
+                    <MenubarTrigger className="px-1 py-2 leading-none hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
                         View
                     </MenubarTrigger>
                     <MenubarContent>
@@ -188,6 +188,11 @@ export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
                             Toggle Sidebar
                         </MenubarItem>
                     </MenubarContent>
+                </MenubarMenu>
+                <MenubarMenu>
+                    <MenubarTrigger className="!ml-auto px-1 py-2 leading-none hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
+                        Saving...
+                    </MenubarTrigger>
                 </MenubarMenu>
             </Menubar>
             <DialogContent>

@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import AceEditor from "./AceEditor";
-import parseMarkdown from "../utils/parser";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
 import { useResizeDetector } from "react-resize-detector";
-import { CircleDot } from "lucide-react";
+import Open from "./Open";
 
 const inter = Inter({
     variable: "--sans",
@@ -30,13 +28,21 @@ const reorder = (list, startIndex, endIndex) => {
 };
 
 export default function Workspace({
-    value,
-    setValue,
     keyboardHandler,
     aceTheme,
-    docRef
+    docRef,
+    left,
+    right,
+    setLeft,
+    setRight,
+    activeLeft,
+    activeRight,
+    setActiveLeft,
+    setActiveRight,
+    aceOptions
 }) {
-    const { width, height, ref } = useResizeDetector();
+    const leftRef = useResizeDetector();
+    const rightRef = useResizeDetector();
 
     const [outputScroll, setOutputScroll] = useState(false);
     const input = docRef;
@@ -53,8 +59,13 @@ export default function Workspace({
                 source.index,
                 destination.index
             );
-            if (destination.droppableId === "left") setLeft(items);
-            else setRight(items);
+            if (destination.droppableId === "left") {
+                setLeft(items);
+                setActiveLeft(destination.index);
+            } else {
+                setRight(items);
+                setActiveRight(destination.index);
+            }
         } else {
             // Remove from one, add to other
             const leftCopy = Array.from(left);
@@ -69,14 +80,17 @@ export default function Workspace({
             );
             setLeft(leftCopy);
             setRight(rightCopy);
+            console.log(source.index, destination.index);
+            if (source.droppableId === "left") {
+                // Left has one extra one, so set it to the index; right has one less, so set it to index - 1 if it isn't empty
+                setActiveLeft(destination.index);
+                setActiveRight(source.index);
+            } else if (source.droppableId === "right") {
+                setActiveRight(destination.index);
+                setActiveLeft(source.index);
+            }
         }
     };
-
-    // Left and right columns
-    const [left, setLeft] = useState([]);
-    const [right, setRight] = useState([]);
-    const [activeLeft, setActiveLeft] = useState(0);
-    const [activeRight, setActiveRight] = useState(0);
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
@@ -120,40 +134,16 @@ export default function Workspace({
                             </div>
                         )}
                     </Droppable>
-                    <div className="h-full flex-1 overflow-auto" ref={ref}>
-                        <AceEditor
-                            options={{
-                                keyboardHandler,
-                                theme: aceTheme
-                            }}
-                            assignRef={docRef}
-                            value={value}
-                            setValue={setValue}
-                            onScroll={(scrollTop, height) => {
-                                if (!outputScroll) {
-                                    let outputDiv = output.current;
-                                    if (outputDiv) {
-                                        let scrollProportion =
-                                            scrollTop / height;
-                                        if (scrollProportion < 0)
-                                            scrollProportion = 0; // Clamp
-                                        outputDiv.scrollTop =
-                                            outputDiv.scrollHeight *
-                                            scrollProportion;
-
-                                        if (
-                                            scrollTop +
-                                                outputDiv.offsetHeight ===
-                                            height
-                                        )
-                                            outputDiv.scrollTop =
-                                                outputDiv.scrollHeight;
-                                    }
-                                }
-                            }}
-                            width={width}
-                            height={height}
-                        />
+                    <div
+                        className="h-full flex-1 overflow-auto"
+                        ref={leftRef.ref}>
+                        {activeLeft !== null && (
+                            <Open
+                                file={left[activeLeft]}
+                                sizeRef={leftRef}
+                                aceOptions={aceOptions}
+                            />
+                        )}
                     </div>
                 </div>
                 <div className="flex h-full flex-col overflow-hidden">
@@ -195,46 +185,22 @@ export default function Workspace({
                             </div>
                         )}
                     </Droppable>
-                    <div
-                        className="h-full flex-1 overflow-auto border-none p-0"
-                        id="output"
-                        ref={output}
-                        onMouseEnter={() => setOutputScroll(true)}
-                        onMouseLeave={() => setOutputScroll(false)}
-                        onScroll={event => {
-                            if (outputScroll && input.current) {
-                                let editor = input.current.editor;
-                                if (event.target.scrollTop === 0)
-                                    editor.session.setScrollTop(-32);
-                                // Account for padding
-                                else {
-                                    const scrollTop = event.target.scrollTop;
-                                    const height = event.target.scrollHeight;
-                                    let scrollProportion = scrollTop / height;
-                                    editor.session.setScrollTop(
-                                        editor.renderer.layerConfig.maxHeight *
-                                            scrollProportion
-                                    );
-                                }
-                            }
-                        }}
-                        value="3">
-                        <style jsx global>{`
-                            .prose > div h1:first-child,
-                            .prose > div h2:first-child,
-                            .prose > div h3:first-child,
-                            .prose > div h4:first-child,
-                            .prose > div h5:first-child,
-                            .prose > div h6:first-child {
-                                margin-top: 1.5rem !important;
-                            }
-                        `}</style>
-                        <div
-                            className={`prose prose-lg max-w-none px-8 pb-3 ${inter.className}`}
-                            dangerouslySetInnerHTML={{
-                                __html: parseMarkdown(value)
-                            }}
-                        />
+                    <div className="h-full flex-1 overflow-auto border-none p-0">
+                        {activeRight !== null && (
+                            <Open
+                                file={right[activeRight]}
+                                sizeRef={rightRef}
+                                aceOptions={aceOptions}
+                                updateValue={value => {
+                                    if (right[activeRight].type === "input") {
+                                        // Update value in tabs
+                                        const rightCopy = Array.from(right);
+                                        rightCopy[activeRight].content = value;
+                                        setRight(leftCopy);
+                                    }
+                                }}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

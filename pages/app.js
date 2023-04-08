@@ -19,6 +19,8 @@ import User from "../database/services/user.service";
 import { downloadMarkdown, downloadHTML } from "../utils/markdownUtils";
 import { useRouter } from "next/router";
 import { getToken } from "next-auth/jwt";
+import { get } from "../utils/fetch";
+import { useToast } from "../hooks/ui/useToast";
 
 const Workspace = dynamic(() => import("../components/Workspace"), {
     ssr: false
@@ -27,6 +29,7 @@ const Workspace = dynamic(() => import("../components/Workspace"), {
 export default function Index({ files, background }) {
     const session = useSession();
     const router = useRouter();
+    const { toast } = useToast();
 
     const docRef = useRef(null);
     const [value, setValue] = useState("");
@@ -36,6 +39,35 @@ export default function Index({ files, background }) {
     // Editor themes
     const [keyboardHandler, setKeyboardHandler] = useState("vim");
     const [aceTheme, setAceTheme] = useState("github");
+
+    const [left, setLeft] = useState([]);
+    const [right, setRight] = useState([]);
+    const [activeLeft, setActiveLeft] = useState(null);
+    const [activeRight, setActiveRight] = useState(null);
+
+    const addLeft = (obj, setActive = true) => {
+        // Determine if already in tabs; if so, focus on that tab
+        const index = left.findIndex(f => f.filename === obj.filename);
+        if (index >= 0) {
+            setActiveLeft(index);
+            return;
+        }
+
+        const length = left.length;
+        setLeft([...left, obj]);
+        if (setActive) setActiveLeft(length);
+    };
+    const addRight = (obj, setActive = true) => {
+        const index = right.findIndex(f => f.filename === obj.filename);
+        if (index >= 0) {
+            setActiveRight(index);
+            return;
+        }
+
+        const length = right.length;
+        setRight([...right, obj]);
+        if (setActive) setActiveRight(length);
+    };
 
     useEffect(() => {
         document.querySelectorAll(".prose pre").forEach(el => {
@@ -88,7 +120,18 @@ export default function Index({ files, background }) {
                                 value="files">
                                 <Files
                                     initialFiles={files}
-                                    openFile={() => {}}
+                                    openFile={(filename, location) => {
+                                        addLeft({
+                                            filename,
+                                            location,
+                                            type: "input"
+                                        });
+                                        addRight({
+                                            filename,
+                                            location,
+                                            type: "output"
+                                        });
+                                    }}
                                 />
                             </TabsContent>
                             <TabsContent
@@ -119,6 +162,15 @@ export default function Index({ files, background }) {
                             keyboardHandler={keyboardHandler}
                             aceTheme={aceTheme}
                             docRef={docRef}
+                            left={left}
+                            right={right}
+                            setLeft={setLeft}
+                            setRight={setRight}
+                            activeLeft={activeLeft}
+                            activeRight={activeRight}
+                            setActiveLeft={setActiveLeft}
+                            setActiveRight={setActiveRight}
+                            aceOptions={{ keyboardHandler, theme: aceTheme }}
                         />
                     </div>
                 </div>

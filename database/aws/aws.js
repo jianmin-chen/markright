@@ -19,7 +19,8 @@ export async function get(filename) {
     return new Promise((resolve, reject) => {
         S3.getObject(params, (err, data) => {
             if (err) return reject(err);
-            return resolve(data.Body.toString());
+            if (data) return resolve(data.Body.toString());
+            return "";
         });
     });
 }
@@ -69,8 +70,7 @@ export async function crypt(filename, type, password) {
 export async function del(filename) {
     const params = {
         Bucket: config.AWS_BUCKET,
-        Key: filename,
-        Body: data
+        Key: filename
     };
 
     return new Promise((resolve, reject) => {

@@ -120,7 +120,8 @@ userSchema.methods.addFile = async function (location, password, content = "") {
     if (traverse.length === 1) {
         if (decrypted.find(x => x.type === "file" && x.name === location))
             throw new Error(`${location} already exists`);
-        const storage = seedrandom(`${this._id}${location}`).int32() + ".md";
+        const storage =
+            Math.abs(seedrandom(`${this._id}${location}`).int32()) + ".md";
         await upload(storage, content);
         this.filesystem.push({
             type: "folder",
@@ -154,7 +155,8 @@ userSchema.methods.addFile = async function (location, password, content = "") {
         )
     ) {
         // Create new file in AWS
-        const storage = seedrandom(`${this._id}${location}`).int32() + ".md";
+        const storage =
+            Math.abs(seedrandom(`${this._id}${location}`).int32()) + ".md";
         await upload(storage, content);
         encrypted.content.push({
             type: "file",
@@ -193,12 +195,14 @@ userSchema.methods.getFile = async function (location, password) {
         decrypted = location[0];
     }
 
-    const index = decrypted.content.find(
+    const index = decrypted.content.findIndex(
         x => x.type === "file" && x.name === traverse[traverse.length - 1]
     );
-    if (!index)
+    if (index < 0)
         throw new Error(`File ${traverse[traverse.length - 1]} doesn't exist`);
-    return decrypt(await get(decrypted[index].storage), password);
+    const content = await get(decrypted.content[index].storage);
+    if (!content) return "";
+    return decrypt(content, password);
 };
 
 userSchema.methods.getFileMeta = async function (location, password) {
@@ -265,12 +269,15 @@ userSchema.methods.updateFile = async function (location, content, password) {
         decrypted = location[0];
     }
 
-    const index = decrypted.content.find(
+    const index = decrypted.content.findIndex(
         x => x.type === "file" && x.name === traverse[traverse.length - 1]
     );
-    if (!index)
+    if (index < 0)
         throw new Error(`File ${traverse[traverse.length - 1]} doesn't exist`);
-    return await upload(decrypted[index].storage, encrypt(content, password));
+    return await upload(
+        decrypted.content[index].storage,
+        encrypt(content, password)
+    );
 };
 
 userSchema.methods.deleteFile = async function (location, password) {
@@ -283,7 +290,7 @@ userSchema.methods.deleteFile = async function (location, password) {
         );
         if (index < 0) throw new Error(`File ${location} not found`);
         await del(this.filesystem[index].storage);
-        delete this.filesystem[index];
+        this.filesystem.splice(index, 1);
         return await this.save();
     }
     let encrypted = this.filesystem;
@@ -307,7 +314,7 @@ userSchema.methods.deleteFile = async function (location, password) {
     );
     if (index < 0) throw new Error(`File ${location} doesn't exist`);
     await del(encrypted.content[index].storage);
-    delete encrypted.content[index];
+    encrypted.content.splice(index, 1);
     this.markModified("filesystem");
     return await this.save();
 };
