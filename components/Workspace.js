@@ -82,14 +82,17 @@ export default function Workspace({
             );
             setLeft(leftCopy);
             setRight(rightCopy);
-            console.log(source.index, destination.index);
             if (source.droppableId === "left") {
-                // Left has one extra one, so set it to the index; right has one less, so set it to index - 1 if it isn't empty
-                setActiveLeft(destination.index);
-                setActiveRight(source.index);
-            } else if (source.droppableId === "right") {
+                if (activeLeft === source.index) {
+                    if (leftCopy.length === 1) setActiveLeft(0);
+                    else if (leftCopy.length > 0)
+                        setActiveLeft(source.index - 1);
+                    else setActiveLeft(null);
+                }
                 setActiveRight(destination.index);
-                setActiveLeft(source.index);
+            } else if (source.droppableId === "right") {
+                setActiveRight(source.index);
+                setActiveLeft(destination.index);
             }
         }
     };
@@ -136,26 +139,32 @@ export default function Workspace({
                                                             index,
                                                             1
                                                         );
+                                                        setLeft(leftCopy);
                                                         if (
                                                             activeLeft === index
                                                         ) {
                                                             let active = null;
                                                             if (
-                                                                leftCopy.length !=
-                                                                0
-                                                            ) {
-                                                                if (index === 0)
-                                                                    active = 0;
-                                                                else
-                                                                    active =
-                                                                        index -
-                                                                        1;
-                                                            }
+                                                                leftCopy.length ===
+                                                                    1 ||
+                                                                index === 0
+                                                            )
+                                                                active = 0;
+                                                            else if (
+                                                                leftCopy.length >
+                                                                1
+                                                            )
+                                                                active =
+                                                                    index - 1;
+                                                            console.log(
+                                                                active,
+                                                                leftCopy,
+                                                                leftCopy[active]
+                                                            );
                                                             setActiveLeft(
                                                                 active
                                                             );
                                                         }
-                                                        setLeft(leftCopy);
                                                     }}>
                                                     &times;
                                                 </span>
@@ -178,7 +187,6 @@ export default function Workspace({
                                 sizeRef={leftRef}
                                 aceOptions={aceOptions}
                                 setMessage={setMessage}
-                                setOutlineValue={setValue}
                             />
                         ) : (
                             <div className="flex h-full flex-col items-center justify-center text-neutral-200">
@@ -186,7 +194,7 @@ export default function Workspace({
                                     className="h-32 w-32"
                                     strokeWidth={0.5}
                                 />
-                                <p>Nothing opened yet.</p>
+                                <p>Nothing opened yet</p>
                             </div>
                         )}
                     </div>
@@ -265,12 +273,12 @@ export default function Workspace({
                     </Droppable>
                     <div
                         className="h-full flex-1 overflow-auto border-none p-0"
-                        id="output">
+                        id="output"
+                        ref={rightRef.ref}>
                         {activeRight !== null &&
                         right[activeRight] !== undefined ? (
                             <Open
                                 file={right[activeRight]}
-                                sizeRef={rightRef}
                                 aceOptions={aceOptions}
                                 updateValue={value => {
                                     if (right[activeRight].type === "input") {
@@ -281,6 +289,7 @@ export default function Workspace({
                                     }
                                 }}
                                 setMessage={setMessage}
+                                sizeRef={rightRef}
                             />
                         ) : (
                             <div className="flex h-full flex-col items-center justify-center text-neutral-200">
@@ -288,7 +297,7 @@ export default function Workspace({
                                     className="h-32 w-32"
                                     strokeWidth={0.5}
                                 />
-                                <p>Nothing opened yet.</p>
+                                <p>Nothing opened yet</p>
                             </div>
                         )}
                     </div>

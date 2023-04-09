@@ -117,7 +117,52 @@ userSchema.methods.renameFolder = async function (
     password
 ) {};
 
-userSchema.methods.deleteFolder = async function (location, password) {};
+userSchema.methods.deleteFolder = async function (location, password) {
+    // Traverse down filesystem, deleting folder and deleting everything in folder as well
+    const traverse = location.split("/");
+    let decrypted = this.decryptObj(this.filesystem, password);
+    if (traverse.length === 1) {
+        const index = decrypted.findIndex(
+            x => x.type === "folder" && x.name === location
+        );
+        if (index < 0) throw new Error(`Folder ${location} not found`);
+        for (let f of decrypted[index].content) {
+            if (f.type === "folder")
+                this.deleteFolder(location + "/" + f.name, password);
+            else this.deleteFile(location + "/" + f.name, password);
+        }
+        this.filesystem.splice(index, 1);
+        return await this.save();
+    }
+    let encrypted = this.filesystem;
+    for (let i = 0; i < traverse.length - 1; i++) {
+        let route = traverse[i];
+        let step;
+        let location = decrypted.filter((x, index) => {
+            if (x.name === route) {
+                if (x.type === "file") return false;
+                step = index;
+                return true;
+            }
+            return false;
+        });
+        if (!location.length) throw new Error(`Folder ${route} not found`);
+        decrypted = location[0];
+        encrypted = encrypted[step];
+    }
+    const index = decrypted.content.findIndex(
+        x => x.type === "folder" && x.name === traverse[traverse.length - 1]
+    );
+    if (index < 0) throw new Error(`File ${location} doesn't exist`);
+    for (let f of decrypted.content[index].content) {
+        if (f.type === "folder")
+            this.deleteFolder(location + "/" + f.name, password);
+        else this.deleteFile(location + "/" + f.name, password);
+    }
+    encrypted.content.splice(index, 1);
+    this.markModified("filesystem");
+    return await this.save();
+};
 
 userSchema.methods.addFile = async function (location, password, content = "") {
     const traverse = location.split("/");

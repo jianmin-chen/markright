@@ -33,12 +33,10 @@ export default function Open({
     sizeRef,
     aceOptions,
     setMessage,
-    setOutlineValue,
     docRef
 }) {
     const { toast } = useToast();
     const [value, setValue] = useState("");
-    const [timer, setTimer] = useState(null);
 
     useEffect(() => {
         get({
@@ -57,9 +55,8 @@ export default function Open({
 
     useEffect(() => {
         // Autosave every 30 seconds
-        if (file.type === "input" && value.length) {
+        if (file.type === "input") {
             setMessage("Saving...");
-            setOutlineValue(value);
             const timer = setTimeout(() => {
                 post({
                     route: "/api/file/update",
@@ -110,7 +107,7 @@ export default function Open({
                 }}
             />
             <DropdownMenu>
-                <DropdownMenuTrigger className="sticky bottom-4 left-4">
+                <DropdownMenuTrigger className="output-options-trigger sticky bottom-4 left-4">
                     <Button
                         variant="outline"
                         className="w-10 rounded-full bg-white p-0 shadow-md">
@@ -118,7 +115,7 @@ export default function Open({
                         <span className="sr-only">Open popover</span>
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className="output-options-content">
                     <DropdownMenuSub>
                         <DropdownMenuSubTrigger>
                             Download

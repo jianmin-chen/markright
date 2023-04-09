@@ -2,6 +2,8 @@ import { Button } from "../../../components/ui/Button";
 import parseMarkdown from "../../../utils/parser";
 import hljs from "highlight.js";
 import "highlight.js/styles/default.css";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { useEffect } from "react";
 
 export default function Slug({ username, markdown }) {
@@ -13,15 +15,30 @@ export default function Slug({ username, markdown }) {
 
     return (
         <div className="relative flex min-h-screen flex-col items-center justify-end gap-y-4 bg-neutral-100 pt-4">
-            <Button
-                disabled
-                variant="outline"
-                className=" rounded-3xl bg-white px-14 py-1.5 shadow-lg hover:bg-white">
-                Shared by {username}
-            </Button>
+            <Link href="/" target="_blank">
+                <Button
+                    disabled
+                    variant="outline"
+                    className=" rounded-3xl bg-white px-14 py-1.5 shadow-lg hover:bg-white">
+                    Shared by {username} with Markright{" "}
+                    <ExternalLink className="ml-1 h-4 w-4" />
+                </Button>
+            </Link>
+            <style jsx global>{`
+                .prose > div h1:first-child,
+                .prose > div h2:first-child,
+                .prose > div h3:first-child,
+                .prose > div h4:first-child,
+                .prose > div h5:first-child,
+                .prose > div h6:first-child {
+                    margin-top: 1.5rem !important;
+                }
+            `}</style>
             <div
-                className="prose prose-lg w-7/12 max-w-none overflow-auto rounded-t-3xl border bg-white p-14 shadow-2xl"
-                dangerouslySetInnerHTML={{ __html: parseMarkdown(markdown) }}
+                className="prose prose-lg w-7/12 max-w-none overflow-auto rounded-t-3xl border bg-white p-14 pt-7 shadow-2xl"
+                dangerouslySetInnerHTML={{
+                    __html: parseMarkdown(markdown)
+                }}
             />
         </div>
     );

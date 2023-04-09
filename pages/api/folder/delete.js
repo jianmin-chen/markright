@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         });
 
     const { method } = req;
-    if (method != "POST")
+    if (method != "DELETE")
         return res.status(400).json({
             success: false,
             reason: "Invalid request method"
@@ -29,13 +29,12 @@ export default async function handler(req, res) {
 
     try {
         await dbConnect();
-        console.log("no nvm", token.sub);
         const user = await User.findOne({ email: session.user.email });
-        console.log("it's here", token.sub);
-        const filesystem = await user.deleteFile(location, token.sub);
+        const filesystem = (await user.deleteFolder(location, token.sub))
+            .filesystem;
         return res.status(200).json({
             success: true,
-            filesystem: user.decryptObj(filesystem, token.sub)
+            filesystem: user.decryptObj(filesystem)
         });
     } catch (err) {
         console.log(err);

@@ -4,7 +4,7 @@
 
 body,
 html {
-    @apply m-0 p-0 max-h-screen;
+    @apply m-0 max-h-screen p-0;
 }
 
 input:not(.ui-input) {
@@ -38,6 +38,11 @@ input:not(.ui-input) {
         top: 0;
         left: 0;
         z-index: 9999;
-        @apply prose prose-slate prose-2xl;
+        @apply prose prose-2xl prose-slate;
+
+        .output-options-trigger,
+        .output-options-content {
+            @apply hidden;
+        }
     }
 }

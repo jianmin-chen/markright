@@ -31,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import styles from "./Files.module.scss";
 import { Input } from "../ui/Input";
 import { useToast } from "../../hooks/ui/useToast";
-import { get, post } from "../../utils/fetch";
+import { del, get, post } from "../../utils/fetch";
 import catchError from "../../utils/logging";
 
 function File({
@@ -306,12 +306,29 @@ function Folder({
             );
     };
 
+    const deleteSelf = () => {
+        del({
+            route: "/api/folder/delete",
+            data: { location }
+        })
+            .then(json => {
+                setFiles(json.filesystem);
+            })
+            .catch(err =>
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: err
+                })
+            );
+    };
+
     return (
         <>
             <div
                 className={`folder flex w-full cursor-pointer items-center justify-between rounded-md py-1 px-3 hover:bg-neutral-200 ${styles.folder}`}
                 onClick={() => setToggle(!toggle)}>
-                <span className="flex items-center gap-x-1">
+                <span className="flex min-w-0 items-center gap-x-1">
                     {content.length > 0 &&
                         (toggle ? (
                             <ChevronDown className="h-4 w-4" />
@@ -336,7 +353,12 @@ function Folder({
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem>Rename</DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-500">
+                            <DropdownMenuItem
+                                className="text-red-500"
+                                onClick={event => {
+                                    event.stopPropagation();
+                                    deleteSelf();
+                                }}>
                                 Delete
                             </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -453,7 +475,6 @@ export default function Files({ initialFiles, openFile, userId }) {
         })
             .then(json => {
                 setFiles(json.filesystem);
-                setOpen(false);
             })
             .catch(err =>
                 toast({
