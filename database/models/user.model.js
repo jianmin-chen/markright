@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema({
         trim: true,
         unique: true
     },
+    name: {
+        type: String,
+        required: true,
+        trim: true
+    },
     background: {
         type: String,
         required: true,
@@ -180,6 +185,7 @@ userSchema.methods.getFile = async function (location, password) {
         const index = decrypted.find(x => x.type === "file" && x === location);
         if (!index) throw new Error(`${location} not found`);
         const content = await get(decrypted[index].storage);
+        if (decrypted[index].isPublic) return content;
         return decrypt(content, password);
     }
     for (let i = 0; i < traverse.length - 1; i++) {
@@ -201,6 +207,7 @@ userSchema.methods.getFile = async function (location, password) {
     if (index < 0)
         throw new Error(`File ${traverse[traverse.length - 1]} doesn't exist`);
     const content = await get(decrypted.content[index].storage);
+    if (decrypted.content[index].isPublic) return content;
     if (!content) return "";
     return decrypt(content, password);
 };
@@ -225,12 +232,12 @@ userSchema.methods.getFileMeta = async function (location, password) {
         decrypted = location[0];
     }
 
-    const file = decrypted.content.find(
+    const index = decrypted.content.findIndex(
         x => x.type === "file" && x.name === traverse[traverse.length - 1]
     );
-    if (!index)
+    if (index < 0)
         throw new Error(`File ${traverse[traverse.length - 1]} doesn't exist`);
-    return file;
+    return decrypted.content[index];
 };
 
 userSchema.methods.renameFile = async function (
@@ -253,7 +260,7 @@ userSchema.methods.updateFile = async function (location, content, password) {
         if (!index) throw new Error(`${location} not found`);
         return await upload(
             decrypted[index].storage,
-            encrypt(content, password)
+            decrypted[index].isPublic ? content : encrypt(content, password)
         );
     }
     for (let i = 0; i < traverse.length - 1; i++) {
@@ -276,7 +283,7 @@ userSchema.methods.updateFile = async function (location, content, password) {
         throw new Error(`File ${traverse[traverse.length - 1]} doesn't exist`);
     return await upload(
         decrypted.content[index].storage,
-        encrypt(content, password)
+        decrypted.content[index].isPublic ? content : encrypt(content, password)
     );
 };
 

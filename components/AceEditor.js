@@ -5,6 +5,7 @@ import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/keybinding-vscode";
 import "ace-builds/src-noconflict/keybinding-vim";
 import { IBM_Plex_Mono } from "next/font/google";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 const ibmPlexMono = IBM_Plex_Mono({
     weight: "400",

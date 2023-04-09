@@ -4,6 +4,19 @@ import { useState, useEffect } from "react";
 import { get, post } from "../utils/fetch";
 import { useToast } from "../hooks/ui/useToast";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger
+} from "./ui/DropdownMenu";
+import { Settings2 } from "lucide-react";
+import { Button } from "./ui/Button";
+import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
 
 const inter = Inter({
     variable: "--sans",
@@ -25,6 +38,7 @@ export default function Open({
 }) {
     const { toast } = useToast();
     const [value, setValue] = useState("");
+    const [timer, setTimer] = useState(null);
 
     useEffect(() => {
         get({
@@ -83,15 +97,10 @@ export default function Open({
         );
 
     return (
-        <div>
+        <div className="relative">
             <style jsx global>{`
-                .prose > div h1:first-child,
-                .prose > div h2:first-child,
-                .prose > div h3:first-child,
-                .prose > div h4:first-child,
-                .prose > div h5:first-child,
-                .prose > div h6:first-child {
-                    margin-top: 1.5rem !important;
+                .prose > div h1:first-child {
+                    margin-top: 3rem !important;
                 }
             `}</style>
             <div
@@ -100,6 +109,40 @@ export default function Open({
                     __html: parseMarkdown(value)
                 }}
             />
+            <DropdownMenu>
+                <DropdownMenuTrigger className="sticky bottom-4 left-4">
+                    <Button
+                        variant="outline"
+                        className="w-10 rounded-full bg-white p-0 shadow-md">
+                        <Settings2 className="h-4 w-4" />
+                        <span className="sr-only">Open popover</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                            Download
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent>
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    downloadHTML(value, file.filename)
+                                }>
+                                As HTML
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() =>
+                                    downloadMarkdown(value, file.filename)
+                                }>
+                                As Markdown
+                            </DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                    <DropdownMenuItem onClick={() => window.print()}>
+                        Print/Save as PDF
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </div>
     );
 }

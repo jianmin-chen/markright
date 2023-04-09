@@ -31,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import styles from "./Files.module.scss";
 import { Input } from "../ui/Input";
 import { useToast } from "../../hooks/ui/useToast";
-import { post } from "../../utils/fetch";
+import { get, post } from "../../utils/fetch";
 import catchError from "../../utils/logging";
 
 function File({
@@ -43,7 +43,8 @@ function File({
     location: initialLocation,
     updateFilesystem,
     openFile,
-    isPublic
+    isPublic,
+    userId
 }) {
     const [name, setName] = useState(initialName);
     const [location, setLocation] = useState(initialLocation);
@@ -174,6 +175,38 @@ function File({
                                             ? "Make private"
                                             : "Make public"}
                                     </DropdownMenuItem>
+                                    {publicState === true && (
+                                        <DropdownMenuItem
+                                            onClick={event => {
+                                                event.stopPropagation();
+                                                get({
+                                                    route: "/api/file/meta",
+                                                    data: { location }
+                                                })
+                                                    .then(res => {
+                                                        navigator.clipboard.writeText(
+                                                            `https://markright.co/public/${userId}/${res.meta.storage.replace(
+                                                                ".md",
+                                                                ""
+                                                            )}`
+                                                        );
+                                                        toast({
+                                                            description:
+                                                                "Copied to clipboard!"
+                                                        });
+                                                    })
+                                                    .catch(err =>
+                                                        toast({
+                                                            variant:
+                                                                "destructive",
+                                                            title: "Uh oh! Something went wrong.",
+                                                            description: err
+                                                        })
+                                                    );
+                                            }}>
+                                            Copy link
+                                        </DropdownMenuItem>
+                                    )}
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
                                         onClick={event => {
@@ -207,7 +240,8 @@ function Folder({
     location,
     updateFilesystem,
     openFile,
-    setFiles
+    setFiles,
+    userId
 }) {
     const [toggle, setToggle] = useState(false);
     const [nameFile, setNameFile] = useState(false);
@@ -371,6 +405,7 @@ function Folder({
                                     {...file}
                                     toast={toast}
                                     location={`${location}/${file.name}`}
+                                    userId={userId}
                                 />
                             );
                         return (
@@ -379,6 +414,7 @@ function Folder({
                                 openFile={openFile}
                                 toast={toast}
                                 location={`${location}/${file.name}`}
+                                userId={userId}
                             />
                         );
                     })}
@@ -388,7 +424,7 @@ function Folder({
     );
 }
 
-export default function Files({ initialFiles, openFile }) {
+export default function Files({ initialFiles, openFile, userId }) {
     const [files, setFiles] = useState(initialFiles);
     const { toast } = useToast();
 
@@ -481,6 +517,7 @@ export default function Files({ initialFiles, openFile }) {
                             updateFilesystem={setFiles}
                             openFile={openFile}
                             setFiles={setFiles}
+                            userId={userId}
                         />
                     );
                 return (
@@ -493,6 +530,7 @@ export default function Files({ initialFiles, openFile }) {
                         updateFilesystem={setFiles}
                         openFile={openFile}
                         setFiles={setFiles}
+                        userId={userId}
                     />
                 );
             })}

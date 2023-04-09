@@ -7,3 +7,4 @@ This is the second version! The old version is the one currently being deployed;
 ## Roadmap
 
 - [ ] Math support (how GitHub does it)
+- [ ] Emoji support with `:`

@@ -4,6 +4,7 @@ import { IBM_Plex_Mono, Inter } from "next/font/google";
 import { useResizeDetector } from "react-resize-detector";
 import Open from "./Open";
 import { post } from "../utils/fetch";
+import { BookOpen } from "lucide-react";
 
 const inter = Inter({
     variable: "--sans",
@@ -126,7 +127,38 @@ export default function Workspace({
                                                 <span className="flex-1 truncate">
                                                     {file.filename}
                                                 </span>
-                                                <span>&times;</span>
+                                                <span
+                                                    className="cursor-pointer"
+                                                    onClick={() => {
+                                                        const leftCopy =
+                                                            Array.from(left);
+                                                        leftCopy.splice(
+                                                            index,
+                                                            1
+                                                        );
+                                                        if (
+                                                            activeLeft === index
+                                                        ) {
+                                                            let active = null;
+                                                            if (
+                                                                leftCopy.length !=
+                                                                0
+                                                            ) {
+                                                                if (index === 0)
+                                                                    active = 0;
+                                                                else
+                                                                    active =
+                                                                        index -
+                                                                        1;
+                                                            }
+                                                            setActiveLeft(
+                                                                active
+                                                            );
+                                                        }
+                                                        setLeft(leftCopy);
+                                                    }}>
+                                                    &times;
+                                                </span>
                                             </div>
                                         )}
                                     </Draggable>
@@ -138,7 +170,8 @@ export default function Workspace({
                     <div
                         className="h-full flex-1 overflow-auto"
                         ref={leftRef.ref}>
-                        {activeLeft !== null && (
+                        {activeLeft !== null &&
+                        left[activeLeft] !== undefined ? (
                             <Open
                                 docRef={docRef}
                                 file={left[activeLeft]}
@@ -147,6 +180,14 @@ export default function Workspace({
                                 setMessage={setMessage}
                                 setOutlineValue={setValue}
                             />
+                        ) : (
+                            <div className="flex h-full flex-col items-center justify-center text-neutral-200">
+                                <BookOpen
+                                    className="h-32 w-32"
+                                    strokeWidth={0.5}
+                                />
+                                <p>Nothing opened yet.</p>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -180,7 +221,40 @@ export default function Workspace({
                                                 <span className="flex-1 truncate">
                                                     {file.filename}
                                                 </span>
-                                                <span>&times;</span>
+                                                <span
+                                                    className="cursor-pointer"
+                                                    onClick={() => {
+                                                        // Remove from right - if it's the active one, check if there's one we can move over
+                                                        const rightCopy =
+                                                            Array.from(right);
+                                                        rightCopy.splice(
+                                                            index,
+                                                            1
+                                                        );
+                                                        if (
+                                                            activeRight ===
+                                                            index
+                                                        ) {
+                                                            let active = null;
+                                                            if (
+                                                                rightCopy.length !=
+                                                                0
+                                                            ) {
+                                                                if (index === 0)
+                                                                    active = 0;
+                                                                else
+                                                                    active =
+                                                                        index -
+                                                                        1;
+                                                            }
+                                                            setActiveRight(
+                                                                active
+                                                            );
+                                                        }
+                                                        setRight(rightCopy);
+                                                    }}>
+                                                    &times;
+                                                </span>
                                             </div>
                                         )}
                                     </Draggable>
@@ -189,8 +263,11 @@ export default function Workspace({
                             </div>
                         )}
                     </Droppable>
-                    <div className="h-full flex-1 overflow-auto border-none p-0">
-                        {activeRight !== null && (
+                    <div
+                        className="h-full flex-1 overflow-auto border-none p-0"
+                        id="output">
+                        {activeRight !== null &&
+                        right[activeRight] !== undefined ? (
                             <Open
                                 file={right[activeRight]}
                                 sizeRef={rightRef}
@@ -205,6 +282,14 @@ export default function Workspace({
                                 }}
                                 setMessage={setMessage}
                             />
+                        ) : (
+                            <div className="flex h-full flex-col items-center justify-center text-neutral-200">
+                                <BookOpen
+                                    className="h-32 w-32"
+                                    strokeWidth={0.5}
+                                />
+                                <p>Nothing opened yet.</p>
+                            </div>
                         )}
                     </div>
                 </div>

@@ -26,7 +26,7 @@ const Workspace = dynamic(() => import("../components/Workspace"), {
     ssr: false
 });
 
-export default function Index({ files, background }) {
+export default function Index({ files, background, userId }) {
     const session = useSession();
     const router = useRouter();
     const { toast } = useToast();
@@ -137,6 +137,7 @@ export default function Index({ files, background }) {
                                             type: "output"
                                         });
                                     }}
+                                    userId={userId}
                                 />
                             </TabsContent>
                             {/*
@@ -198,7 +199,8 @@ export async function getServerSideProps({ req, res }) {
     return {
         props: {
             files: user.decryptObj(user.filesystem, token.sub, { safe: true }),
-            background: user.background
+            background: user.background,
+            userId: user._id.toString()
         }
     };
 }

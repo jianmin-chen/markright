@@ -159,29 +159,6 @@ export default function MenubarDemo({
                 </MenubarMenu>
                 <MenubarMenu>
                     <MenubarTrigger className="px-1 py-2 leading-none hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
-                        File
-                    </MenubarTrigger>
-                    <MenubarContent>
-                        <MenubarSub>
-                            <MenubarSubTrigger>Download</MenubarSubTrigger>
-                            <MenubarSubContent>
-                                <MenubarItem onClick={downloads.downloadHTML}>
-                                    As HTML
-                                </MenubarItem>
-                                <MenubarItem
-                                    onClick={downloads.downloadMarkdown}>
-                                    As Markdown
-                                </MenubarItem>
-                            </MenubarSubContent>
-                        </MenubarSub>
-                        <MenubarItem onClick={() => window.print()}>
-                            Print/Save as PDF{" "}
-                            <MenubarShortcut>⌘P</MenubarShortcut>
-                        </MenubarItem>
-                    </MenubarContent>
-                </MenubarMenu>
-                <MenubarMenu>
-                    <MenubarTrigger className="px-1 py-2 leading-none hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
                         View
                     </MenubarTrigger>
                     <MenubarContent>

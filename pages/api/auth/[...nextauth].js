@@ -15,7 +15,7 @@ export default NextAuth({
         async signIn({ user }) {
             await dbConnect();
             if (!(await User.findOne({ email: user.email })))
-                await User.create({ email: user.email });
+                await User.create({ email: user.email, name: user.name });
             return true;
         },
         async session({ session, token }) {
