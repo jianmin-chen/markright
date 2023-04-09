@@ -2,17 +2,30 @@ const regex = /^#{1,6} /;
 
 export default function Outline({ value, onClick }) {
     const toc = value => {
-        const headings = value.split("\n").flatMap((heading, line) => {
-            if (regex.test(heading)) {
-                let type = regex.exec(heading)[0];
-                return {
-                    line,
-                    heading: heading.slice(type.length),
-                    type: type.trim()
-                };
+        value = value.split("\n");
+        let headings = [];
+        for (let line = 0; line < value.length; line++) {
+            const curr = value[line];
+            if (curr.startsWith("```") && line != value.length - 1) {
+                // Skip code blocks
+                line++;
+                while (
+                    !value[line].startsWith("```") &&
+                    !(line === value.length - 1)
+                )
+                    line++;
+                continue;
             }
-            return [];
-        });
+
+            if (regex.test(curr)) {
+                let type = regex.exec(curr)[0];
+                headings.push({
+                    line,
+                    heading: curr.slice(type.length),
+                    type: type.trim()
+                });
+            }
+        }
         return headings;
     };
 

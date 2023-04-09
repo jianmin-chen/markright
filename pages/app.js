@@ -34,6 +34,8 @@ export default function Index({ files, background }) {
     const docRef = useRef(null);
     const [value, setValue] = useState("");
 
+    const [message, setMessage] = useState("");
+
     const [showSidebar, setShowSidebar] = useState(true);
 
     // Editor themes
@@ -97,23 +99,26 @@ export default function Index({ files, background }) {
                         downloadHTML: () => downloadHTML(value)
                     }}
                     keyboardHandler={{ keyboardHandler, setKeyboardHandler }}
+                    message={message}
                 />
             </div>
             <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md bg-white shadow-md">
                 {showSidebar === true && (
                     <div className="col-span-4 flex h-full flex-col overflow-auto border-r bg-neutral-100">
                         <Tabs defaultValue="files">
-                            <TabsList className="sticky top-0 mx-auto w-full flex-1 rounded-none bg-gray-200 p-0">
+                            <TabsList className="sticky top-0 mx-auto w-full flex-1 rounded-none border-b bg-gray-200 p-0">
                                 <TabsTrigger
                                     className="w-full rounded-none !shadow-none data-[state=active]:bg-neutral-100"
                                     value="files">
                                     Files
                                 </TabsTrigger>
+                                {/*
                                 <TabsTrigger
                                     className="w-full rounded-none !shadow-none data-[state=active]:bg-neutral-100"
                                     value="outline">
                                     Outline
                                 </TabsTrigger>
+                                */}
                             </TabsList>
                             <TabsContent
                                 className="flex flex-col gap-y-4 border-none p-0"
@@ -134,6 +139,7 @@ export default function Index({ files, background }) {
                                     }}
                                 />
                             </TabsContent>
+                            {/*
                             <TabsContent
                                 className="border-none"
                                 value="outline">
@@ -148,6 +154,7 @@ export default function Index({ files, background }) {
                                     }}
                                 />
                             </TabsContent>
+                            */}
                         </Tabs>
                     </div>
                 )}
@@ -157,7 +164,6 @@ export default function Index({ files, background }) {
                     } h-full overflow-hidden`}>
                     <div className="h-full border-r">
                         <Workspace
-                            value={value}
                             setValue={setValue}
                             keyboardHandler={keyboardHandler}
                             aceTheme={aceTheme}
@@ -171,6 +177,7 @@ export default function Index({ files, background }) {
                             setActiveLeft={setActiveLeft}
                             setActiveRight={setActiveRight}
                             aceOptions={{ keyboardHandler, theme: aceTheme }}
+                            setMessage={setMessage}
                         />
                     </div>
                 </div>

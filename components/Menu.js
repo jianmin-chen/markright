@@ -29,7 +29,12 @@ import { useToast } from "../hooks/ui/useToast";
 import { useEffect } from "react";
 import Unsplash from "./Unsplash";
 
-export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
+export default function MenubarDemo({
+    keyboardHandler,
+    downloads,
+    sidebar,
+    message
+}) {
     const { toast } = useToast();
     const { data: session } = useSession();
 
@@ -191,7 +196,7 @@ export default function MenubarDemo({ keyboardHandler, downloads, sidebar }) {
                 </MenubarMenu>
                 <MenubarMenu>
                     <MenubarTrigger className="!ml-auto px-1 py-2 leading-none hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
-                        Saving...
+                        {message}
                     </MenubarTrigger>
                 </MenubarMenu>
             </Menubar>

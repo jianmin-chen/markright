@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
 import { useResizeDetector } from "react-resize-detector";
 import Open from "./Open";
+import { post } from "../utils/fetch";
 
 const inter = Inter({
     variable: "--sans",
@@ -28,8 +29,6 @@ const reorder = (list, startIndex, endIndex) => {
 };
 
 export default function Workspace({
-    keyboardHandler,
-    aceTheme,
     docRef,
     left,
     right,
@@ -39,7 +38,9 @@ export default function Workspace({
     activeRight,
     setActiveLeft,
     setActiveRight,
-    aceOptions
+    aceOptions,
+    setMessage,
+    setValue
 }) {
     const leftRef = useResizeDetector();
     const rightRef = useResizeDetector();
@@ -118,10 +119,10 @@ export default function Workspace({
                                                 } ${
                                                     index === activeLeft &&
                                                     "bg-white"
-                                                } flex w-[0] shrink grow basis-0 items-center justify-center px-3 py-1.5  text-center text-sm font-medium text-slate-700  !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-200 dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-slate-100`}
-                                                onClick={() =>
-                                                    setActiveLeft(index)
-                                                }>
+                                                } flex w-[0] shrink grow basis-0 items-center justify-center border-b px-3 py-1.5  text-center text-sm font-medium text-slate-700  !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-200 dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-slate-100`}
+                                                onClick={() => {
+                                                    setActiveLeft(index);
+                                                }}>
                                                 <span className="flex-1 truncate">
                                                     {file.filename}
                                                 </span>
@@ -139,9 +140,12 @@ export default function Workspace({
                         ref={leftRef.ref}>
                         {activeLeft !== null && (
                             <Open
+                                docRef={docRef}
                                 file={left[activeLeft]}
                                 sizeRef={leftRef}
                                 aceOptions={aceOptions}
+                                setMessage={setMessage}
+                                setOutlineValue={setValue}
                             />
                         )}
                     </div>
@@ -169,7 +173,7 @@ export default function Workspace({
                                                 } ${
                                                     index === activeRight &&
                                                     "bg-white"
-                                                } flex w-[0] shrink grow basis-0 items-center justify-center px-3 py-1.5  text-center text-sm font-medium text-slate-700  !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-200 dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-slate-100`}
+                                                } flex w-[0] shrink grow basis-0 items-center justify-center border-b px-3 py-1.5  text-center text-sm font-medium text-slate-700  !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-200 dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-slate-100`}
                                                 onClick={() =>
                                                     setActiveRight(index)
                                                 }>
@@ -199,6 +203,7 @@ export default function Workspace({
                                         setRight(leftCopy);
                                     }
                                 }}
+                                setMessage={setMessage}
                             />
                         )}
                     </div>

@@ -429,7 +429,7 @@ export default function Files({ initialFiles, openFile }) {
     };
 
     return (
-        <div className="flex flex-col items-center py-7 px-2">
+        <div className="flex flex-col items-center py-1 px-2">
             <button
                 className="file flex w-full max-w-full items-center gap-x-1 rounded-md py-1 px-3 hover:bg-neutral-200"
                 onClick={() => setNameFolder(true)}>

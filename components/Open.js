@@ -15,7 +15,14 @@ const ibmPlexMono = IBM_Plex_Mono({
     subsets: ["latin"]
 });
 
-export default function Open({ file, sizeRef, aceOptions }) {
+export default function Open({
+    file,
+    sizeRef,
+    aceOptions,
+    setMessage,
+    setOutlineValue,
+    docRef
+}) {
     const { toast } = useToast();
     const [value, setValue] = useState("");
 
@@ -37,19 +44,26 @@ export default function Open({ file, sizeRef, aceOptions }) {
     useEffect(() => {
         // Autosave every 30 seconds
         if (file.type === "input" && value.length) {
+            setMessage("Saving...");
+            setOutlineValue(value);
             const timer = setTimeout(() => {
                 post({
                     route: "/api/file/update",
                     data: { location: file.location, content: value }
-                }).catch(err =>
-                    toast({
-                        variant: "destructive",
-                        title: "Uh oh! Something went wrong.",
-                        description: err
-                    })
-                );
+                })
+                    .then(() => setMessage("Saved"))
+                    .catch(err =>
+                        toast({
+                            variant: "destructive",
+                            title: "Uh oh! Something went wrong.",
+                            description: err
+                        })
+                    );
             }, 5000);
-            return () => clearTimeout(timer);
+            return () => {
+                clearTimeout(timer);
+                setMessage("");
+            };
         }
     }, [value]);
 
@@ -64,6 +78,7 @@ export default function Open({ file, sizeRef, aceOptions }) {
                 options={{
                     ...aceOptions
                 }}
+                assignRef={docRef ? docRef : null}
             />
         );
 
