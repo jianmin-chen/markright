@@ -1,22 +1,22 @@
+import { getServerSession } from "next-auth";
+import { signIn } from "next-auth/react";
+import { authOptions } from "./api/auth/[...nextauth]";
 import { Button } from "../components/ui/Button";
 
-export default function Index() {
+export default function Login() {
     return (
-        <div className="max-w-screen relative h-screen max-h-screen w-screen overflow-hidden">
-            <img
-                className="min-w-screen relative z-[-1] min-h-screen"
-                src="/images/screenshot.png"
-            />
-            <div className="absolute top-2 left-2 rounded-lg border border-neutral-600 bg-neutral-800 p-14 text-neutral-200 shadow-2xl">
-                <div className="relative"></div>
-                <div className="flex flex-col gap-y-7">
-                    <h1 className="text-2xl">
-                        <code>markright</code> is a minimal, Markdown-based
-                        writing tool.
-                    </h1>
-                    <Button>Log in with Google</Button>
-                </div>
+        <div className="fixed inset-0 z-50 backdrop-blur-sm">
+            <div className="flex h-screen w-full flex-col items-center justify-center">
+                <Button variant="outline" onClick={() => signIn("google")}>
+                    Sign in with Google
+                </Button>
             </div>
         </div>
     );
+}
+
+export async function getServerSideProps({ req, res }) {
+    const session = await getServerSession(req, res, authOptions);
+    if (session) return { redirect: { destination: "/app" } };
+    return { props: {} };
 }

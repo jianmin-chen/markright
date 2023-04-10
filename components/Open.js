@@ -107,7 +107,10 @@ export default function Open({
                 }}
             />
             <DropdownMenu>
-                <DropdownMenuTrigger className="output-options-trigger sticky bottom-4 left-4">
+                <DropdownMenuTrigger
+                    className={`${
+                        !value.length && "hidden"
+                    } output-options-trigger sticky bottom-4 left-4`}>
                     <Button
                         variant="outline"
                         className="w-10 rounded-full bg-white p-0 shadow-md">

@@ -32,7 +32,7 @@ export default async function handler(req, res) {
         console.log("no nvm", token.sub);
         const user = await User.findOne({ email: session.user.email });
         console.log("it's here", token.sub);
-        const filesystem = await user.deleteFile(location, token.sub);
+        const { filesystem } = await user.deleteFile(location, token.sub);
         return res.status(200).json({
             success: true,
             filesystem: user.decryptObj(filesystem, token.sub)

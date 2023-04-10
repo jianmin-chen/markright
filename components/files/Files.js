@@ -44,7 +44,8 @@ function File({
     updateFilesystem,
     openFile,
     isPublic,
-    userId
+    userId,
+    setFiles
 }) {
     const [name, setName] = useState(initialName);
     const [location, setLocation] = useState(initialLocation);
@@ -68,6 +69,7 @@ function File({
 
     const renameFile = filename => {
         const traversed = location.split("/");
+        setName(filename);
         post({
             route: "/api/file/rename",
             data: {
@@ -78,7 +80,8 @@ function File({
             }
         })
             .then(res => {
-                console.log(res);
+                setRename(false);
+                setFiles(res.filesystem);
             })
             .catch(err =>
                 toast({
@@ -95,7 +98,7 @@ function File({
             data: { location }
         })
             .then(res => {
-                console.log(res);
+                setFiles(res.filesystem);
             })
             .catch(err =>
                 toast({
@@ -113,12 +116,13 @@ function File({
                     !rename && "hover:bg-neutral-200"
                 } ${styles.file} ${className} `}
                 onClick={() => {
-                    openFile(name, location);
+                    if (!rename) openFile(name, location);
                 }}>
                 {rename ? (
                     <form
                         className="flex w-full max-w-full items-center justify-between rounded-md border border-blue-500 py-1 px-3 pl-5 shadow-md"
                         onSubmit={event => {
+                            event.stopPropagation();
                             event.preventDefault();
                             if (
                                 event.target.file.value.length &&
@@ -127,7 +131,6 @@ function File({
                                 renameFile(event.target.file.value);
                             }
                             event.target.reset();
-                            setRename(false);
                         }}>
                         <span className="flex min-w-0 max-w-full items-center gap-x-1 overflow-hidden">
                             <FileIcon className="h-4 w-4 shrink-0" />
@@ -136,6 +139,7 @@ function File({
                                 autoComplete="off"
                                 autoFocus={true}
                                 name="file"
+                                onChange={event => event.stopPropagation()}
                                 onBlur={event => {
                                     if (
                                         !event.target.value.length ||
@@ -424,19 +428,23 @@ function Folder({
                         if (file.type === "folder")
                             return (
                                 <Folder
+                                    key={`folder${file.name}`}
                                     {...file}
                                     toast={toast}
                                     location={`${location}/${file.name}`}
                                     userId={userId}
+                                    setFiles={setFiles}
                                 />
                             );
                         return (
                             <File
                                 {...file}
+                                key={`file${file.name}`}
                                 openFile={openFile}
                                 toast={toast}
                                 location={`${location}/${file.name}`}
                                 userId={userId}
+                                setFiles={setFiles}
                             />
                         );
                     })}
@@ -446,8 +454,7 @@ function Folder({
     );
 }
 
-export default function Files({ initialFiles, openFile, userId }) {
-    const [files, setFiles] = useState(initialFiles);
+export default function Files({ files, setFiles, openFile, userId }) {
     const { toast } = useToast();
 
     // Toggle new folder creation

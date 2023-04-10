@@ -26,7 +26,7 @@ const Workspace = dynamic(() => import("../components/Workspace"), {
     ssr: false
 });
 
-export default function Index({ files, background, userId }) {
+export default function Index({ files: initialFiles, background, userId }) {
     const session = useSession();
     const router = useRouter();
     const { toast } = useToast();
@@ -71,6 +71,11 @@ export default function Index({ files, background, userId }) {
         if (setActive) setActiveRight(length);
     };
 
+    const [files, setFiles] = useState(initialFiles);
+    useEffect(() => {
+        // TODO: Update tabs as needed
+    }, [files]);
+
     useEffect(() => {
         document.querySelectorAll(".prose pre").forEach(el => {
             if (!el.querySelector("span")) hljs.highlightElement(el);
@@ -78,7 +83,7 @@ export default function Index({ files, background, userId }) {
     }, [value]);
 
     useEffect(() => {
-        if (session.status === "unauthenticated") return router.push("/login");
+        if (session.status === "unauthenticated") return router.push("/");
     }, []);
 
     return (
@@ -124,7 +129,8 @@ export default function Index({ files, background, userId }) {
                                 className="flex flex-col gap-y-4 border-none p-0"
                                 value="files">
                                 <Files
-                                    initialFiles={files}
+                                    files={files}
+                                    setFiles={setFiles}
                                     openFile={(filename, location) => {
                                         addLeft({
                                             filename,
@@ -190,7 +196,7 @@ export default function Index({ files, background, userId }) {
 export async function getServerSideProps({ req, res }) {
     const session = await getServerSession(req, res);
     const token = await getToken({ req });
-    if (!session || !token) return { redirect: { destination: "/login" } };
+    if (!session || !token) return { redirect: { destination: "/" } };
 
     // Get files
     await dbConnect();

@@ -290,10 +290,10 @@ userSchema.methods.renameFile = async function (
     newLocation,
     password
 ) {
-    const content = this.getFile(oldLocation, password);
+    const content = await this.getFile(oldLocation, password);
     await this.deleteFile(oldLocation, password);
     await this.addFile(newLocation, password, content);
-    await this.getFileMeta(newLocation, password);
+    return this;
 };
 
 userSchema.methods.updateFile = async function (location, content, password) {
