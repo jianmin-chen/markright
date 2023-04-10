@@ -1,6 +1,6 @@
 import AceEditor from "./AceEditor";
 import parseMarkdown from "../utils/parser";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { get, post } from "../utils/fetch";
 import { useToast } from "../hooks/ui/useToast";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
@@ -33,10 +33,17 @@ export default function Open({
     sizeRef,
     aceOptions,
     setMessage,
-    docRef
+    docRef,
+    setMirror,
+    mirror,
+    setSideValue
 }) {
     const { toast } = useToast();
     const [value, setValue] = useState("");
+
+    useEffect(() => {
+        if (file.type === "output" && mirror !== null) setValue(mirror);
+    }, [mirror]);
 
     useEffect(() => {
         get({
@@ -53,24 +60,30 @@ export default function Open({
             );
     }, [file]);
 
+    const update = () => {
+        post({
+            route: "/api/file/update",
+            data: { location: file.location, content: value }
+        })
+            .then(() => {
+                setMessage("Saved");
+            })
+            .catch(err =>
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: err
+                })
+            );
+    };
+
     useEffect(() => {
         // Autosave every 30 seconds
         if (file.type === "input") {
             setMessage("Saving...");
-            const timer = setTimeout(() => {
-                post({
-                    route: "/api/file/update",
-                    data: { location: file.location, content: value }
-                })
-                    .then(() => setMessage("Saved"))
-                    .catch(err =>
-                        toast({
-                            variant: "destructive",
-                            title: "Uh oh! Something went wrong.",
-                            description: err
-                        })
-                    );
-            }, 5000);
+            setMirror(value);
+            setSideValue(value);
+            const timer = setTimeout(update, 5000);
             return () => {
                 clearTimeout(timer);
                 setMessage("");
@@ -84,6 +97,10 @@ export default function Open({
                 value={value}
                 setValue={setValue}
                 onScroll={() => {}}
+                onBlur={() => {
+                    update();
+                    setMessage("Saved");
+                }}
                 width={sizeRef.width}
                 height={sizeRef.height}
                 options={{

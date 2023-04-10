@@ -5,6 +5,7 @@ import { useResizeDetector } from "react-resize-detector";
 import Open from "./Open";
 import { post } from "../utils/fetch";
 import { BookOpen } from "lucide-react";
+import { useToast } from "../hooks/ui/useToast";
 
 const inter = Inter({
     variable: "--sans",
@@ -43,9 +44,12 @@ export default function Workspace({
     setMessage,
     setValue
 }) {
+    const { toast } = useToast();
     const leftRef = useResizeDetector();
     const rightRef = useResizeDetector();
-
+    const [mirror, setMirror] = useState("");
+    const [leftValue, setLeftValue] = useState("");
+    const [rightValue, setRightValue] = useState("");
     const [outputScroll, setOutputScroll] = useState(false);
     const input = docRef;
     const output = useRef(null);
@@ -97,6 +101,37 @@ export default function Workspace({
         }
     };
 
+    const updateActiveTabs = async () => {
+        // Run when tabs change
+        try {
+            if (left[activeLeft] && left[activeLeft].type === "input") {
+                await post({
+                    route: "/api/file/update",
+                    data: {
+                        location: left[activeLeft].location,
+                        content: leftValue
+                    }
+                });
+            }
+            if (right[activeRight] && right[activeRight].type === "input") {
+                await post({
+                    route: "/api/file/update",
+                    data: {
+                        location: right[activeRight].location,
+                        content: rightValue
+                    }
+                });
+            }
+            setMessage("Saved");
+        } catch (err) {
+            toast({
+                variant: "destructive",
+                title: "Uh oh! Looks like there was an error",
+                description: err
+            });
+        }
+    };
+
     return (
         <DragDropContext onDragEnd={onDragEnd}>
             <div className="grid h-full w-full grid-cols-2 overflow-hidden">
@@ -124,7 +159,8 @@ export default function Workspace({
                                                     index === activeLeft &&
                                                     "bg-white"
                                                 } flex w-[0] shrink grow basis-0 items-center justify-center border-b px-3 py-1.5  text-center text-sm font-medium text-slate-700  !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-200 dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-slate-100`}
-                                                onClick={() => {
+                                                onClick={async () => {
+                                                    await updateActiveTabs();
                                                     setActiveLeft(index);
                                                 }}>
                                                 <span className="flex-1 truncate">
@@ -187,6 +223,16 @@ export default function Workspace({
                                 sizeRef={leftRef}
                                 aceOptions={aceOptions}
                                 setMessage={setMessage}
+                                setSideValue={setLeftValue}
+                                mirror={
+                                    left[activeLeft] &&
+                                    right[activeRight] &&
+                                    left[activeLeft].location ===
+                                        right[activeRight].location
+                                        ? mirror
+                                        : null
+                                }
+                                setMirror={setMirror}
                             />
                         ) : (
                             <div className="flex h-full flex-col items-center justify-center text-neutral-200">
@@ -223,9 +269,10 @@ export default function Workspace({
                                                     index === activeRight &&
                                                     "bg-white"
                                                 } flex w-[0] shrink grow basis-0 items-center justify-center border-b px-3 py-1.5  text-center text-sm font-medium text-slate-700  !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-200 dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-slate-100`}
-                                                onClick={() =>
-                                                    setActiveRight(index)
-                                                }>
+                                                onClick={async () => {
+                                                    await updateActiveTabs();
+                                                    setActiveRight(index);
+                                                }}>
                                                 <span className="flex-1 truncate">
                                                     {file.filename}
                                                 </span>
@@ -272,7 +319,7 @@ export default function Workspace({
                         )}
                     </Droppable>
                     <div
-                        className="h-full flex-1 overflow-auto border-none p-0"
+                        className="h-full flex-1 overflow-auto"
                         id="output"
                         ref={rightRef.ref}>
                         {activeRight !== null &&
@@ -288,8 +335,18 @@ export default function Workspace({
                                         setRight(leftCopy);
                                     }
                                 }}
+                                setSideValue={setRightValue}
                                 setMessage={setMessage}
                                 sizeRef={rightRef}
+                                mirror={
+                                    left[activeLeft] &&
+                                    right[activeRight] &&
+                                    left[activeLeft].location ===
+                                        right[activeRight].location
+                                        ? mirror
+                                        : null
+                                }
+                                setMirror={setMirror}
                             />
                         ) : (
                             <div className="flex h-full flex-col items-center justify-center text-neutral-200">

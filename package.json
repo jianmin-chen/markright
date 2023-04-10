@@ -28,6 +28,7 @@
     "clsx": "^1.2.1",
     "cmdk": "^0.2.0",
     "highlight.js": "^11.7.0",
+    "lru-cache": "^9.0.0",
     "lucide-react": "^0.121.0",
     "mathjax": "^3.2.2",
     "mongoose": "^7.0.0",

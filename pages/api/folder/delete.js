@@ -34,7 +34,7 @@ export default async function handler(req, res) {
             .filesystem;
         return res.status(200).json({
             success: true,
-            filesystem: user.decryptObj(filesystem)
+            filesystem: user.decryptObj(filesystem, token.sub)
         });
     } catch (err) {
         console.log(err);

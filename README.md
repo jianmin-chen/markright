@@ -6,7 +6,7 @@ A full-fledged Markdown editor with a filesystem and OAuth login, written using 
 
 - [ ] Math support (how GitHub does it)
 - [ ] Emoji support with `:`
-- [ ] Save user preferences (including open folders and files)
+- [ ] Save user preferences (including open folders and files, which also means draggable folders and files)
 - [ ] Adding more (unnecessary but fun) features, including: 
   - [ ] Background image customization
   - [ ] More themes
