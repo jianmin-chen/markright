@@ -22,7 +22,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger
-} from "./ui/dialog";
+} from "./ui/Dialog";
 import { Label } from "./ui/Label";
 import { Input } from "./ui/Input";
 import { useToast } from "../hooks/ui/useToast";

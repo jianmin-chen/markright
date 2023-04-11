@@ -13,7 +13,7 @@ import {
     TabsTrigger
 } from "../components/ui/tabs";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/Avatar";
-import Files from "../components/Files/Files";
+import Files from "../components/files/Files";
 import dbConnect from "../database/connect";
 import User from "../database/services/user.service";
 import { downloadMarkdown, downloadHTML } from "../utils/markdownUtils";
