@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+* {
+    box-sizing: border-box;
+}
+
 body,
 html {
     @apply m-0 max-h-screen p-0;
@@ -20,29 +24,15 @@ input:not(.ui-input) {
 }
 
 @media print {
-    body * {
-        visibility: hidden;
+    @page {
+        margin: 3.5rem 0;
     }
 
-    #output * {
-        visibility: visible;
-    }
-
-    #output {
-        background-color: white;
+    *:not(style) {
         display: block;
-        width: auto;
-        height: auto;
-        overflow: visible;
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 9999;
-        @apply prose prose-2xl prose-slate;
+    }
 
-        .output-options-trigger,
-        .output-options-content {
-            @apply hidden;
-        }
+    body {
+        @apply prose prose-2xl prose-slate block px-7 py-4;
     }
 }

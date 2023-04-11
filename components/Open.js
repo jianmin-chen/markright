@@ -17,6 +17,7 @@ import {
 import { Settings2 } from "lucide-react";
 import { Button } from "./ui/Button";
 import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
+import ReactToPrint from "react-to-print";
 
 const inter = Inter({
     variable: "--sans",
@@ -38,6 +39,7 @@ export default function Open({
     mirror,
     setSideValue
 }) {
+    const componentRef = useRef();
     const { toast } = useToast();
     const [value, setValue] = useState("");
 
@@ -111,23 +113,24 @@ export default function Open({
         );
 
     return (
-        <div className="relative">
+        <div className="h-full overflow-auto">
             <style jsx global>{`
                 .prose > div h1:first-child {
                     margin-top: 3rem !important;
                 }
             `}</style>
             <div
-                className={`prose prose-lg max-w-none px-8 pb-3 ${inter.className}`}
+                className={`prose prose-lg max-w-none px-8 pb-12 ${inter.className}`}
                 dangerouslySetInnerHTML={{
                     __html: parseMarkdown(value)
                 }}
+                ref={componentRef}
             />
             <DropdownMenu>
                 <DropdownMenuTrigger
                     className={`${
                         !value.length && "hidden"
-                    } output-options-trigger sticky bottom-4 left-4`}>
+                    } output-options-trigger absolute bottom-4 left-4`}>
                     <Button
                         variant="outline"
                         className="w-10 rounded-full bg-white p-0 shadow-md">
@@ -155,9 +158,14 @@ export default function Open({
                             </DropdownMenuItem>
                         </DropdownMenuSubContent>
                     </DropdownMenuSub>
-                    <DropdownMenuItem onClick={() => window.print()}>
-                        Print/Save as PDF
-                    </DropdownMenuItem>
+                    <ReactToPrint
+                        trigger={() => (
+                            <DropdownMenuItem>
+                                Print/Save as PDF
+                            </DropdownMenuItem>
+                        )}
+                        content={() => componentRef.current}
+                    />
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>

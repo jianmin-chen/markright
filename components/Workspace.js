@@ -192,11 +192,7 @@ export default function Workspace({
                                                             )
                                                                 active =
                                                                     index - 1;
-                                                            console.log(
-                                                                active,
-                                                                leftCopy,
-                                                                leftCopy[active]
-                                                            );
+                                                            console.log(active);
                                                             setActiveLeft(
                                                                 active
                                                             );
@@ -213,7 +209,7 @@ export default function Workspace({
                         )}
                     </Droppable>
                     <div
-                        className="h-full flex-1 overflow-auto"
+                        className="relative h-full flex-1 overflow-hidden"
                         ref={leftRef.ref}>
                         {activeLeft !== null &&
                         left[activeLeft] !== undefined ? (
@@ -319,8 +315,7 @@ export default function Workspace({
                         )}
                     </Droppable>
                     <div
-                        className="h-full flex-1 overflow-auto"
-                        id="output"
+                        className="relative h-full flex-1 overflow-hidden"
                         ref={rightRef.ref}>
                         {activeRight !== null &&
                         right[activeRight] !== undefined ? (

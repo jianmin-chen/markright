@@ -6,7 +6,7 @@ import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 
-export default function Slug({ username, markdown }) {
+export default function Slug({ username, markdown, title }) {
     useEffect(() => {
         document.querySelectorAll(".prose pre").forEach(el => {
             if (!el.querySelector("span")) hljs.highlightElement(el);
@@ -20,7 +20,7 @@ export default function Slug({ username, markdown }) {
                     disabled
                     variant="outline"
                     className=" rounded-3xl bg-white px-14 py-1.5 shadow-lg hover:bg-white">
-                    Shared by {username} with Markright{" "}
+                    Renaming &middot; Shared by {username} with Markright{" "}
                     <ExternalLink className="ml-1 h-4 w-4" />
                 </Button>
             </Link>
@@ -67,7 +67,6 @@ export async function getServerSideProps({ query }) {
         const user = await User.findOne({
             _id: new mongoose.Types.ObjectId(id)
         });
-        console.log(user);
         if (user) {
             // Go through user's files, find public files
             const content = search(user.filesystem, slug);
@@ -75,6 +74,7 @@ export async function getServerSideProps({ query }) {
             return {
                 props: {
                     username: user.name,
+                    title: content[0].name,
                     markdown: await get(content[0].storage)
                 }
             };

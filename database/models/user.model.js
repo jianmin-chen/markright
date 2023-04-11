@@ -291,8 +291,10 @@ userSchema.methods.renameFile = async function (
     password
 ) {
     const content = await this.getFile(oldLocation, password);
+    const oldFile = await this.getFileMeta(oldLocation, password);
     await this.deleteFile(oldLocation, password);
-    await this.addFile(newLocation, password, content);
+    if (oldFile.isPublic) await this.addFile(newLocation, password, content);
+    else await this.addFile(newLocation, password, encrypt(content, password));
     return this;
 };
 
@@ -387,9 +389,16 @@ userSchema.methods.toggleFilePublic = async function (
         if (this.filesystem[index].isPublic === isPublic) return this;
         this.filesystem[index].isPublic = isPublic;
         // If isPublic, decrypt content, otherwise encrypt content at location
-        if (isPublic)
+        if (isPublic) {
+            this.filesystem[index].publicName = decrypt(
+                this.filesystem[index].name,
+                password
+            );
             await crypt(this.filesysem[index].storage, "decrypt", password);
-        else await crypt(this.filesystem[index].storage, "encrypt", password);
+        } else {
+            delete this.filesysem[index].publicName;
+            await crypt(this.filesystem[index].storage, "encrypt", password);
+        }
         return await this.save();
     }
     let encrypted = this.filesystem;
@@ -417,9 +426,16 @@ userSchema.methods.toggleFilePublic = async function (
     encrypted.content[index].isPublic = isPublic;
     this.markModified("filesystem");
     // If isPublic, decrypt content, otherwise encrypt content at location
-    if (isPublic)
+    if (isPublic) {
+        encrypted.content[index].publicName = decrypt(
+            encrypted.content[index].name,
+            password
+        );
         await crypt(encrypted.content[index].storage, "decrypt", password);
-    else await crypt(encrypted.content[index].storage, "encrypt", password);
+    } else {
+        delete encrypted.content[index].publicName;
+        await crypt(encrypted.content[index].storage, "encrypt", password);
+    }
     return await this.save();
 };
 
