@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { get, post } from "../utils/fetch";
 import { useToast } from "../hooks/ui/useToast";
 import { IBM_Plex_Mono, Inter } from "next/font/google";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import {
     DropdownMenu,
     DropdownMenuContent,
