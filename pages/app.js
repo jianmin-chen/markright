@@ -11,7 +11,7 @@ import {
     TabsContent,
     TabsList,
     TabsTrigger
-} from "../components/ui/tabs";
+} from "../components/ui/Tabs";
 import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/Avatar";
 import Files from "../components/files/Files";
 import dbConnect from "../database/connect";

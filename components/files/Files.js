@@ -18,15 +18,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "../ui/DropdownMenu";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-    DialogFooter
-} from "../ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
 import styles from "./Files.module.scss";
 import { Input } from "../ui/Input";
