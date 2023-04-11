@@ -1,15 +1,35 @@
 import { getServerSession } from "next-auth";
 import { signIn } from "next-auth/react";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { Button } from "../components/ui/Button";
+import { ExternalLink } from "lucide-react";
 
 export default function Login() {
     return (
         <div className="fixed inset-0 z-50 backdrop-blur-sm">
-            <div className="flex h-screen w-full flex-col items-center justify-center">
-                <Button variant="outline" onClick={() => signIn("google")}>
-                    Sign in with Google
-                </Button>
+            <div className="flex min-h-screen w-full flex-col items-center justify-center gap-y-6 py-14">
+                <div className="prose prose-xl">
+                    <h1 className="!mb-0">Markright</h1>
+                    <p>
+                        A full-fledged Markdown editor with a filesystem and
+                        OAuth login, written using a{" "}
+                        <a
+                            href="https://github.com/jianmin-chen/markdown-parser"
+                            target="_blank">
+                            custom Markdown parser
+                        </a>
+                        !{" "}
+                        <button onClick={() => signIn("google")}>
+                            <a>
+                                Sign in with Google{" "}
+                                <ExternalLink className="inline -rotate-2" />
+                            </a>
+                        </button>
+                    </p>
+                    <img
+                        className="rounded-xl shadow-xl"
+                        src="/images/screenshot.png"
+                    />
+                </div>
             </div>
         </div>
     );

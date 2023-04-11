@@ -238,7 +238,7 @@ function File({
 }
 
 function Folder({
-    name,
+    name: initialName,
     content,
     toast,
     location,
@@ -247,7 +247,9 @@ function Folder({
     setFiles,
     userId
 }) {
+    const [name, setName] = useState(initialName);
     const [toggle, setToggle] = useState(false);
+    const [renameFolder, setRenameFolder] = useState(false);
     const [nameFile, setNameFile] = useState(false);
     const [nameFolder, setNameFolder] = useState(false);
 
@@ -310,6 +312,37 @@ function Folder({
             );
     };
 
+    const renameSelf = foldername => {
+        const traversed = location.split("/");
+        setName(foldername);
+        const oldLocation =
+            traversed.length === 1
+                ? initialName
+                : traversed.slice(0, traversed.length - 1) + "/" + initialName;
+        const newLocation =
+            traversed.length === 1
+                ? foldername
+                : traversed.slice(0, traversed.length - 1) + "/" + foldername;
+        post({
+            route: "/api/folder/rename",
+            data: {
+                oldLocation,
+                newLocation
+            }
+        })
+            .then(res => {
+                setRenameFolder(false);
+                setFiles(res.filesystem);
+            })
+            .catch(err =>
+                toast({
+                    variant: "destructive",
+                    title: "Uh oh! Something went wrong.",
+                    description: err
+                })
+            );
+    };
+
     const deleteSelf = () => {
         del({
             route: "/api/folder/delete",
@@ -329,54 +362,101 @@ function Folder({
 
     return (
         <>
-            <div
-                className={`folder flex w-full cursor-pointer items-center justify-between rounded-md py-1 px-3 hover:bg-neutral-200 ${styles.folder}`}
-                onClick={() => setToggle(!toggle)}>
-                <span className="flex min-w-0 items-center gap-x-1">
-                    {content.length > 0 &&
-                        (toggle ? (
-                            <ChevronDown className="h-4 w-4" />
-                        ) : (
-                            <ChevronRight className="h-4 w-4" />
-                        ))}
-                    <FolderClosed className="h-4 w-4 shrink-0" />
-                    <span className="truncate">{name}</span>
-                </span>
-                <span className={`${styles.extra} flex`}>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300">
-                            <MoreHorizontal className="h-4 w-4" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                            <DropdownMenuItem
-                                onClick={event => {
-                                    event.stopPropagation();
-                                    setNameFolder(true);
-                                }}>
-                                New folder
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>Rename</DropdownMenuItem>
-                            <DropdownMenuItem
-                                className="text-red-500"
-                                onClick={event => {
-                                    event.stopPropagation();
-                                    deleteSelf();
-                                }}>
-                                Delete
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                    <button
-                        className="rounded-md px-1 py-0.5 hover:bg-neutral-300"
-                        onClick={event => {
-                            event.stopPropagation();
-                            setNameFile(true);
-                        }}>
-                        <Plus className="h-4 w-4" />
-                    </button>
-                </span>
-            </div>
+            {!renameFolder ? (
+                <div
+                    className={`folder flex w-full cursor-pointer items-center justify-between rounded-md py-1 px-3 hover:bg-neutral-200 ${styles.folder}`}
+                    onClick={() => setToggle(!toggle)}>
+                    <span className="flex min-w-0 items-center gap-x-1">
+                        {content.length > 0 &&
+                            (toggle ? (
+                                <ChevronDown className="h-4 w-4" />
+                            ) : (
+                                <ChevronRight className="h-4 w-4" />
+                            ))}
+                        <FolderClosed className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{name}</span>
+                    </span>
+                    <span className={`${styles.extra} flex`}>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300">
+                                <MoreHorizontal className="h-4 w-4" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                                <DropdownMenuItem
+                                    onClick={event => {
+                                        event.stopPropagation();
+                                        setNameFolder(true);
+                                    }}>
+                                    New folder
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    onClick={event => {
+                                        event.stopPropagation();
+                                        setRenameFolder(true);
+                                    }}>
+                                    Rename
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="text-red-500"
+                                    onClick={event => {
+                                        event.stopPropagation();
+                                        deleteSelf();
+                                    }}>
+                                    Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <button
+                            className="rounded-md px-1 py-0.5 hover:bg-neutral-300"
+                            onClick={event => {
+                                event.stopPropagation();
+                                setNameFile(true);
+                            }}>
+                            <Plus className="h-4 w-4" />
+                        </button>
+                    </span>
+                </div>
+            ) : (
+                <form
+                    className="flex w-full max-w-full items-center justify-between rounded-md border border-blue-500 py-1 px-3 pl-5 shadow-md"
+                    onSubmit={event => {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        if (
+                            event.target.folder.value.length &&
+                            event.target.folder.value !== name
+                        )
+                            renameSelf(event.target.folder.value);
+                        event.target.reset();
+                    }}>
+                    <span className="flex min-w-0 max-w-full items-center gap-x-1 overflow-hidden">
+                        <FolderClosed className="h-4 w-4 shrink-0" />
+                        <input
+                            className="max-w-full flex-1 overflow-auto bg-transparent"
+                            autoComplete="off"
+                            autoFocus={true}
+                            name="folder"
+                            onChange={event => event.stopPropagation()}
+                            onBlur={event => {
+                                if (
+                                    !event.target.value.length ||
+                                    event.target.value === name
+                                ) {
+                                    setRenameFolder(false);
+                                    return;
+                                }
+                                event.target.value = "";
+                                renameSelf(event.target.value);
+                                setRenameFolder(false);
+                            }}
+                            required
+                            title="Rename folder"
+                            defaultValue={name}
+                        />
+                    </span>
+                </form>
+            )}
             {(nameFile || nameFolder) && (
                 <form
                     className={`flex w-full max-w-full items-center justify-between rounded-md border border-blue-500 py-1 px-3 pl-5 shadow-md`}

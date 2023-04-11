@@ -30,17 +30,15 @@ export default async function handler(req, res) {
         try {
             await dbConnect();
             const user = await User.findOne({ email: session.user.email });
-            const { filesystem } = await user.renameFile(
+            const { filesystem } = await user.moveFile(
                 oldLocation,
                 newLocation,
                 token.sub
             );
-            return res
-                .status(200)
-                .json({
-                    success: true,
-                    filesystem: user.decryptObj(filesystem, token.sub)
-                });
+            return res.status(200).json({
+                success: true,
+                filesystem: user.decryptObj(filesystem, token.sub)
+            });
         } catch (err) {
             console.log(err);
             return res.status(500).json({

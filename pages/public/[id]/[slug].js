@@ -20,7 +20,7 @@ export default function Slug({ username, markdown, title }) {
                     disabled
                     variant="outline"
                     className=" rounded-3xl bg-white px-14 py-1.5 shadow-lg hover:bg-white">
-                    Renaming &middot; Shared by {username} with Markright{" "}
+                    {title} &middot; Shared by {username} with Markright{" "}
                     <ExternalLink className="ml-1 h-4 w-4" />
                 </Button>
             </Link>
@@ -31,11 +31,11 @@ export default function Slug({ username, markdown, title }) {
                 .prose > div h4:first-child,
                 .prose > div h5:first-child,
                 .prose > div h6:first-child {
-                    margin-top: 1.5rem !important;
+                    margin-top: 2rem !important;
                 }
             `}</style>
             <div
-                className="prose prose-lg w-7/12 max-w-none overflow-auto rounded-t-3xl border bg-white p-14 pt-7 shadow-2xl"
+                className="prose prose-lg w-7/12 max-w-none overflow-auto rounded-t-3xl border bg-white px-14 py-7 shadow-2xl"
                 dangerouslySetInnerHTML={{
                     __html: parseMarkdown(markdown)
                 }}
@@ -74,7 +74,7 @@ export async function getServerSideProps({ query }) {
             return {
                 props: {
                     username: user.name,
-                    title: content[0].name,
+                    title: content[0].publicName,
                     markdown: await get(content[0].storage)
                 }
             };

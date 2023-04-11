@@ -111,11 +111,76 @@ userSchema.methods.addFolder = async function (location, password) {
     return await this.save();
 };
 
-userSchema.methods.renameFolder = async function (
+userSchema.methods.moveFolder = async function (
     oldLocation,
     newLocation,
     password
-) {};
+) {
+    // High cost currently... because you have to rename all the internal folders and such
+    let decrypted = this.decryptObj(this.filesystem, password);
+    if (oldLocation.split("/").length === 1) {
+        const index = decrypted.findIndex(
+            x => x.type === "folder" && x.name === oldLocation
+        );
+        if (index < 0) throw new Error(`Folder ${oldLocation} not found`);
+        // Create new folder first, then move all content in old corresponding folder to new folder before deleting
+        await this.addFolder(newLocation, password);
+        for (let f of decrypted[index].content) {
+            if (f.type === "folder")
+                await this.moveFolder(
+                    oldLocation + "/" + f.name,
+                    newLocation + "/" + f.name,
+                    password
+                );
+            else
+                await this.moveFile(
+                    oldLocation + "/" + f.name,
+                    newLocation + "/" + f.name,
+                    password
+                );
+        }
+        this.deleteFolder(oldLocation, password);
+        return this;
+    }
+    const traverse = oldLocation.split("/");
+    let encrypted = this.filesystem;
+    for (let i = 0; i < traverse.length - 1; i++) {
+        let route = traverse[i];
+        let step;
+        let location = decrypted.filter((x, index) => {
+            if (x.name === route) {
+                if (x.type === "file") return false;
+                step = index;
+                return true;
+            }
+            return false;
+        });
+        if (!location.length) throw new Error(`Folder ${route} not found`);
+        decrypted = location[0];
+        encrypted = encrypted[step];
+    }
+    const index = decrypted.content.findIndex(
+        x => x.type === "folder" && x.name === traverse[traverse.length - 1]
+    );
+    if (index < 0) throw new Error(`File ${location} doesn't exist`);
+    await this.addFolder(newLocation, password);
+    for (let f of decrypted.content[index].content) {
+        if (f.type === "folder")
+            await this.moveFolder(
+                oldLocation + "/" + f.name,
+                newLocation + "/" + f.name,
+                password
+            );
+        else
+            await this.moveFile(
+                oldLocation + "/" + f.name,
+                newLocation + "/" + f.name,
+                password
+            );
+    }
+    this.deleteFolder(oldLocation, password);
+    return this;
+};
 
 userSchema.methods.deleteFolder = async function (location, password) {
     // Traverse down filesystem, deleting folder and deleting everything in folder as well
@@ -164,7 +229,12 @@ userSchema.methods.deleteFolder = async function (location, password) {
     return await this.save();
 };
 
-userSchema.methods.addFile = async function (location, password, content = "") {
+userSchema.methods.addFile = async function (
+    location,
+    password,
+    content = "",
+    extras = {}
+) {
     const traverse = location.split("/");
     let decrypted = this.decryptObj(this.filesystem, password);
     if (traverse.length === 1) {
@@ -177,7 +247,8 @@ userSchema.methods.addFile = async function (location, password, content = "") {
             type: "folder",
             name: encrypt(location, password),
             isPublic: false,
-            storage
+            storage,
+            ...extras
         });
         return await this.save();
     }
@@ -212,7 +283,8 @@ userSchema.methods.addFile = async function (location, password, content = "") {
             type: "file",
             name: encrypt(traverse[traverse.length - 1], password),
             isPublic: false,
-            storage
+            storage,
+            ...extras
         });
     } else
         throw new Error(`File ${traverse[traverse.length - 1]} already exists`);
@@ -285,7 +357,7 @@ userSchema.methods.getFileMeta = async function (location, password) {
     return decrypted.content[index];
 };
 
-userSchema.methods.renameFile = async function (
+userSchema.methods.moveFile = async function (
     oldLocation,
     newLocation,
     password
@@ -293,7 +365,12 @@ userSchema.methods.renameFile = async function (
     const content = await this.getFile(oldLocation, password);
     const oldFile = await this.getFileMeta(oldLocation, password);
     await this.deleteFile(oldLocation, password);
-    if (oldFile.isPublic) await this.addFile(newLocation, password, content);
+    if (oldFile.isPublic)
+        await this.addFile(newLocation, password, content, {
+            isPublic: true,
+            publicName:
+                newLocation.split("/")[newLocation.split("/").length - 1]
+        });
     else await this.addFile(newLocation, password, encrypt(content, password));
     return this;
 };
