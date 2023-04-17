@@ -42,7 +42,9 @@ export default function Workspace({
     setActiveRight,
     aceOptions,
     setMessage,
-    setValue
+    setValue,
+    leftRef: leftScrollRef,
+    rightRef: rightScrollRef
 }) {
     const { toast } = useToast();
     const leftRef = useResizeDetector();
@@ -50,10 +52,6 @@ export default function Workspace({
     const [mirror, setMirror] = useState("");
     const [leftValue, setLeftValue] = useState("");
     const [rightValue, setRightValue] = useState("");
-    const [outputScroll, setOutputScroll] = useState(false);
-    const input = docRef;
-    const output = useRef(null);
-
     const onDragEnd = result => {
         if (!result.destination) return;
         const source = result.source;
@@ -131,6 +129,11 @@ export default function Workspace({
             });
         }
     };
+
+    useEffect(() => {
+        window.addEventListener("beforeunload", updateActiveTabs);
+        return () => window.addEventListener("beforeunload", updateActiveTabs);
+    }, []);
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
@@ -227,6 +230,47 @@ export default function Workspace({
                                         : null
                                 }
                                 setMirror={setMirror}
+                                onScroll={(scrollTop, height, kind) => {
+                                    let rightDiv = rightRef.current;
+                                    if (rightDiv) {
+                                        if (rightDiv.editor) {
+                                            // Scroll input
+                                            let scrollProportion = Math.max(
+                                                0,
+                                                scrollTop / height
+                                            );
+                                            if (scrollTop === 0)
+                                                rightDiv.editor.session.setScrollTop(
+                                                    -32
+                                                );
+                                            else
+                                                rightDiv.editor.session.setScrollTop(
+                                                    rightDiv.editor.session.setScrollTop(
+                                                        rightDiv.editor.renderer
+                                                            .layerConfig
+                                                            .maxHeight *
+                                                            scrollProportion
+                                                    )
+                                                );
+                                        } else {
+                                            let scrollProportion = Math.max(
+                                                0,
+                                                scrollTop / height
+                                            );
+                                            rightDiv.scrollTop =
+                                                rightDiv.scrollHeight *
+                                                scrollProportion;
+                                            if (
+                                                scrollTop +
+                                                    rightDiv.offsetHeight ===
+                                                height
+                                            )
+                                                rightDiv.scrollTop =
+                                                    rightDiv.scrollHeight;
+                                        }
+                                    }
+                                }}
+                                scrollRef={leftRef}
                             />
                         ) : (
                             <div className="flex h-full flex-col items-center justify-center text-neutral-200">
@@ -334,7 +378,49 @@ export default function Workspace({
                                         ? mirror
                                         : null
                                 }
+                                onScroll={(scrollTop, height, kind) => {
+                                    let leftDiv = leftRef.current;
+                                    if (leftDiv) {
+                                        if (leftDiv.editor) {
+                                            // Scroll input
+                                            let scrollProportion = Math.max(
+                                                0,
+                                                scrollTop / height
+                                            );
+                                            if (scrollTop === 0)
+                                                leftDiv.editor.session.setScrollTop(
+                                                    -32
+                                                );
+                                            // Account for padding
+                                            else
+                                                leftDiv.editor.session.setScrollTop(
+                                                    leftDiv.editor.session.setScrollTop(
+                                                        leftDiv.editor.renderer
+                                                            .layerConfig
+                                                            .maxHeight *
+                                                            scrollProportion
+                                                    )
+                                                );
+                                        } else {
+                                            let scrollProportion = Math.max(
+                                                0,
+                                                scrollTop / height
+                                            );
+                                            leftDiv.scrollTop =
+                                                leftDiv.scrollHeight *
+                                                scrollProportion;
+                                            if (
+                                                scrollTop +
+                                                    leftDiv.offsetHeight ===
+                                                height
+                                            )
+                                                leftDiv.scrollTop =
+                                                    leftDiv.scrollHeight;
+                                        }
+                                    }
+                                }}
                                 setMirror={setMirror}
+                                scrollRef={rightRef}
                             />
                         ) : (
                             <div className="flex h-full flex-col items-center justify-center text-neutral-200">

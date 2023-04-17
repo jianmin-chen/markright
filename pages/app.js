@@ -12,14 +12,12 @@ import {
     TabsList,
     TabsTrigger
 } from "../components/ui/Tabs";
-import { Avatar, AvatarImage, AvatarFallback } from "../components/ui/Avatar";
 import Files from "../components/files/Files";
 import dbConnect from "../database/connect";
 import User from "../database/services/user.service";
 import { downloadMarkdown, downloadHTML } from "../utils/markdownUtils";
 import { useRouter } from "next/router";
 import { getToken } from "next-auth/jwt";
-import { get } from "../utils/fetch";
 import { useToast } from "../hooks/ui/useToast";
 
 const Workspace = dynamic(() => import("../components/Workspace"), {
@@ -31,7 +29,6 @@ export default function Index({ files: initialFiles, background, userId }) {
     const router = useRouter();
     const { toast } = useToast();
 
-    const docRef = useRef(null);
     const [value, setValue] = useState("");
 
     const [message, setMessage] = useState("");
@@ -42,6 +39,8 @@ export default function Index({ files: initialFiles, background, userId }) {
     const [keyboardHandler, setKeyboardHandler] = useState(null);
     const [aceTheme, setAceTheme] = useState("github");
 
+    const leftRef = useRef(null);
+    const rightRef = useRef(null);
     const [left, setLeft] = useState([]);
     const [right, setRight] = useState([]);
     const [activeLeft, setActiveLeft] = useState(null);
@@ -72,9 +71,6 @@ export default function Index({ files: initialFiles, background, userId }) {
     };
 
     const [files, setFiles] = useState(initialFiles);
-    useEffect(() => {
-        // TODO: Update tabs as needed
-    }, [files]);
 
     useEffect(() => {
         document.querySelectorAll(".prose pre").forEach(el => {
@@ -144,6 +140,14 @@ export default function Index({ files: initialFiles, background, userId }) {
                                         });
                                     }}
                                     userId={userId}
+                                    setLeft={setLeft}
+                                    setRight={setRight}
+                                    left={left}
+                                    right={right}
+                                    activeLeft={activeLeft}
+                                    activeRight={activeRight}
+                                    setActiveLeft={setActiveLeft}
+                                    setActiveRight={setActiveRight}
                                 />
                             </TabsContent>
                             {/*
@@ -174,7 +178,6 @@ export default function Index({ files: initialFiles, background, userId }) {
                             setValue={setValue}
                             keyboardHandler={keyboardHandler}
                             aceTheme={aceTheme}
-                            docRef={docRef}
                             left={left}
                             right={right}
                             setLeft={setLeft}
@@ -185,6 +188,8 @@ export default function Index({ files: initialFiles, background, userId }) {
                             setActiveRight={setActiveRight}
                             aceOptions={{ keyboardHandler, theme: aceTheme }}
                             setMessage={setMessage}
+                            leftRef={leftRef}
+                            rightRef={rightRef}
                         />
                     </div>
                 </div>

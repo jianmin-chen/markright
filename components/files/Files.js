@@ -36,7 +36,15 @@ function File({
     openFile,
     isPublic,
     userId,
-    setFiles
+    setFiles,
+    left,
+    right,
+    activeLeft,
+    activeRight,
+    setLeft,
+    setRight,
+    setActiveLeft,
+    setActiveRight
 }) {
     const [name, setName] = useState(initialName);
     const [location, setLocation] = useState(initialLocation);
@@ -61,6 +69,7 @@ function File({
     const renameFile = filename => {
         const traversed = location.split("/");
         setName(filename);
+        setLocation(traversed.slice(0, traversed.length - 1) + "/" + filename);
         post({
             route: "/api/file/rename",
             data: {
@@ -73,6 +82,35 @@ function File({
             .then(res => {
                 setRename(false);
                 setFiles(res.filesystem);
+                // Update tabs
+                const leftCopy = Array.from(left);
+                const leftIndex = leftCopy.findIndex(
+                    f => f.location === location
+                );
+                if (leftIndex)
+                    leftCopy[leftIndex] = {
+                        ...leftCopy[leftIndex],
+                        filename,
+                        location:
+                            traversed.slice(0, traversed.length - 1) +
+                            "/" +
+                            filename
+                    };
+                setLeft(leftCopy);
+                const rightCopy = Array.from(right);
+                const rightIndex = rightCopy.findIndex(
+                    f => f.location === location
+                );
+                if (rightIndex)
+                    rightCopy[rightIndex] = {
+                        ...rightCopy[rightIndex],
+                        filename,
+                        location:
+                            traversed.slice(0, traversed.length - 1) +
+                            "/" +
+                            filename
+                    };
+                setRight(rightCopy);
             })
             .catch(err =>
                 toast({
@@ -90,6 +128,23 @@ function File({
         })
             .then(res => {
                 setFiles(res.filesystem);
+                // Update tabs
+                const leftCopy = Array.from(left).filter(
+                    f => f.location !== location
+                );
+                if (leftCopy.length === 0) setActiveLeft(null);
+                else if (leftCopy.length != left.length && leftActive !== 0)
+                    setActiveLeft(activeLeft - 1);
+                console.log(leftCopy);
+                setLeft(leftCopy);
+                const rightCopy = Array.from(right).filter(
+                    f => f.location !== location
+                );
+                if (rightCopy.length === 0) setActiveRight(null);
+                else if (rightCopy.length != right.length && rightActive !== 0)
+                    setActiveRight(activeRight - 1);
+                console.log(rightCopy);
+                setRight(rightCopy);
             })
             .catch(err =>
                 toast({
@@ -236,7 +291,15 @@ function Folder({
     updateFilesystem,
     openFile,
     setFiles,
-    userId
+    userId,
+    left,
+    right,
+    setLeft,
+    setRight,
+    activeLeft,
+    activeRight,
+    setActiveLeft,
+    setActiveRight
 }) {
     const [name, setName] = useState(initialName);
     const [toggle, setToggle] = useState(false);
@@ -516,6 +579,14 @@ function Folder({
                                 location={`${location}/${file.name}`}
                                 userId={userId}
                                 setFiles={setFiles}
+                                left={left}
+                                right={right}
+                                setLeft={setLeft}
+                                setRight={setRight}
+                                activeLeft={activeLeft}
+                                activeRight={activeRight}
+                                setActiveLeft={setActiveLeft}
+                                setActiveRight={setActiveRight}
                             />
                         );
                     })}
@@ -525,7 +596,20 @@ function Folder({
     );
 }
 
-export default function Files({ files, setFiles, openFile, userId }) {
+export default function Files({
+    files,
+    setFiles,
+    openFile,
+    userId,
+    left,
+    right,
+    setLeft,
+    setRight,
+    activeLeft,
+    activeRight,
+    setActiveLeft,
+    setActiveRight
+}) {
     const { toast } = useToast();
 
     // Toggle new folder creation
@@ -617,6 +701,14 @@ export default function Files({ files, setFiles, openFile, userId }) {
                             openFile={openFile}
                             setFiles={setFiles}
                             userId={userId}
+                            left={left}
+                            right={right}
+                            setLeft={setLeft}
+                            setRight={setRight}
+                            activeLeft={activeLeft}
+                            activeRight={activeRight}
+                            setActiveLeft={setActiveLeft}
+                            setActiveRight={setActiveRight}
                         />
                     );
                 return (
@@ -630,6 +722,14 @@ export default function Files({ files, setFiles, openFile, userId }) {
                         openFile={openFile}
                         setFiles={setFiles}
                         userId={userId}
+                        left={left}
+                        right={right}
+                        setLeft={setLeft}
+                        setRight={setRight}
+                        activeLeft={activeLeft}
+                        activeRight={activeRight}
+                        setActiveLeft={setActiveLeft}
+                        setActiveRight={setActiveRight}
                     />
                 );
             })}

@@ -3,7 +3,7 @@ import parseMarkdown from "../utils/parser";
 import { useState, useEffect, useRef } from "react";
 import { get, post } from "../utils/fetch";
 import { useToast } from "../hooks/ui/useToast";
-import { IBM_Plex_Mono, Inter } from "next/font/google";
+import { Inter } from "next/font/google";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,14 +17,10 @@ import { Settings2 } from "lucide-react";
 import { Button } from "./ui/Button";
 import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
 import ReactToPrint from "react-to-print";
+import Loader from "./Loader";
 
 const inter = Inter({
     variable: "--sans",
-    subsets: ["latin"]
-});
-
-const ibmPlexMono = IBM_Plex_Mono({
-    weight: "400",
     subsets: ["latin"]
 });
 
@@ -33,14 +29,17 @@ export default function Open({
     sizeRef,
     aceOptions,
     setMessage,
-    docRef,
     setMirror,
     mirror,
-    setSideValue
+    setSideValue,
+    onScroll,
+    scrollRef
 }) {
     const componentRef = useRef();
     const { toast } = useToast();
     const [value, setValue] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [scroll, setScroll] = useState(false);
 
     useEffect(() => {
         if (file.type === "output" && mirror !== null) setValue(mirror);
@@ -51,7 +50,10 @@ export default function Open({
             route: "/api/file/content",
             data: { location: file.location }
         })
-            .then(res => setValue(res.file))
+            .then(res => {
+                setValue(res.file);
+                setLoading(false);
+            })
             .catch(err =>
                 toast({
                     variant: "destructive",
@@ -92,27 +94,46 @@ export default function Open({
         }
     }, [value]);
 
+    if (loading) return <Loader />;
+
     if (file.type === "input")
         return (
-            <AceEditor
-                value={value}
-                setValue={setValue}
-                onScroll={() => {}}
-                onBlur={() => {
-                    update();
-                    setMessage("Saved");
-                }}
-                width={sizeRef.width}
-                height={sizeRef.height}
-                options={{
-                    ...aceOptions
-                }}
-                assignRef={docRef ? docRef : null}
-            />
+            <div
+                onMouseEnter={() => setScroll(true)}
+                onMouseLeave={() => setScroll(false)}>
+                <AceEditor
+                    value={value}
+                    setValue={setValue}
+                    onBlur={() => {
+                        update();
+                        setMessage("Saved");
+                    }}
+                    width={sizeRef.width}
+                    height={sizeRef.height}
+                    options={{
+                        ...aceOptions
+                    }}
+                    scrollRef={scrollRef}
+                    scroll={scroll}
+                    onScroll={onScroll}
+                />
+            </div>
         );
 
     return (
-        <div className="h-full overflow-auto">
+        <div
+            className="h-full overflow-auto"
+            onMouseEnter={() => setScroll(true)}
+            onMouseLeave={() => setScroll(false)}
+            onScroll={() => {
+                if (scroll)
+                    onScroll(
+                        scrollRef.current.scrollTop,
+                        scrollRef.current.scrollHeight,
+                        "output"
+                    );
+            }}
+            ref={scrollRef}>
             <style jsx global>{`
                 .prose > div h1:first-child {
                     margin-top: 3rem !important;

@@ -4,22 +4,18 @@ import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/keybinding-vscode";
 import "ace-builds/src-noconflict/keybinding-vim";
-import { IBM_Plex_Mono } from "next/font/google";
-
-const ibmPlexMono = IBM_Plex_Mono({
-    weight: "400",
-    subsets: ["latin"]
-});
+import { useState } from "react";
 
 export default function Editor({
     options,
     value,
     setValue,
-    onScroll,
     onBlur,
-    assignRef,
     width,
-    height
+    height,
+    onScroll,
+    scrollRef,
+    scroll
 }) {
     return (
         <AceEditor
@@ -38,16 +34,18 @@ export default function Editor({
                 enableBasicAutocompletion: true,
                 cursorStyle: "slim"
             }}
-            ref={assignRef}
+            ref={scrollRef}
             onLoad={editor => {
                 editor.renderer.setPadding(32);
                 editor.renderer.setScrollMargin(32);
             }}
             onScroll={editor => {
-                onScroll(
-                    editor.session.getScrollTop(),
-                    editor.renderer.layerConfig.maxHeight
-                );
+                if (scroll)
+                    onScroll(
+                        editor.session.getScrollTop(),
+                        editor.renderer.layerConfig.maxHeight,
+                        "input"
+                    );
             }}
         />
     );
