@@ -167,8 +167,17 @@ export default function Workspace({
                                                     {file.filename}
                                                 </span>
                                                 <span
-                                                    className="cursor-pointer"
-                                                    onClick={() => {
+                                                    className={`flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-md text-[18px] font-light transition ${
+                                                        activeLeft === index
+                                                            ? "hover:bg-neutral-100"
+                                                            : "hover:bg-neutral-200"
+                                                    }`}
+                                                    onClick={event => {
+                                                        event.stopPropagation();
+                                                        // Remove from left, then:
+                                                        // * If user removed the active one, set it to index = 0 || index - 1
+                                                        // * If user didn't remove the active one, update index to what it should be currently
+                                                        updateActiveTabs();
                                                         const leftCopy =
                                                             Array.from(left);
                                                         leftCopy.splice(
@@ -177,26 +186,15 @@ export default function Workspace({
                                                         );
                                                         setLeft(leftCopy);
                                                         if (
-                                                            activeLeft === index
-                                                        ) {
-                                                            let active = null;
-                                                            if (
-                                                                leftCopy.length ===
-                                                                    1 ||
-                                                                index === 0
-                                                            )
-                                                                active = 0;
-                                                            else if (
-                                                                leftCopy.length >
-                                                                1
-                                                            )
-                                                                active =
-                                                                    index - 1;
-                                                            console.log(active);
+                                                            (activeLeft ===
+                                                                index &&
+                                                                activeLeft !==
+                                                                    0) ||
+                                                            index < activeLeft
+                                                        )
                                                             setActiveLeft(
-                                                                active
+                                                                activeLeft - 1
                                                             );
-                                                        }
                                                     }}>
                                                     &times;
                                                 </span>
@@ -273,36 +271,31 @@ export default function Workspace({
                                                     {file.filename}
                                                 </span>
                                                 <span
-                                                    className="cursor-pointer"
-                                                    onClick={() => {
-                                                        // Remove from right - if it's the active one, check if there's one we can move over
+                                                    className={`flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-md text-[18px] font-light transition hover:bg-neutral-100 ${
+                                                        activeRight === index
+                                                            ? "hover:bg-neutral-100"
+                                                            : "hover:bg-neutral-200"
+                                                    }`}
+                                                    onClick={event => {
+                                                        event.stopPropagation();
+                                                        updateActiveTabs();
                                                         const rightCopy =
                                                             Array.from(right);
                                                         rightCopy.splice(
                                                             index,
                                                             1
                                                         );
-                                                        if (
-                                                            activeRight ===
-                                                            index
-                                                        ) {
-                                                            let active = null;
-                                                            if (
-                                                                rightCopy.length !=
-                                                                0
-                                                            ) {
-                                                                if (index === 0)
-                                                                    active = 0;
-                                                                else
-                                                                    active =
-                                                                        index -
-                                                                        1;
-                                                            }
-                                                            setActiveRight(
-                                                                active
-                                                            );
-                                                        }
                                                         setRight(rightCopy);
+                                                        if (
+                                                            (activeRight ===
+                                                                index &&
+                                                                activeRight !==
+                                                                    0) ||
+                                                            index < activeRight
+                                                        )
+                                                            setActiveRight(
+                                                                activeRight - 1
+                                                            );
                                                     }}>
                                                     &times;
                                                 </span>

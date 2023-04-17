@@ -39,7 +39,7 @@ export default function Index({ files: initialFiles, background, userId }) {
     const [showSidebar, setShowSidebar] = useState(true);
 
     // Editor themes
-    const [keyboardHandler, setKeyboardHandler] = useState("vim");
+    const [keyboardHandler, setKeyboardHandler] = useState(null);
     const [aceTheme, setAceTheme] = useState("github");
 
     const [left, setLeft] = useState([]);

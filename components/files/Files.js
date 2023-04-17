@@ -180,7 +180,7 @@ function File({
                                                 })
                                                     .then(res => {
                                                         navigator.clipboard.writeText(
-                                                            `https://markright.co/public/${userId}/${res.meta.storage.replace(
+                                                            `https://markright.vercel.app/public/${userId}/${res.meta.storage.replace(
                                                                 ".md",
                                                                 ""
                                                             )}`

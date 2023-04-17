@@ -1,3 +1,8 @@
+@font-face {
+    font-family: "PT Mono";
+    src: url("../public/fonts/PTMono-Regular.ttf") format("truetype");
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -26,10 +31,6 @@ input:not(.ui-input) {
 @media print {
     @page {
         margin: 3.5rem 0;
-    }
-
-    *:not(style) {
-        display: block;
     }
 
     body {
