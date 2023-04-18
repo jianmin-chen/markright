@@ -59,7 +59,7 @@ const splitBlock = (block, inner = false) => {
     };
 
     if (!block.length) return [];
-    else if ((block.startsWith("* ") || block.startsWith("- ")) && !inner)
+    else if (block.startsWith("* ") && !inner)
         // Unordered list item
         return {
             type: "li",
@@ -165,7 +165,7 @@ const processBlock = (block, i) => {
         block = block.slice(1);
         type = "blockquote";
         block = block.trim();
-    } else if (block.startsWith("* ") || block.startsWith("- "))
+    } else if (block.startsWith("* "))
         // Unordered list
         return {
             type: "ul",
@@ -301,7 +301,7 @@ const renderHTML = element => {
     return pieces.join("");
 };
 
-const parseMarkdown = (markdown, html = true) => {
+export default function parseMarkdown(markdown, html = true) {
     // MAIN WRAPPER FUNCTION
     // :check 1. Split the file into paragraphs by cutting it at every empty line.
     // :check 2. Remove the "#" characters from header paragraphs and mark them as headers.
@@ -320,14 +320,7 @@ const parseMarkdown = (markdown, html = true) => {
     for (let i = 0; i < blocks.length; i++) {
         let block = blocks[i];
 
-        let tlRegex = block.length ? block.search(/\- \[[X ]{1}\] /) : -1;
-        if (!(tlRegex === 0) && tlFragments.length) {
-            // End of task list
-            fragments.push(tlFragments.join("\n"));
-            tlFragments = [];
-        }
-
-        let ulRegex = block.length ? block.search(/(\*|\-) /) : -1;
+        let ulRegex = block.length ? block.search(/\* /) : -1;
         if (!(ulRegex === 0) && ulFragments.length) {
             // End of unordered list
             fragments.push(ulFragments.join("\n"));
@@ -339,6 +332,13 @@ const parseMarkdown = (markdown, html = true) => {
             // End of ordered list
             fragments.push(olFragments.join("\n"));
             olFragments = [];
+        }
+
+        let tlRegex = block.length ? block.search(/\- \[[X ]{1}\] /) : -1;
+        if (!(tlRegex === 0) && tlFragments.length) {
+            // End of task list
+            fragments.push(tlFragments.join("\n"));
+            tlFragments = [];
         }
 
         if (!block.length && !inCodeBlock) continue; // Newline
@@ -373,6 +373,4 @@ const parseMarkdown = (markdown, html = true) => {
     wrapper.content = parse(wrapper.content);
     if (html) return renderHTML(wrapper);
     return wrapper;
-};
-
-export default parseMarkdown;
+}
