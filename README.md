@@ -2,7 +2,7 @@
 
 A full-fledged Markdown editor with a filesystem and OAuth login, written using a [custom Markdown parser](https://github.com/jianmin-chen/markdown-parser)! Check this demo out:
 
-This is actually the second version! Check out the [first](https://github.com/jianmin-chen/markright/tree/v1) if you'd like.
+This is actually the second version! Check out the [first](https://github.com/jianmin-chen/markright/tree/v1) version if you'd like.
 
 ## Roadmap
 
