@@ -25,10 +25,11 @@ export default function Login() {
                             </a>
                         </button>
                     </p>
-                    <img
-                        className="rounded-xl shadow-xl"
-                        src="/images/screenshot.png"
-                    />
+                    <div className="flex w-full gap-x-2">
+                        <video className="rounded-lg" autoPlay muted loop>
+                            <source src="/images/demo.mp4" type="video/mp4" />
+                        </video>
+                    </div>
                 </div>
             </div>
         </div>
