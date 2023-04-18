@@ -87,7 +87,7 @@ function File({
                 const leftIndex = leftCopy.findIndex(
                     f => f.location === location
                 );
-                if (leftIndex)
+                if (leftIndex !== -1)
                     leftCopy[leftIndex] = {
                         ...leftCopy[leftIndex],
                         filename,
@@ -101,7 +101,7 @@ function File({
                 const rightIndex = rightCopy.findIndex(
                     f => f.location === location
                 );
-                if (rightIndex)
+                if (rightIndex !== -1)
                     rightCopy[rightIndex] = {
                         ...rightCopy[rightIndex],
                         filename,
@@ -132,10 +132,8 @@ function File({
                 const leftCopy = Array.from(left).filter(
                     f => f.location !== location
                 );
-                if (leftCopy.length === 0) setActiveLeft(null);
-                else if (leftCopy.length != left.length && leftActive !== 0)
-                    setActiveLeft(activeLeft - 1);
-                console.log(leftCopy);
+                if (left[activeLeft])
+                    if (leftCopy.length === 0) setActiveLeft(null);
                 setLeft(leftCopy);
                 const rightCopy = Array.from(right).filter(
                     f => f.location !== location
@@ -143,7 +141,6 @@ function File({
                 if (rightCopy.length === 0) setActiveRight(null);
                 else if (rightCopy.length != right.length && rightActive !== 0)
                     setActiveRight(activeRight - 1);
-                console.log(rightCopy);
                 setRight(rightCopy);
             })
             .catch(err =>
@@ -265,6 +262,7 @@ function File({
                                         }}>
                                         Rename
                                     </DropdownMenuItem>
+                                    {/*
                                     <DropdownMenuItem
                                         className="text-red-500"
                                         onClick={event => {
@@ -273,6 +271,7 @@ function File({
                                         }}>
                                         Delete
                                     </DropdownMenuItem>
+                                    */}
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </span>
@@ -387,6 +386,11 @@ function Folder({
             .then(res => {
                 setRenameFolder(false);
                 setFiles(res.filesystem);
+                // Update tabs
+                const leftCopy = Array.from(left);
+                const leftIndex = leftCopy.findIndex(
+                    f => f.split("/").includes
+                );
             })
             .catch(err =>
                 toast({
@@ -431,6 +435,7 @@ function Folder({
                         <span className="truncate">{name}</span>
                     </span>
                     <span className={`${styles.extra} flex`}>
+                        {/*
                         <DropdownMenu>
                             <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300">
                                 <MoreHorizontal className="h-4 w-4" />
@@ -461,6 +466,7 @@ function Folder({
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
+                                */}
                         <button
                             className="rounded-md px-1 py-0.5 hover:bg-neutral-300"
                             onClick={event => {

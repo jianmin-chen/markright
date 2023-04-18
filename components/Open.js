@@ -129,8 +129,7 @@ export default function Open({
                 if (scroll)
                     onScroll(
                         scrollRef.current.scrollTop,
-                        scrollRef.current.scrollHeight,
-                        "output"
+                        scrollRef.current.scrollHeight
                     );
             }}
             ref={scrollRef}>

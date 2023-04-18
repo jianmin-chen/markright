@@ -230,7 +230,12 @@ export default function Workspace({
                                         : null
                                 }
                                 setMirror={setMirror}
-                                onScroll={(scrollTop, height, kind) => {
+                                onScroll={(scrollTop, height) => {
+                                    if (
+                                        left[activeLeft].location !==
+                                        right[activeRight].location
+                                    )
+                                        return;
                                     let rightDiv = rightRef.current;
                                     if (rightDiv) {
                                         if (rightDiv.editor) {
@@ -378,7 +383,12 @@ export default function Workspace({
                                         ? mirror
                                         : null
                                 }
-                                onScroll={(scrollTop, height, kind) => {
+                                onScroll={(scrollTop, height) => {
+                                    if (
+                                        left[activeLeft].location !==
+                                        right[activeRight].location
+                                    )
+                                        return;
                                     let leftDiv = leftRef.current;
                                     if (leftDiv) {
                                         if (leftDiv.editor) {

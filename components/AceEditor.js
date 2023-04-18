@@ -43,8 +43,7 @@ export default function Editor({
                 if (scroll)
                     onScroll(
                         editor.session.getScrollTop(),
-                        editor.renderer.layerConfig.maxHeight,
-                        "input"
+                        editor.renderer.layerConfig.maxHeight
                     );
             }}
         />
