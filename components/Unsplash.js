@@ -28,7 +28,7 @@ export default function Unsplash() {
     return (
         <div className="relative max-h-[75vh] overflow-auto">
             <input
-                className="w-full bg-neutral-100 py-2 px-3 mb-0.5 sticky top-0"
+                className="sticky top-0 mb-0.5 w-full bg-neutral-100 py-2 px-3"
                 placeholder="Search Unsplash"
                 onChange={search}
             />

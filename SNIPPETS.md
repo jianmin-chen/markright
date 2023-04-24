@@ -52,6 +52,6 @@ onScroll={(scrollTop, height) => {
 
 Final TODO:
 
-* Make sure filesystem stuff works and updates with the tabs. That's it. Ignore all other minor issues right now.
-* Rate limiting
-* Rewrite Markdown parser
+-   Make sure filesystem stuff works and updates with the tabs. That's it. Ignore all other minor issues right now.
+-   Rate limiting
+-   Rewrite Markdown parser

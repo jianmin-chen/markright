@@ -6,17 +6,17 @@ This is actually the second version! Check out the [first](https://github.com/ji
 
 ## Roadmap
 
-- [ ] Fix printing issues
-- [ ] Mobile support
-- [ ] Math support (how GitHub does it)
-- [ ] Emoji support with `:`
-- [ ] Save user preferences (including open folders and files, which also means draggable folders and files)
-- [ ] Adding more (unnecessary but fun) features, including: 
-  - [ ] Background image customization
-  - [ ] More themes
-  - [ ] Outline for editor tabs
-  - [ ] Direct insert options in the menu bar
-  - [ ] Shortcuts
-  - [ ] Grammarly integration, ChatGPT integration
-  - [ ] "Notes" for highlighting content
-  - [ ] Calendar
+-   [ ] Fix printing issues
+-   [ ] Mobile support
+-   [ ] Math support (how GitHub does it)
+-   [ ] Emoji support with `:`
+-   [ ] Save user preferences (including open folders and files, which also means draggable folders and files)
+-   [ ] Adding more (unnecessary but fun) features, including:
+    -   [ ] Background image customization
+    -   [ ] More themes
+    -   [ ] Outline for editor tabs
+    -   [ ] Direct insert options in the menu bar
+    -   [ ] Shortcuts
+    -   [ ] Grammarly integration, ChatGPT integration
+    -   [ ] "Notes" for highlighting content
+    -   [ ] Calendar
