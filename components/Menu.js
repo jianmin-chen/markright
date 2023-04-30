@@ -33,7 +33,8 @@ export default function MenubarDemo({
     keyboardHandler,
     downloads,
     sidebar,
-    message
+    message,
+    setBackground
 }) {
     const { toast } = useToast();
     const { data: session } = useSession();
@@ -71,6 +72,12 @@ export default function MenubarDemo({
                         Preferences
                     </MenubarTrigger>
                     <MenubarContent>
+                        <MenubarSub>
+                            <MenubarSubTrigger>Background</MenubarSubTrigger>
+                            <MenubarSubContent>
+                                <Unsplash setBackground={setBackground} />
+                            </MenubarSubContent>
+                        </MenubarSub>
                         <MenubarSub>
                             <MenubarSubTrigger>Main theme</MenubarSubTrigger>
                             <MenubarSubContent>

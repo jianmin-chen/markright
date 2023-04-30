@@ -36,6 +36,11 @@ const userSchema = new mongoose.Schema({
     }
 });
 
+userSchema.methods.setBackground = async function (data) {
+    this.background = data;
+    return await this.save();
+};
+
 userSchema.methods.decryptObj = function (arr, password, options = {}) {
     const decrypted = [];
     for (let i = 0; i < arr.length; i++) {

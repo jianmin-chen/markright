@@ -24,10 +24,16 @@ const Workspace = dynamic(() => import("../components/Workspace"), {
     ssr: false
 });
 
-export default function Index({ files: initialFiles, background, userId }) {
+export default function Index({
+    files: initialFiles,
+    background: initialBackground,
+    userId
+}) {
     const session = useSession();
     const router = useRouter();
     const { toast } = useToast();
+
+    const [background, setBackground] = useState(initialBackground);
 
     const [value, setValue] = useState("");
 
@@ -91,6 +97,7 @@ export default function Index({ files: initialFiles, background, userId }) {
             }}>
             <div>
                 <Menu
+                    setBackground={setBackground}
                     sidebar={{
                         sidebar: showSidebar,
                         showSidebar: setShowSidebar
@@ -103,7 +110,7 @@ export default function Index({ files: initialFiles, background, userId }) {
                     message={message}
                 />
             </div>
-            <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md bg-white shadow-md">
+            <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md shadow-md">
                 {showSidebar === true && (
                     <div className="col-span-4 flex h-full flex-col overflow-auto border-r bg-neutral-100">
                         <Tabs defaultValue="files">

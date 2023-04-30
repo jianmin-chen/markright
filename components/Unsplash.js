@@ -1,38 +1,65 @@
-import { get } from "../utils/fetch";
-import { useState } from "react";
+import { get, post } from "../utils/fetch";
+import { useEffect, useState, useRef } from "react";
 
-export default function Unsplash() {
+export default function Unsplash({ setBackground }) {
+    const [query, setQuery] = useState("");
+    const [currPage, setCurrPage] = useState(1);
     const [photos, setPhotos] = useState([]);
+    const container = useRef(null);
 
-    const search = event => {
-        const query = event.target.value;
-        if (query) {
-            get({
-                route: "/api/unsplash",
-                data: { query }
-            }).then(json => {
-                console.log(json.results);
-                setPhotos(json.results.results);
-            });
+    const onScroll = () => {
+        if (container.current) {
+            const { scrollTop, scrollHeight, clientHeight } = container.current;
+            if (scrollTop + clientHeight === scrollHeight) {
+                // Make API call for next page
+                const page = currPage;
+                setCurrPage(prev => prev + 1);
+                get({
+                    route: "/api/unsplash",
+                    data: { query, page: page + 1 }
+                }).then(json => {
+                    setPhotos(prev => [...prev, ...json.results.results]);
+                });
+            }
         }
     };
 
     const setPhoto = uri => {
         if (uri) {
             post({
-                route: "/api/"
+                route: "/api/unsplash",
+                data: { data: uri }
+            }).then(json => {
+                console.log(json.results);
+                setBackground(uri);
             });
         }
     };
 
+    useEffect(() => {
+        // Grab first page photos
+        if (query.length) {
+            setCurrPage(1);
+            get({
+                route: "/api/unsplash",
+                data: { query }
+            }).then(json => {
+                setPhotos(json.results.results);
+            });
+        }
+    }, [query]);
+
     return (
-        <div className="relative max-h-[75vh] overflow-auto">
+        <div
+            className="relative max-h-[75vh] overflow-auto"
+            onScroll={onScroll}
+            ref={container}>
             <input
-                className="sticky top-0 mb-0.5 w-full bg-neutral-100 py-2 px-3"
+                className="sticky top-0 mb-0.5 w-full rounded-md bg-neutral-100 py-2 px-3"
                 placeholder="Search Unsplash"
-                onChange={search}
+                onChange={event => setQuery(event.target.value)}
             />
-            <div className="flex flex-col gap-y-1 p-1">
+            <div className="mt-1 flex flex-col gap-y-1 p-1">
                 {photos.map(img => (
                     <button
                         key={img.id}
