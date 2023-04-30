@@ -13,11 +13,21 @@ import {
     DropdownMenuSubContent,
     DropdownMenuSubTrigger
 } from "./ui/DropdownMenu";
-import { Settings2 } from "lucide-react";
+import { Menu, Settings2 } from "lucide-react";
 import { Button } from "./ui/Button";
 import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
 import ReactToPrint from "react-to-print";
 import Loader from "./Loader";
+import {
+    Menubar,
+    MenubarLabel,
+    MenubarContent,
+    MenubarItem,
+    MenubarMenu,
+    MenubarTrigger
+} from "./ui/Menubar";
+import { useResizeDetector } from "react-resize-detector";
+import { GrammarlyEditorPlugin } from "@grammarly/editor-sdk-react";
 
 const inter = Inter({
     variable: "--sans",
@@ -35,6 +45,7 @@ export default function Open({
     onScroll,
     scrollRef
 }) {
+    const menuSizeRef = useResizeDetector();
     const componentRef = useRef();
     const { toast } = useToast();
     const [value, setValue] = useState("");
@@ -101,6 +112,34 @@ export default function Open({
             <div
                 onMouseEnter={() => setScroll(true)}
                 onMouseLeave={() => setScroll(false)}>
+                <Menubar
+                    className="sticky top-2 z-[99] m-2 space-x-0"
+                    ref={menuSizeRef.ref}>
+                    <MenubarMenu>
+                        <MenubarTrigger className="pr-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
+                            Paragraph
+                        </MenubarTrigger>
+                        <MenubarContent>
+                            <MenubarLabel>Coming soon!</MenubarLabel>
+                        </MenubarContent>
+                    </MenubarMenu>
+                    <MenubarMenu>
+                        <MenubarTrigger className="pr-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
+                            Format
+                        </MenubarTrigger>
+                        <MenubarContent>
+                            <MenubarLabel>Coming soon!</MenubarLabel>
+                        </MenubarContent>
+                    </MenubarMenu>
+                    <MenubarMenu>
+                        <MenubarTrigger className="pr-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
+                            Plugins
+                        </MenubarTrigger>
+                        <MenubarContent>
+                            <MenubarLabel>Coming soon!</MenubarLabel>
+                        </MenubarContent>
+                    </MenubarMenu>
+                </Menubar>
                 <AceEditor
                     value={value}
                     setValue={setValue}
@@ -109,7 +148,7 @@ export default function Open({
                         setMessage("Saved");
                     }}
                     width={sizeRef.width}
-                    height={sizeRef.height}
+                    height={sizeRef.height - menuSizeRef.height}
                     options={{
                         ...aceOptions
                     }}
@@ -138,6 +177,31 @@ export default function Open({
                     margin-top: 3rem !important;
                 }
             `}</style>
+            <Menubar className="sticky top-2 m-2">
+                <MenubarMenu>
+                    <MenubarTrigger className="pr-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
+                        Download
+                    </MenubarTrigger>
+                    <MenubarContent>
+                        <MenubarItem
+                            onClick={() => downloadHTML(value, file.filename)}>
+                            As HTML
+                        </MenubarItem>
+                        <MenubarItem
+                            onClick={() =>
+                                downloadMarkdown(value, file.filename)
+                            }>
+                            As Markdown
+                        </MenubarItem>
+                        <ReactToPrint
+                            trigger={() => (
+                                <MenubarItem>Print/Save as PDF</MenubarItem>
+                            )}
+                            content={() => componentRef.current}
+                        />
+                    </MenubarContent>
+                </MenubarMenu>
+            </Menubar>
             <div
                 className={`prose prose-lg max-w-none px-8 pb-12 ${inter.className}`}
                 dangerouslySetInnerHTML={{
@@ -145,48 +209,6 @@ export default function Open({
                 }}
                 ref={componentRef}
             />
-            <DropdownMenu>
-                <DropdownMenuTrigger
-                    className={`${
-                        !value.length && "hidden"
-                    } output-options-trigger absolute bottom-4 left-4`}>
-                    <Button
-                        variant="outline"
-                        className="w-10 rounded-full bg-white p-0 shadow-md">
-                        <Settings2 className="h-4 w-4" />
-                        <span className="sr-only">Open popover</span>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="output-options-content">
-                    <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                            Download
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuSubContent>
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    downloadHTML(value, file.filename)
-                                }>
-                                As HTML
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() =>
-                                    downloadMarkdown(value, file.filename)
-                                }>
-                                As Markdown
-                            </DropdownMenuItem>
-                        </DropdownMenuSubContent>
-                    </DropdownMenuSub>
-                    <ReactToPrint
-                        trigger={() => (
-                            <DropdownMenuItem>
-                                Print/Save as PDF
-                            </DropdownMenuItem>
-                        )}
-                        content={() => componentRef.current}
-                    />
-                </DropdownMenuContent>
-            </DropdownMenu>
         </div>
     );
 }

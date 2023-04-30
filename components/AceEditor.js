@@ -20,6 +20,50 @@ export default function Editor({
     return (
         <AceEditor
             {...options}
+            commands={[
+                {
+                    name: "insertItalic",
+                    bindKey: {
+                        win: "Ctrl-i",
+                        mac: "Cmd-i"
+                    },
+                    exec: editor => {
+                        let { row, column } = editor.getCursorPosition();
+                        if (editor.session.getLine(row)[column] === "*") {
+                            // Italic already there, get out of it
+                            try {
+                                editor.moveCursorTo(row, column + 1);
+                                return;
+                            } catch {}
+                        }
+                        editor.insert("**");
+                        ({ row, column } = editor.getCursorPosition());
+                        editor.moveCursorTo(row, column - 1);
+                    }
+                },
+                {
+                    name: "insertBold",
+                    bindKey: {
+                        win: "Ctrl-b",
+                        mac: "Cmd-b"
+                    },
+                    exec: editor => {
+                        let { row, column } = editor.getCursorPosition();
+                        if (
+                            editor.session.getLine(row)[column] === "*" &&
+                            editor.session.getLine(row)[column + 1] === "*"
+                        ) {
+                            try {
+                                editor.moveCursorTo(row, column + 2);
+                                return;
+                            } catch {}
+                        }
+                        editor.insert("****");
+                        ({ row, column } = editor.getCursorPosition());
+                        editor.moveCursorTo(row, column - 2);
+                    }
+                }
+            ]}
             mode="markdown"
             width={width}
             height={height}

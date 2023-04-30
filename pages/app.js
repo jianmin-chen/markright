@@ -110,7 +110,7 @@ export default function Index({
                     message={message}
                 />
             </div>
-            <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md shadow-md">
+            <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md bg-white shadow-md">
                 {showSidebar === true && (
                     <div className="col-span-4 flex h-full flex-col overflow-auto border-r bg-neutral-100">
                         <Tabs defaultValue="files">

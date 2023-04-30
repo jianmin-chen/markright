@@ -160,7 +160,8 @@ function File({
                 } ${styles.file} ${className} `}
                 onClick={() => {
                     if (!rename) openFile(name, location);
-                }}>
+                }}
+                title={name}>
                 {rename ? (
                     <form
                         className="flex w-full max-w-full items-center justify-between rounded-md border border-blue-500 py-1 px-3 pl-5 shadow-md"
@@ -421,7 +422,8 @@ function Folder({
             {!renameFolder ? (
                 <div
                     className={`folder flex w-full cursor-pointer items-center justify-between rounded-md py-1 px-3 hover:bg-neutral-200 ${styles.folder}`}
-                    onClick={() => setToggle(!toggle)}>
+                    onClick={() => setToggle(!toggle)}
+                    title={name}>
                     <span className="flex min-w-0 items-center gap-x-1">
                         {content.length > 0 &&
                             (toggle ? (
