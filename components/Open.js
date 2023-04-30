@@ -27,7 +27,6 @@ import {
     MenubarTrigger
 } from "./ui/Menubar";
 import { useResizeDetector } from "react-resize-detector";
-import { GrammarlyEditorPlugin } from "@grammarly/editor-sdk-react";
 
 const inter = Inter({
     variable: "--sans",
