@@ -9,7 +9,7 @@ export default function Login() {
             <div className="flex min-h-screen w-full flex-col items-center justify-center gap-y-6 py-14">
                 <div className="prose prose-xl">
                     <h1 className="!mb-0">Markright</h1>
-                    <p>
+                    <p className="mb-0">
                         A full-fledged Markdown editor with a filesystem and
                         OAuth login, written using a{" "}
                         <a
@@ -26,9 +26,7 @@ export default function Login() {
                         </button>
                     </p>
                     <div className="flex w-full gap-x-2">
-                        <video className="rounded-lg" autoPlay muted loop>
-                            <source src="/images/demo.mp4" type="video/mp4" />
-                        </video>
+                        <img src="/images/screenshot.png" className="rounded-lg"/>
                     </div>
                 </div>
             </div>

@@ -19,6 +19,7 @@ import { downloadMarkdown, downloadHTML } from "../utils/markdownUtils";
 import { useRouter } from "next/router";
 import { getToken } from "next-auth/jwt";
 import { useToast } from "../hooks/ui/useToast";
+import { Calendar } from "../components/ui/Calendar";
 
 const Workspace = dynamic(() => import("../components/Workspace"), {
     ssr: false
@@ -120,13 +121,11 @@ export default function Index({
                                     value="files">
                                     Files
                                 </TabsTrigger>
-                                {/*
                                 <TabsTrigger
                                     className="w-full rounded-none !shadow-none data-[state=active]:bg-neutral-100"
                                     value="outline">
-                                    Outline
+                                    Journal
                                 </TabsTrigger>
-                                */}
                             </TabsList>
                             <TabsContent
                                 className="flex flex-col gap-y-4 border-none p-0"
@@ -157,10 +156,10 @@ export default function Index({
                                     setActiveRight={setActiveRight}
                                 />
                             </TabsContent>
-                            {/*
                             <TabsContent
-                                className="border-none"
+                                className="max-w-full overflow-auto border-none py-0 px-4"
                                 value="outline">
+                                {/*
                                 <Outline
                                     value={value}
                                     onClick={line => {
@@ -171,8 +170,12 @@ export default function Index({
                                         }
                                     }}
                                 />
+                                */}
+                                <Calendar
+                                    mode="single"
+                                    className="w-fit rounded-md border bg-neutral-50"
+                                />
                             </TabsContent>
-                            */}
                         </Tabs>
                     </div>
                 )}

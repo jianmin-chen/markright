@@ -108,11 +108,9 @@ export default function Open({
 
     if (file.type === "input")
         return (
-            <div
-                onMouseEnter={() => setScroll(true)}
-                onMouseLeave={() => setScroll(false)}>
+            <>
                 <Menubar
-                    className="sticky top-2 z-[99] m-2 space-x-0"
+                    className="sticky top-2 z-[99] m-2 space-x-0 p-2"
                     ref={menuSizeRef.ref}>
                     <MenubarMenu>
                         <MenubarTrigger className="pr-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
@@ -139,23 +137,27 @@ export default function Open({
                         </MenubarContent>
                     </MenubarMenu>
                 </Menubar>
-                <AceEditor
-                    value={value}
-                    setValue={setValue}
-                    onBlur={() => {
-                        update();
-                        setMessage("Saved");
-                    }}
-                    width={sizeRef.width}
-                    height={sizeRef.height - menuSizeRef.height}
-                    options={{
-                        ...aceOptions
-                    }}
-                    scrollRef={scrollRef}
-                    scroll={scroll}
-                    onScroll={onScroll}
-                />
-            </div>
+                <div
+                    onMouseEnter={() => setScroll(true)}
+                    onMouseLeave={() => setScroll(false)}>
+                    <AceEditor
+                        value={value}
+                        setValue={setValue}
+                        onBlur={() => {
+                            update();
+                            setMessage("Saved");
+                        }}
+                        width={sizeRef.width}
+                        height={sizeRef.height - menuSizeRef.height}
+                        options={{
+                            ...aceOptions
+                        }}
+                        scrollRef={scrollRef}
+                        scroll={scroll}
+                        onScroll={onScroll}
+                    />
+                </div>
+            </>
         );
 
     return (
