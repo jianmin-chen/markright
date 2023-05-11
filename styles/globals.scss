@@ -56,13 +56,19 @@ input:not(.ui-input) {
     }
 }
 
+.rdp {
+    button[aria-selected="true"] {
+        @apply bg-neutral-200;
+    }
+}
+
 @media print {
     @page {
-        margin: 3.5rem 0;
+        margin: 2.5rem 0;
     }
 
     body {
-        @apply prose prose-2xl prose-slate block px-7 py-4;
+        @apply prose prose-2xl prose-slate block py-0 pl-7 pr-14;
     }
 
     pre {

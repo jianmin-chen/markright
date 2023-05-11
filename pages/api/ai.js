@@ -1,8 +1,20 @@
 import { getServerSession } from "next-auth/next";
 import authOptions from "./auth/[...nextauth]";
 import connect from "../../utils/openai";
+import { ipRateLimit } from "../../utils/rate-limit";
+
+export const config = {
+    runtime: "edge"
+};
 
 export default async function handler(req, res) {
+    const res = await ipRateLimit(req);
+    if (res.status !== 200)
+        return res.status(429).json({
+            success: false,
+            reason: "Too many requests. Try again later."
+        });
+
     const session = await getServerSession(req, res, authOptions);
     if (!session || !session.user)
         return res.status(401).json({

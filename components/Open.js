@@ -92,10 +92,10 @@ export default function Open({
 
     useEffect(() => {
         // Autosave every 30 seconds
+        setSideValue(value);
         if (file.type === "input") {
             setMessage("Saving...");
             setMirror(value);
-            setSideValue(value);
             const timer = setTimeout(update, 5000);
             return () => {
                 clearTimeout(timer);
@@ -108,56 +108,26 @@ export default function Open({
 
     if (file.type === "input")
         return (
-            <>
-                <Menubar
-                    className="sticky top-2 z-[99] m-2 space-x-0 p-2"
-                    ref={menuSizeRef.ref}>
-                    <MenubarMenu>
-                        <MenubarTrigger className="pr-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
-                            Paragraph
-                        </MenubarTrigger>
-                        <MenubarContent>
-                            <MenubarLabel>Coming soon!</MenubarLabel>
-                        </MenubarContent>
-                    </MenubarMenu>
-                    <MenubarMenu>
-                        <MenubarTrigger className="pr-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
-                            Format
-                        </MenubarTrigger>
-                        <MenubarContent>
-                            <MenubarLabel>Coming soon!</MenubarLabel>
-                        </MenubarContent>
-                    </MenubarMenu>
-                    <MenubarMenu>
-                        <MenubarTrigger className="pr-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
-                            Plugins
-                        </MenubarTrigger>
-                        <MenubarContent>
-                            <MenubarLabel>Coming soon!</MenubarLabel>
-                        </MenubarContent>
-                    </MenubarMenu>
-                </Menubar>
-                <div
-                    onMouseEnter={() => setScroll(true)}
-                    onMouseLeave={() => setScroll(false)}>
-                    <AceEditor
-                        value={value}
-                        setValue={setValue}
-                        onBlur={() => {
-                            update();
-                            setMessage("Saved");
-                        }}
-                        width={sizeRef.width}
-                        height={sizeRef.height - menuSizeRef.height}
-                        options={{
-                            ...aceOptions
-                        }}
-                        scrollRef={scrollRef}
-                        scroll={scroll}
-                        onScroll={onScroll}
-                    />
-                </div>
-            </>
+            <div
+                onMouseEnter={() => setScroll(true)}
+                onMouseLeave={() => setScroll(false)}>
+                <AceEditor
+                    value={value}
+                    setValue={setValue}
+                    onBlur={() => {
+                        update();
+                        setMessage("Saved");
+                    }}
+                    width={sizeRef.width}
+                    height={sizeRef.height}
+                    options={{
+                        ...aceOptions
+                    }}
+                    scrollRef={scrollRef}
+                    scroll={scroll}
+                    onScroll={onScroll}
+                />
+            </div>
         );
 
     return (
@@ -178,33 +148,8 @@ export default function Open({
                     margin-top: 3rem !important;
                 }
             `}</style>
-            <Menubar className="sticky top-2 m-2">
-                <MenubarMenu>
-                    <MenubarTrigger className="pr-0 hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
-                        Download
-                    </MenubarTrigger>
-                    <MenubarContent>
-                        <MenubarItem
-                            onClick={() => downloadHTML(value, file.filename)}>
-                            As HTML
-                        </MenubarItem>
-                        <MenubarItem
-                            onClick={() =>
-                                downloadMarkdown(value, file.filename)
-                            }>
-                            As Markdown
-                        </MenubarItem>
-                        <ReactToPrint
-                            trigger={() => (
-                                <MenubarItem>Print/Save as PDF</MenubarItem>
-                            )}
-                            content={() => componentRef.current}
-                        />
-                    </MenubarContent>
-                </MenubarMenu>
-            </Menubar>
             <div
-                className={`prose prose-lg max-w-none px-8 pb-12 ${inter.className}`}
+                className={`prose prose-lg max-w-none px-8 ${inter.className}`}
                 dangerouslySetInnerHTML={{
                     __html: parseMarkdown(value)
                 }}

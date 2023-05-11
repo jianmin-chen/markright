@@ -4,8 +4,21 @@ import { IBM_Plex_Mono, Inter } from "next/font/google";
 import { useResizeDetector } from "react-resize-detector";
 import Open from "./Open";
 import { post } from "../utils/fetch";
-import { BookOpen } from "lucide-react";
+import { BookOpen, MoreHorizontal } from "lucide-react";
 import { useToast } from "../hooks/ui/useToast";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuLabel
+} from "./ui/DropdownMenu";
+import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
+import ReactToPrint from "react-to-print";
+import parseMarkdown from "../utils/parser";
 
 const inter = Inter({
     variable: "--sans",
@@ -161,11 +174,116 @@ export default function Workspace({
                                                 } ${
                                                     index === activeLeft &&
                                                     "bg-white"
-                                                } flex w-[0] shrink grow basis-0 items-center justify-center border-b px-3 py-1.5  text-center text-sm font-medium text-slate-700  !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-200 dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-slate-100`}
+                                                } flex w-[0] shrink grow basis-0 items-center justify-between border-b px-3 py-1.5 text-center text-sm font-medium text-slate-700  !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-200 dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-slate-100`}
                                                 onClick={async () => {
                                                     await updateActiveTabs();
                                                     setActiveLeft(index);
                                                 }}>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger>
+                                                        <span
+                                                            className={`flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-md text-[18px] font-light transition ${
+                                                                activeLeft ===
+                                                                index
+                                                                    ? "hover:bg-neutral-100"
+                                                                    : "hover:bg-neutral-200"
+                                                            }`}
+                                                            onClick={event => {
+                                                                event.stopPropagation();
+                                                            }}>
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </span>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent>
+                                                        {left[activeLeft]
+                                                            .type ===
+                                                        "output" ? (
+                                                            <>
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger>
+                                                                        Download
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent>
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                downloadHTML(
+                                                                                    leftValue,
+                                                                                    left[
+                                                                                        activeLeft
+                                                                                    ]
+                                                                                        .filename
+                                                                                );
+                                                                            }}>
+                                                                            As
+                                                                            HTML
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem
+                                                                            onClick={() =>
+                                                                                downloadMarkdown(
+                                                                                    leftValue,
+                                                                                    left[
+                                                                                        activeLeft
+                                                                                    ]
+                                                                                        .filename
+                                                                                )
+                                                                            }>
+                                                                            As
+                                                                            Markdown
+                                                                        </DropdownMenuItem>
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                                <ReactToPrint
+                                                                    trigger={() => (
+                                                                        <DropdownMenuItem>
+                                                                            Print/Save
+                                                                            as
+                                                                            PDF
+                                                                        </DropdownMenuItem>
+                                                                    )}
+                                                                    content={() =>
+                                                                        leftRef.current
+                                                                    }
+                                                                />
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger>
+                                                                        Paragraph
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent>
+                                                                        <DropdownMenuLabel>
+                                                                            Coming
+                                                                            soon!
+                                                                        </DropdownMenuLabel>
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger>
+                                                                        Format
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent>
+                                                                        <DropdownMenuLabel>
+                                                                            Coming
+                                                                            soon!
+                                                                        </DropdownMenuLabel>
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger>
+                                                                        Tools
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent>
+                                                                        <DropdownMenuLabel>
+                                                                            Coming
+                                                                            soon!
+                                                                        </DropdownMenuLabel>
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                            </>
+                                                        )}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
                                                 <span className="flex-1 truncate">
                                                     {file.filename}
                                                 </span>
@@ -231,6 +349,11 @@ export default function Workspace({
                                 }
                                 setMirror={setMirror}
                                 onScroll={(scrollTop, height) => {
+                                    if (
+                                        !left[activeLeft] ||
+                                        !right[activeRight]
+                                    )
+                                        return;
                                     if (
                                         left[activeLeft].location !==
                                         right[activeRight].location
@@ -316,6 +439,75 @@ export default function Workspace({
                                                     await updateActiveTabs();
                                                     setActiveRight(index);
                                                 }}>
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger>
+                                                        <span
+                                                            className={`flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-md text-[18px] font-light transition ${
+                                                                activeLeft ===
+                                                                index
+                                                                    ? "hover:bg-neutral-100"
+                                                                    : "hover:bg-neutral-200"
+                                                            }`}
+                                                            onClick={event => {
+                                                                event.stopPropagation();
+                                                            }}>
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </span>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent>
+                                                        {right[activeRight]
+                                                            .type ===
+                                                        "output" ? (
+                                                            <>
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger>
+                                                                        Download
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent>
+                                                                        <DropdownMenuItem
+                                                                            onClick={() => {
+                                                                                downloadHTML(
+                                                                                    rightValue,
+                                                                                    right[
+                                                                                        activeRight
+                                                                                    ]
+                                                                                        .filename
+                                                                                );
+                                                                            }}>
+                                                                            As
+                                                                            HTML
+                                                                        </DropdownMenuItem>
+                                                                        <DropdownMenuItem
+                                                                            onClick={() =>
+                                                                                downloadMarkdown(
+                                                                                    rightValue,
+                                                                                    right[
+                                                                                        activeRight
+                                                                                    ]
+                                                                                        .filename
+                                                                                )
+                                                                            }>
+                                                                            As
+                                                                            Markdown
+                                                                        </DropdownMenuItem>
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                                <ReactToPrint
+                                                                    trigger={() => (
+                                                                        <DropdownMenuItem>
+                                                                            Print/Save
+                                                                            as
+                                                                            PDF
+                                                                        </DropdownMenuItem>
+                                                                    )}
+                                                                    content={() =>
+                                                                        rightRef.current
+                                                                    }
+                                                                />
+                                                            </>
+                                                        ) : null}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
                                                 <span className="flex-1 truncate">
                                                     {file.filename}
                                                 </span>
@@ -384,6 +576,11 @@ export default function Workspace({
                                         : null
                                 }
                                 onScroll={(scrollTop, height) => {
+                                    if (
+                                        !left[activeLeft] ||
+                                        !right[activeRight]
+                                    )
+                                        return;
                                     if (
                                         left[activeLeft].location !==
                                         right[activeRight].location
