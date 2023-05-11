@@ -3,10 +3,6 @@ import authOptions from "./auth/[...nextauth]";
 import connect from "../../utils/openai";
 import { ipRateLimit } from "../../utils/rate-limit";
 
-export const config = {
-    runtime: "edge"
-};
-
 export default async function handler(req, res) {
     const res = await ipRateLimit(req);
     if (res.status !== 200)
