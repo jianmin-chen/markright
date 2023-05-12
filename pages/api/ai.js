@@ -1,10 +1,8 @@
 import { getServerSession } from "next-auth/next";
 import authOptions from "./auth/[...nextauth]";
 import connect from "../../utils/openai";
-import { ipRateLimit } from "../../utils/rate-limit";
 
 export default async function handler(req, res) {
-    const res = await ipRateLimit(req);
     if (res.status !== 200)
         return res.status(429).json({
             success: false,
