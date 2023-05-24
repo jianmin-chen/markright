@@ -4,14 +4,14 @@ import AWS from "aws-sdk";
 import { decrypt, encrypt } from "../../utils/filesystem";
 
 const S3 = new AWS.S3({
-    endpoint: new AWS.Endpoint(config.AWS_ENDPOINT),
-    accessKeyId: config.AWS_ID,
-    secretAccessKey: config.AWS_SECRET
+    endpoint: new AWS.Endpoint(config.R2_ENDPOINT),
+    accessKeyId: config.R2_ID,
+    secretAccessKey: config.R2_SECRET
 });
 
 export async function get(filename) {
     const params = {
-        Bucket: config.AWS_BUCKET,
+        Bucket: config.R2_BUCKET,
         Key: filename
     };
 
@@ -27,7 +27,7 @@ export async function get(filename) {
 
 export async function exists(filename) {
     const params = {
-        Bucket: config.AWS_BUCKET,
+        Bucket: config.R2_BUCKET,
         Key: filename
     };
 
@@ -42,7 +42,7 @@ export async function exists(filename) {
 
 export async function upload(filename, data = "") {
     const params = {
-        Bucket: config.AWS_BUCKET,
+        Bucket: config.R2_BUCKET,
         Key: filename,
         Body: data
     };
@@ -69,7 +69,7 @@ export async function crypt(filename, type, password) {
 
 export async function del(filename) {
     const params = {
-        Bucket: config.AWS_BUCKET,
+        Bucket: config.R2_BUCKET,
         Key: filename
     };
 
