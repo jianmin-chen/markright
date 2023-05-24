@@ -9,7 +9,7 @@ import {
     PlusCircle
 } from "lucide-react";
 import { Button } from "../ui/Button";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -69,14 +69,20 @@ function File({
     const renameFile = filename => {
         const traversed = location.split("/");
         setName(filename);
-        setLocation(traversed.slice(0, traversed.length - 1) + "/" + filename);
+        setLocation(
+            traversed.slice(0, traversed.length - 1).join("/") + "/" + filename
+        );
         post({
             route: "/api/file/rename",
             data: {
                 oldLocation:
-                    traversed.slice(0, traversed.length - 1) + "/" + name,
+                    traversed.slice(0, traversed.length - 1).join("/") +
+                    "/" +
+                    name,
                 newLocation:
-                    traversed.slice(0, traversed.length - 1) + "/" + filename
+                    traversed.slice(0, traversed.length - 1).join("/") +
+                    "/" +
+                    filename
             }
         })
             .then(res => {
@@ -92,7 +98,7 @@ function File({
                         ...leftCopy[leftIndex],
                         filename,
                         location:
-                            traversed.slice(0, traversed.length - 1) +
+                            traversed.slice(0, traversed.length - 1).join("/") +
                             "/" +
                             filename
                     };
@@ -106,7 +112,7 @@ function File({
                         ...rightCopy[rightIndex],
                         filename,
                         location:
-                            traversed.slice(0, traversed.length - 1) +
+                            traversed.slice(0, traversed.length - 1).join("/") +
                             "/" +
                             filename
                     };
@@ -303,7 +309,7 @@ function Folder({
     const [toggle, setToggle] = useState(false);
     const [renameFolder, setRenameFolder] = useState(false);
     const [nameFile, setNameFile] = useState(false);
-    const [nameFolder, setNameFolder] = useState(false);
+    const [nameFolder, setNameFolder] = useState(0);
 
     const createFile = file => {
         if (!file) {
@@ -370,11 +376,15 @@ function Folder({
         const oldLocation =
             traversed.length === 1
                 ? initialName
-                : traversed.slice(0, traversed.length - 1) + "/" + initialName;
+                : traversed.slice(0, traversed.length - 1).join("/") +
+                  "/" +
+                  initialName;
         const newLocation =
             traversed.length === 1
                 ? foldername
-                : traversed.slice(0, traversed.length - 1) + "/" + foldername;
+                : traversed.slice(0, traversed.length - 1).join("/") +
+                  "/" +
+                  foldername;
         post({
             route: "/api/folder/rename",
             data: {
@@ -386,10 +396,33 @@ function Folder({
                 setRenameFolder(false);
                 setFiles(res.filesystem);
                 // Update tabs
-                const leftCopy = Array.from(left);
-                const leftIndex = leftCopy.findIndex(
-                    f => f.split("/").includes
-                );
+                const leftCopy = Array.from(left).map(f => {
+                    if (f.location.includes(oldLocation)) {
+                        // Update location
+                        return {
+                            ...f,
+                            location: f.location.replace(
+                                oldLocation,
+                                newLocation
+                            )
+                        };
+                    }
+                    return f;
+                });
+                setLeft(leftCopy);
+                const rightCopy = Array.from(right).map(f => {
+                    if (f.location.includes(oldLocation)) {
+                        return {
+                            ...f,
+                            location: f.location.replace(
+                                oldLocation,
+                                newLocation
+                            )
+                        };
+                    }
+                    return f;
+                });
+                setRight(rightCopy);
             })
             .catch(err =>
                 toast({
@@ -407,6 +440,15 @@ function Folder({
         })
             .then(json => {
                 setFiles(json.filesystem);
+                // Update tabs
+                setLeft(
+                    Array.from(left).filter(f => !f.location.includes(location))
+                );
+                setRight(
+                    Array.from(right).filter(
+                        f => !f.location.includes(location)
+                    )
+                );
             })
             .catch(err =>
                 toast({
@@ -427,9 +469,9 @@ function Folder({
                     <span className="flex min-w-0 items-center gap-x-1">
                         {content.length > 0 &&
                             (toggle ? (
-                                <ChevronDown className="h-4 w-4" />
+                                <ChevronDown className="h-4 w-4 shrink-0" />
                             ) : (
-                                <ChevronRight className="h-4 w-4" />
+                                <ChevronRight className="h-4 w-4 shrink-0" />
                             ))}
                         <FolderClosed className="h-4 w-4 shrink-0" />
                         <span className="truncate">{name}</span>
@@ -443,7 +485,7 @@ function Folder({
                                 <DropdownMenuItem
                                     onClick={event => {
                                         event.stopPropagation();
-                                        setNameFolder(true);
+                                        setNameFolder(1);
                                     }}>
                                     New folder
                                 </DropdownMenuItem>
@@ -515,26 +557,42 @@ function Folder({
                     </span>
                 </form>
             )}
-            {(nameFile || nameFolder) && (
+            {(nameFile || nameFolder !== 0) && (
                 <form
                     className={`flex w-full max-w-full items-center justify-between rounded-md border border-blue-500 py-1 px-3 pl-5 shadow-md`}
                     onSubmit={event => {
                         event.preventDefault();
-                        createFile(event.target.file.value);
+                        if (nameFile) {
+                            createFile(event.target.name.value);
+                            setNameFile(false);
+                        } else {
+                            createFolder(event.target.name.value);
+                            setNameFolder(0);
+                        }
                         event.target.reset();
-                        setNameFile(false);
                     }}>
                     <span className="flex min-w-0 items-center gap-x-1 ">
-                        <FileIcon className="h-4 w-4 shrink-0" />
+                        {nameFile ? (
+                            <FileIcon className="h-4 w-4 shrink-0" />
+                        ) : (
+                            <FolderClosed className="h-4 w-4 shrink-0" />
+                        )}
                         <input
                             className="max-w-full flex-1 bg-transparent"
                             autoComplete="off"
                             autoFocus={true}
-                            name="file"
+                            name="name"
                             onBlur={event => {
+                                if (nameFolder && !event.target.value.length) {
+                                    if (nameFolder === 1) {
+                                        setNameFolder(2);
+                                        event.target.focus();
+                                    } else setNameFolder(0);
+                                    return;
+                                }
                                 if (!event.target.value.length) {
                                     setNameFile(false);
-                                    setNameFolder(false);
+                                    setNameFolder(0);
                                     return;
                                 }
                                 event.target.value = "";
@@ -542,10 +600,10 @@ function Folder({
                                     createFile(event.target.value);
                                     setNameFile(false);
                                 } else {
-                                    console.log(
+                                    createFolder(
                                         `${location}/${event.target.value}`
                                     );
-                                    setNameFolder(false);
+                                    setNameFolder(0);
                                 }
                             }}
                             placeholder={`Untitled ${
@@ -571,7 +629,16 @@ function Folder({
                                     toast={toast}
                                     location={`${location}/${file.name}`}
                                     userId={userId}
+                                    openFile={openFile}
                                     setFiles={setFiles}
+                                    left={left}
+                                    right={right}
+                                    setLeft={setLeft}
+                                    setRight={setRight}
+                                    activeLeft={activeLeft}
+                                    activeRight={activeRight}
+                                    setActiveLeft={setActiveLeft}
+                                    setActiveRight={setActiveRight}
                                 />
                             );
                         return (

@@ -17,6 +17,6 @@ This is actually the second version! Check out the [first](https://github.com/ji
     -   [ ] Outline for editor tabs
     -   [ ] Direct insert options in the menu bar
     -   [ ] Shortcuts
-    -   [ ] Grammarly integration, ChatGPT integration
+    -   [ ] Grammar checking integration, ChatGPT integration
+    -   [ ] Quick notes, sorted by day
     -   [ ] "Notes" for highlighting content
-    -   [ ] Calendar

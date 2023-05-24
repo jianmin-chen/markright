@@ -30,7 +30,6 @@ export default function Unsplash({ setBackground }) {
                 route: "/api/unsplash",
                 data: { data: uri }
             }).then(json => {
-                console.log(json.results);
                 setBackground(uri);
             });
         }

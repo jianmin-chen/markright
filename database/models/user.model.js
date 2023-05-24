@@ -79,7 +79,7 @@ userSchema.methods.addFolder = async function (location, password) {
         return await this.save();
     }
     let encrypted = this.filesystem;
-    // Traverse down filesystem, adding file where it needs to be
+    // Traverse down filesystem, adding folder where it needs to be
     for (let i = 0; i < traverse.length - 1; i++) {
         let route = traverse[i];
         let step;
@@ -92,16 +92,16 @@ userSchema.methods.addFolder = async function (location, password) {
             return false;
         });
         if (!location.length) throw new Error(`Folder ${route} not found`);
-        decrypted = location[0];
-        encrypted = encrypted[step];
+        decrypted = location[0].content;
+        encrypted = encrypted[step].content;
     }
 
     if (
-        !decrypted.content.find(
+        !decrypted.find(
             x => x.type === "folder" && x.name === traverse[traverse.length - 1]
         )
     )
-        encrypted.content.push({
+        encrypted.push({
             type: "folder",
             name: encrypt(traverse[traverse.length - 1], password),
             content: []
@@ -161,15 +161,15 @@ userSchema.methods.moveFolder = async function (
             return false;
         });
         if (!location.length) throw new Error(`Folder ${route} not found`);
-        decrypted = location[0];
-        encrypted = encrypted[step];
+        decrypted = location[0].content;
+        encrypted = encrypted[step].content;
     }
-    const index = decrypted.content.findIndex(
+    const index = decrypted.findIndex(
         x => x.type === "folder" && x.name === traverse[traverse.length - 1]
     );
     if (index < 0) throw new Error(`File ${location} doesn't exist`);
     await this.addFolder(newLocation, password);
-    for (let f of decrypted.content[index].content) {
+    for (let f of decrypted[index].content) {
         if (f.type === "folder")
             await this.moveFolder(
                 oldLocation + "/" + f.name,
@@ -217,19 +217,19 @@ userSchema.methods.deleteFolder = async function (location, password) {
             return false;
         });
         if (!location.length) throw new Error(`Folder ${route} not found`);
-        decrypted = location[0];
-        encrypted = encrypted[step];
+        decrypted = location[0].content;
+        encrypted = encrypted[step].content;
     }
-    const index = decrypted.content.findIndex(
+    const index = decrypted.findIndex(
         x => x.type === "folder" && x.name === traverse[traverse.length - 1]
     );
     if (index < 0) throw new Error(`File ${location} doesn't exist`);
-    for (let f of decrypted.content[index].content) {
+    for (let f of decrypted[index].content) {
         if (f.type === "folder")
-            this.deleteFolder(location + "/" + f.name, password);
-        else this.deleteFile(location + "/" + f.name, password);
+            await this.deleteFolder(location + "/" + f.name, password);
+        else await this.deleteFile(location + "/" + f.name, password);
     }
-    encrypted.content.splice(index, 1);
+    encrypted.splice(index, 1);
     this.markModified("filesystem");
     return await this.save();
 };
@@ -271,12 +271,12 @@ userSchema.methods.addFile = async function (
             return false;
         });
         if (!location.length) throw new Error(`Folder ${route} not found`);
-        decrypted = location[0];
-        encrypted = encrypted[step];
+        decrypted = location[0].content;
+        encrypted = encrypted[step].content;
     }
 
     if (
-        !decrypted.content.find(
+        !decrypted.find(
             x => x.type === "file" && x.name === traverse[traverse.length - 1]
         )
     ) {
@@ -284,7 +284,7 @@ userSchema.methods.addFile = async function (
         const storage =
             Math.abs(seedrandom(`${this._id}${location}`).int32()) + ".md";
         await upload(storage, content);
-        encrypted.content.push({
+        encrypted.push({
             type: "file",
             name: encrypt(traverse[traverse.length - 1], password),
             isPublic: false,
@@ -320,16 +320,16 @@ userSchema.methods.getFile = async function (location, password) {
             return false;
         });
         if (!location.length) throw new Error(`Folder ${route} not found`);
-        decrypted = location[0];
+        decrypted = location[0].content;
     }
 
-    const index = decrypted.content.findIndex(
+    const index = decrypted.findIndex(
         x => x.type === "file" && x.name === traverse[traverse.length - 1]
     );
     if (index < 0)
         throw new Error(`File ${traverse[traverse.length - 1]} doesn't exist`);
-    const content = await get(decrypted.content[index].storage);
-    if (decrypted.content[index].isPublic) return content;
+    const content = await get(decrypted[index].storage);
+    if (decrypted[index].isPublic) return content;
     if (!content) return "";
     return decrypt(content, password);
 };
@@ -351,15 +351,15 @@ userSchema.methods.getFileMeta = async function (location, password) {
             }
         });
         if (!location.length) throw new Error(`Folder ${route} not found`);
-        decrypted = location[0];
+        decrypted = location[0].content;
     }
 
-    const index = decrypted.content.findIndex(
+    const index = decrypted.findIndex(
         x => x.type === "file" && x.name === traverse[traverse.length - 1]
     );
     if (index < 0)
         throw new Error(`File ${traverse[traverse.length - 1]} doesn't exist`);
-    return decrypted.content[index];
+    return decrypted[index];
 };
 
 userSchema.methods.moveFile = async function (
@@ -402,17 +402,17 @@ userSchema.methods.updateFile = async function (location, content, password) {
             return false;
         });
         if (!location.length) throw new Error(`Folder ${route} not found`);
-        decrypted = location[0];
+        decrypted = location[0].content;
     }
 
-    const index = decrypted.content.findIndex(
+    const index = decrypted.findIndex(
         x => x.type === "file" && x.name === traverse[traverse.length - 1]
     );
     if (index < 0)
         throw new Error(`File ${traverse[traverse.length - 1]} doesn't exist`);
     return await upload(
-        decrypted.content[index].storage,
-        decrypted.content[index].isPublic ? content : encrypt(content, password)
+        decrypted[index].storage,
+        decrypted[index].isPublic ? content : encrypt(content, password)
     );
 };
 
@@ -442,15 +442,15 @@ userSchema.methods.deleteFile = async function (location, password) {
             return false;
         });
         if (!location.length) throw new Error(`Folder ${route} not found`);
-        decrypted = location[0];
-        encrypted = encrypted[step];
+        decrypted = location[0].content;
+        encrypted = encrypted[step].content;
     }
-    const index = decrypted.content.findIndex(
+    const index = decrypted.findIndex(
         x => x.type === "file" && x.name === traverse[traverse.length - 1]
     );
     if (index < 0) throw new Error(`File ${location} doesn't exist`);
-    await del(encrypted.content[index].storage);
-    encrypted.content.splice(index, 1);
+    await del(encrypted[index].storage);
+    encrypted.splice(index, 1);
     this.markModified("filesystem");
     return await this.save();
 };
@@ -496,27 +496,24 @@ userSchema.methods.toggleFilePublic = async function (
             return false;
         });
         if (!location.length) throw new Error(`Folder ${route} not found`);
-        decrypted = location[0];
-        encrypted = encrypted[step];
+        decrypted = location[0].content;
+        encrypted = encrypted[step].content;
     }
     // Now get the file in encrypted
-    const index = decrypted.content.findIndex(
+    const index = decrypted.findIndex(
         x => x.type === "file" && x.name === traverse[traverse.length - 1]
     );
     if (index < 0) throw new Error(`File ${location} doesn't exist`);
-    if (encrypted.content[index].isPublic === isPublic) return this;
-    encrypted.content[index].isPublic = isPublic;
+    if (encrypted[index].isPublic === isPublic) return this;
+    encrypted[index].isPublic = isPublic;
     this.markModified("filesystem");
     // If isPublic, decrypt content, otherwise encrypt content at location
     if (isPublic) {
-        encrypted.content[index].publicName = decrypt(
-            encrypted.content[index].name,
-            password
-        );
-        await crypt(encrypted.content[index].storage, "decrypt", password);
+        encrypted[index].publicName = decrypt(encrypted[index].name, password);
+        await crypt(encrypted[index].storage, "decrypt", password);
     } else {
-        delete encrypted.content[index].publicName;
-        await crypt(encrypted.content[index].storage, "encrypt", password);
+        delete encrypted[index].publicName;
+        await crypt(encrypted[index].storage, "encrypt", password);
     }
     return await this.save();
 };

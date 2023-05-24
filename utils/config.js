@@ -1,25 +1,23 @@
-const AWS_ENDPOINT = process.env.AWS_ENDPOINT;
-if (!AWS_ENDPOINT)
+const R2_ENDPOINT = process.env.R2_ENDPOINT;
+if (!R2_ENDPOINT)
     throw new Error(
-        "Please define the AWS_ENDPOINT environment variable inside .env"
+        "Please define the R2_ENDPOINT environment variable inside .env"
     );
 
-const AWS_ID = process.env.AWS_ID;
-if (!AWS_ID)
+const R2_ID = process.env.R2_ID;
+if (!R2_ID)
+    throw new Error("Please define the R2_ID environment variable inside .env");
+
+const R2_SECRET = process.env.R2_SECRET;
+if (!R2_SECRET)
     throw new Error(
-        "Please define the AWS_ID environment variable inside .env"
+        "Please define the R2_SECRET environment variable inside .env"
     );
 
-const AWS_SECRET = process.env.AWS_SECRET;
-if (!AWS_SECRET)
+const R2_BUCKET = process.env.R2_BUCKET;
+if (!R2_BUCKET)
     throw new Error(
-        "Please define the AWS_SECRET environment variable inside .env"
-    );
-
-const AWS_BUCKET = process.env.AWS_BUCKET;
-if (!AWS_BUCKET)
-    throw new Error(
-        "Please define the AWS_BUCKET environment variable inside .env"
+        "Please define the R2_BUCKET environment variable inside .env"
     );
 
 const CRYPTO_ALGORITHM = process.env.CRYPTO_ALGORITHM;
@@ -71,10 +69,10 @@ if (!UNSPLASH_SECRET_KEY)
     );
 
 export default {
-    AWS_ENDPOINT,
-    AWS_ID,
-    AWS_SECRET,
-    AWS_BUCKET,
+    R2_ENDPOINT,
+    R2_ID,
+    R2_SECRET,
+    R2_BUCKET,
     CRYPTO_ALGORITHM,
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,

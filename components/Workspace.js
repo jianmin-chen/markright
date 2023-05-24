@@ -271,7 +271,7 @@ export default function Workspace({
                                                                 </DropdownMenuSub>
                                                                 <DropdownMenuSub>
                                                                     <DropdownMenuSubTrigger>
-                                                                        Tools
+                                                                        Plugins
                                                                     </DropdownMenuSubTrigger>
                                                                     <DropdownMenuSubContent>
                                                                         <DropdownMenuLabel>
@@ -293,12 +293,12 @@ export default function Workspace({
                                                             ? "hover:bg-neutral-100"
                                                             : "hover:bg-neutral-200"
                                                     }`}
-                                                    onClick={event => {
+                                                    onClick={async event => {
                                                         event.stopPropagation();
                                                         // Remove from left, then:
                                                         // * If user removed the active one, set it to index = 0 || index - 1
                                                         // * If user didn't remove the active one, update index to what it should be currently
-                                                        updateActiveTabs();
+                                                        await updateActiveTabs();
                                                         const leftCopy =
                                                             Array.from(left);
                                                         leftCopy.splice(
@@ -505,7 +505,43 @@ export default function Workspace({
                                                                     }
                                                                 />
                                                             </>
-                                                        ) : null}
+                                                        ) : (
+                                                            <>
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger>
+                                                                        Paragraph
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent>
+                                                                        <DropdownMenuLabel>
+                                                                            Coming
+                                                                            soon!
+                                                                        </DropdownMenuLabel>
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger>
+                                                                        Format
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent>
+                                                                        <DropdownMenuLabel>
+                                                                            Coming
+                                                                            soon!
+                                                                        </DropdownMenuLabel>
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                                <DropdownMenuSub>
+                                                                    <DropdownMenuSubTrigger>
+                                                                        Plugins
+                                                                    </DropdownMenuSubTrigger>
+                                                                    <DropdownMenuSubContent>
+                                                                        <DropdownMenuLabel>
+                                                                            Coming
+                                                                            soon!
+                                                                        </DropdownMenuLabel>
+                                                                    </DropdownMenuSubContent>
+                                                                </DropdownMenuSub>
+                                                            </>
+                                                        )}
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                                 <span className="flex-1 truncate">
@@ -517,9 +553,9 @@ export default function Workspace({
                                                             ? "hover:bg-neutral-100"
                                                             : "hover:bg-neutral-200"
                                                     }`}
-                                                    onClick={event => {
+                                                    onClick={async event => {
                                                         event.stopPropagation();
-                                                        updateActiveTabs();
+                                                        await updateActiveTabs();
                                                         const rightCopy =
                                                             Array.from(right);
                                                         rightCopy.splice(

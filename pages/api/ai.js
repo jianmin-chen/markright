@@ -3,6 +3,7 @@ import authOptions from "./auth/[...nextauth]";
 import connect from "../../utils/openai";
 
 export default async function handler(req, res) {
+    return res.status(404);
     if (res.status !== 200)
         return res.status(429).json({
             success: false,

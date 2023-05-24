@@ -57,7 +57,6 @@ export async function upload(filename, data = "") {
 }
 
 export async function crypt(filename, type, password) {
-    console.log(type);
     let content = await get(filename);
     if (!content.length) return "";
     return await upload(

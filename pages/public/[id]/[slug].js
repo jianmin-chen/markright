@@ -59,7 +59,7 @@ export async function getServerSideProps({ query }) {
             else if (f.isPublic && f.storage.replace(".md", "") === file)
                 return f;
         }
-        return results.filter(f => !Array.isArray(f));
+        return results.flat();
     };
 
     try {
