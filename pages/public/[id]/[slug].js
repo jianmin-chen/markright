@@ -35,7 +35,7 @@ export default function Slug({ username, markdown, title }) {
                 }
             `}</style>
             <div
-                className="prose prose-lg w-7/12 max-w-none overflow-auto rounded-t-3xl border bg-white px-14 py-7 shadow-2xl"
+                className="prose prose-lg w-11/12 max-w-none overflow-auto rounded-t-3xl border bg-white px-14 py-7 shadow-2xl lg:w-7/12"
                 dangerouslySetInnerHTML={{
                     __html: parseMarkdown(markdown)
                 }}
