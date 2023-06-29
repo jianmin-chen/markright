@@ -111,7 +111,7 @@ export default function Index({
             </div>
             <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md bg-white shadow-md">
                 {showSidebar === true && (
-                    <div className="col-span-4 flex h-full flex-col overflow-auto border-r bg-neutral-100">
+                    <div className="col-span-8 flex h-full flex-col overflow-auto border-r bg-neutral-100 md:col-span-4">
                         <Tabs defaultValue="files">
                             <TabsList className="sticky top-0 mx-auto w-full flex-1 rounded-none border-b bg-gray-200 p-0">
                                 <TabsTrigger
@@ -166,7 +166,9 @@ export default function Index({
                 )}
                 <div
                     className={`${
-                        showSidebar ? "col-span-20" : "col-span-24"
+                        showSidebar
+                            ? "col-span-16 md:col-span-20"
+                            : "col-span-24 md:col-span-24"
                     } h-full overflow-hidden`}>
                     <div className="h-full border-r">
                         <Workspace

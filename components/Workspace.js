@@ -18,7 +18,7 @@ import {
 } from "./ui/DropdownMenu";
 import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
 import ReactToPrint from "react-to-print";
-import parseMarkdown from "../utils/parser";
+import Tool, { tools } from "./Tool";
 
 const inter = Inter({
     variable: "--sans",
@@ -60,6 +60,10 @@ export default function Workspace({
     rightRef: rightScrollRef
 }) {
     const { toast } = useToast();
+
+    const [leftTool, setLeftTool] = useState(null);
+    const [rightTool, setRightTool] = useState(null);
+
     const leftRef = useResizeDetector();
     const rightRef = useResizeDetector();
     const [mirror, setMirror] = useState("");
@@ -150,8 +154,8 @@ export default function Workspace({
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="grid h-full w-full grid-cols-2 overflow-hidden bg-white">
-                <div className="flex h-full flex-col overflow-hidden border-r">
+            <div className="grid h-full w-full grid-rows-2 overflow-hidden bg-white md:grid-cols-2">
+                <div className="relative flex h-full flex-col overflow-hidden border-b md:border-b-0 md:border-r">
                     <Droppable droppableId="left" direction="horizontal">
                         {(provided, snapshot) => (
                             <div
@@ -274,6 +278,24 @@ export default function Workspace({
                                                                         Plugins
                                                                     </DropdownMenuSubTrigger>
                                                                     <DropdownMenuSubContent>
+                                                                        {/*
+                                                                        {tools.map(
+                                                                            tool => (
+                                                                                <DropdownMenuItem
+                                                                                    key={
+                                                                                        tool
+                                                                                    }
+                                                                                    onClick={() =>
+                                                                                        setRightTool(
+                                                                                            tool
+                                                                                        )
+                                                                                    }>
+                                                                                    {
+                                                                                        tool
+                                                                                    }
+                                                                                </DropdownMenuItem>
+                                                                            )
+                                                                                )}*/}
                                                                         <DropdownMenuLabel>
                                                                             Coming
                                                                             soon!
@@ -411,7 +433,8 @@ export default function Workspace({
                         )}
                     </div>
                 </div>
-                <div className="flex h-full flex-col overflow-hidden">
+                <div className="relative flex h-full flex-col overflow-hidden">
+                    {/*{rightTool !== null && <Tool name={rightTool} />}*/}
                     <Droppable droppableId="right" direction="horizontal">
                         {(provided, snapshot) => (
                             <div
@@ -534,6 +557,24 @@ export default function Workspace({
                                                                         Plugins
                                                                     </DropdownMenuSubTrigger>
                                                                     <DropdownMenuSubContent>
+                                                                        {/*
+                                                                        {tools.map(
+                                                                            tool => (
+                                                                                <DropdownMenuItem
+                                                                                    key={
+                                                                                        tool
+                                                                                    }
+                                                                                    onClick={() =>
+                                                                                        setTool(
+                                                                                            tool
+                                                                                        )
+                                                                                    }>
+                                                                                    {
+                                                                                        tool
+                                                                                    }
+                                                                                </DropdownMenuItem>
+                                                                            )
+                                                                                )}*/}
                                                                         <DropdownMenuLabel>
                                                                             Coming
                                                                             soon!

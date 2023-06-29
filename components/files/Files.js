@@ -719,9 +719,9 @@ export default function Files({
     };
 
     return (
-        <div className="flex flex-col items-center py-1 px-2">
+        <div className="flex flex-col items-center md:py-1 md:px-2">
             <button
-                className="file flex w-full max-w-full items-center gap-x-1 rounded-md py-1 px-3 hover:bg-neutral-200"
+                className="file flex w-full max-w-full items-center gap-x-1 truncate rounded-md py-1 px-3 hover:bg-neutral-200"
                 onClick={() => setNameFolder(true)}>
                 <PlusCircle className="h-4 w-4" /> Add a folder
             </button>

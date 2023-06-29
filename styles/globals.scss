@@ -14,10 +14,16 @@
 body,
 html {
     @apply m-0 max-h-screen p-0;
+    font-feature-settings: "rlig" 1, "calt" 1;
 }
 
 input:not(.ui-input) {
-    @apply border-none focus:outline-none focus:ring-0 #{!important};
+    @apply border-none;
+}
+
+input:not(.ui-input),
+textarea {
+    @apply resize-none focus:outline-none focus:ring-0 #{!important};
 }
 
 .checkbox {
