@@ -154,7 +154,7 @@ export default function Workspace({
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="grid h-full w-full grid-rows-2 overflow-hidden bg-white md:grid-cols-2">
+            <div className="grid h-full w-full grid-rows-2 overflow-hidden bg-white md:grid-cols-2 md:grid-rows-none">
                 <div className="relative flex h-full flex-col overflow-hidden border-b md:border-b-0 md:border-r">
                     <Droppable droppableId="left" direction="horizontal">
                         {(provided, snapshot) => (
