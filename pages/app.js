@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 import { useEffect, useState, useRef, use } from "react";
 import dynamic from "next/dynamic";
-import hljs from "highlight.js";
 import "highlight.js/styles/default.css";
 import Menu from "../components/Menu";
 import Outline from "../components/Outline";
@@ -76,12 +75,6 @@ export default function Index({
     };
 
     const [files, setFiles] = useState(initialFiles);
-
-    useEffect(() => {
-        document.querySelectorAll(".prose pre").forEach(el => {
-            if (!el.querySelector("span")) hljs.highlightElement(el);
-        });
-    }, [value]);
 
     useEffect(() => {
         if (session.status === "unauthenticated") return router.push("/");

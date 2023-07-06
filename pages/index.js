@@ -26,7 +26,10 @@ export default function Login() {
                         </button>
                     </p>
                     <div className="flex w-full gap-x-2">
-                        <img src="/images/screenshot.png" className="rounded-lg"/>
+                        <img
+                            src="/images/screenshot.png"
+                            className="rounded-lg"
+                        />
                     </div>
                 </div>
             </div>

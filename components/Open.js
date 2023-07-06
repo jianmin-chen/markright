@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { get, post } from "../utils/fetch";
 import { useToast } from "../hooks/ui/useToast";
 import { Inter } from "next/font/google";
+import hljs from "highlight.js";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -51,11 +52,19 @@ export default function Open({
     const [loading, setLoading] = useState(true);
     const [scroll, setScroll] = useState(false);
 
+    const highlight = () => {
+        document.querySelectorAll(".prose pre").forEach(el => {
+            console.log(el);
+            if (!el.querySelector("span")) hljs.highlightElement(el);
+        });
+    };
+
     useEffect(() => {
         if (file.type === "output" && mirror !== null) setValue(mirror);
     }, [mirror]);
 
     useEffect(() => {
+        highlight();
         get({
             route: "/api/file/content",
             data: { location: file.location }
@@ -92,6 +101,7 @@ export default function Open({
 
     useEffect(() => {
         // Autosave every 30 seconds
+        highlight();
         setSideValue(value);
         if (file.type === "input") {
             setMessage("Saving...");
