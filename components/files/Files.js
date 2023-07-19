@@ -162,7 +162,7 @@ function File({
         <>
             <button
                 className={`file flex w-full max-w-full items-center justify-between rounded-md py-1 px-3 ${
-                    !rename && "hover:bg-neutral-200"
+                    !rename && "hover:bg-neutral-200 dark:hover:bg-neutral-700"
                 } ${styles.file} ${className} `}
                 onClick={() => {
                     if (!rename) openFile(name, location);
@@ -216,7 +216,7 @@ function File({
                         </span>
                         <span className={`${styles.extra} flex items-center`}>
                             <DropdownMenu>
-                                <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300">
+                                <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-600">
                                     <MoreHorizontal className="h-4 w-4" />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
@@ -463,7 +463,7 @@ function Folder({
         <>
             {!renameFolder ? (
                 <div
-                    className={`folder flex w-full cursor-pointer items-center justify-between rounded-md py-1 px-3 hover:bg-neutral-200 ${styles.folder}`}
+                    className={`folder dark:hover-bg-neutral-700 flex w-full cursor-pointer items-center justify-between rounded-md py-1 px-3 hover:bg-neutral-200 dark:hover:bg-neutral-700 ${styles.folder}`}
                     onClick={() => setToggle(!toggle)}
                     title={name}>
                     <span className="flex min-w-0 items-center gap-x-1">
@@ -478,7 +478,7 @@ function Folder({
                     </span>
                     <span className={`${styles.extra} flex`}>
                         <DropdownMenu>
-                            <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300">
+                            <DropdownMenuTrigger className="rounded-md px-1 py-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-600">
                                 <MoreHorizontal className="h-4 w-4" />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
@@ -508,7 +508,7 @@ function Folder({
                             </DropdownMenuContent>
                         </DropdownMenu>
                         <button
-                            className="rounded-md px-1 py-0.5 hover:bg-neutral-300"
+                            className="rounded-md px-1 py-0.5 hover:bg-neutral-300 dark:hover:bg-neutral-600"
                             onClick={event => {
                                 event.stopPropagation();
                                 setNameFile(true);
@@ -721,7 +721,7 @@ export default function Files({
     return (
         <div className="flex flex-col items-center md:py-1 md:px-2">
             <button
-                className="file flex w-full max-w-full items-center gap-x-1 truncate rounded-md py-1 px-3 hover:bg-neutral-200"
+                className="file flex w-full max-w-full items-center gap-x-1 truncate rounded-md py-1 px-3 hover:bg-neutral-200 dark:hover:bg-neutral-700"
                 onClick={() => setNameFolder(true)}>
                 <PlusCircle className="h-4 w-4" /> Add a folder
             </button>

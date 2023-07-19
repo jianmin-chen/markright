@@ -19,6 +19,7 @@ import {
 import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
 import ReactToPrint from "react-to-print";
 import Tool, { tools } from "./Tool";
+import { useHotkeys, useRecordHotkeys } from "react-hotkeys-hook";
 
 const inter = Inter({
     variable: "--sans",
@@ -154,14 +155,14 @@ export default function Workspace({
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <div className="grid h-full w-full grid-rows-2 overflow-hidden bg-white md:grid-cols-2 md:grid-rows-none">
-                <div className="relative flex h-full flex-col overflow-hidden border-b md:border-b-0 md:border-r">
+            <div className="grid h-full w-full grid-rows-2 overflow-hidden bg-white dark:bg-neutral-900 md:grid-cols-2 md:grid-rows-none">
+                <div className="relative flex h-full flex-col overflow-hidden border-b dark:border-neutral-700 md:border-b-0 md:border-r">
                     <Droppable droppableId="left" direction="horizontal">
                         {(provided, snapshot) => (
                             <div
                                 ref={provided.innerRef}
                                 {...provided.droppableProps}
-                                className="flex bg-neutral-100 dark:bg-slate-800">
+                                className="flex bg-neutral-100 dark:bg-neutral-700">
                                 {left.map((file, index) => (
                                     <Draggable
                                         key={`${file.filename}-${file.type}`}
@@ -177,8 +178,8 @@ export default function Workspace({
                                                     "bg-neutral-200 shadow-sm"
                                                 } ${
                                                     index === activeLeft &&
-                                                    "bg-white"
-                                                } flex w-[0] shrink grow basis-0 items-center justify-between border-b px-3 py-1.5 text-center text-sm font-medium text-slate-700  !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-200 dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-slate-100`}
+                                                    "bg-white dark:bg-neutral-900"
+                                                } flex w-[0] shrink grow basis-0 items-center justify-between border-b px-3 py-1.5 text-center text-sm font-medium text-slate-700 !shadow-none  transition-colors disabled:pointer-events-none  disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:border-b dark:border-b-neutral-700 dark:text-slate-200 dark:data-[state=active]:bg-neutral-900 dark:data-[state=active]:text-slate-100`}
                                                 onClick={async () => {
                                                     await updateActiveTabs();
                                                     setActiveLeft(index);
@@ -189,8 +190,8 @@ export default function Workspace({
                                                             className={`flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-md text-[18px] font-light transition ${
                                                                 activeLeft ===
                                                                 index
-                                                                    ? "hover:bg-neutral-100"
-                                                                    : "hover:bg-neutral-200"
+                                                                    ? "hover:bg-neutral-100 dark:hover:bg-neutral-600"
+                                                                    : "hover:bg-neutral-200 dark:hover:bg-neutral-500"
                                                             }`}
                                                             onClick={event => {
                                                                 event.stopPropagation();
@@ -312,8 +313,8 @@ export default function Workspace({
                                                 <span
                                                     className={`flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-md text-[18px] font-light transition ${
                                                         activeLeft === index
-                                                            ? "hover:bg-neutral-100"
-                                                            : "hover:bg-neutral-200"
+                                                            ? "hover:bg-neutral-100 dark:hover:bg-neutral-600"
+                                                            : "hover:bg-neutral-200 dark:hover:bg-neutral-500"
                                                     }`}
                                                     onClick={async event => {
                                                         event.stopPropagation();
@@ -423,7 +424,7 @@ export default function Workspace({
                                 scrollRef={leftRef}
                             />
                         ) : (
-                            <div className="flex h-full flex-col items-center justify-center text-neutral-200">
+                            <div className="flex h-full flex-col items-center justify-center text-neutral-200 dark:bg-neutral-900 dark:text-gray-300">
                                 <BookOpen
                                     className="h-32 w-32"
                                     strokeWidth={0.5}
@@ -440,7 +441,7 @@ export default function Workspace({
                             <div
                                 ref={provided.innerRef}
                                 {...provided.droppableProps}
-                                className="flex bg-neutral-100 dark:bg-slate-800">
+                                className="flex bg-neutral-100 dark:bg-neutral-700">
                                 {right.map((file, index) => (
                                     <Draggable
                                         key={`${file.filename}-${file.type}`}
@@ -456,8 +457,8 @@ export default function Workspace({
                                                     "bg-neutral-200 shadow-sm"
                                                 } ${
                                                     index === activeRight &&
-                                                    "bg-white"
-                                                } flex w-[0] shrink grow basis-0 items-center justify-center border-b px-3 py-1.5  text-center text-sm font-medium text-slate-700  !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-200 dark:data-[state=active]:bg-slate-900 dark:data-[state=active]:text-slate-100`}
+                                                    "bg-white dark:bg-neutral-900"
+                                                } flex w-[0] shrink grow basis-0 items-center justify-center border-b px-3 py-1.5 text-center text-sm  font-medium text-slate-700 !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50  data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:border-b dark:border-b-neutral-700 dark:text-slate-200 dark:data-[state=active]:bg-neutral-900 dark:data-[state=active]:text-slate-100`}
                                                 onClick={async () => {
                                                     await updateActiveTabs();
                                                     setActiveRight(index);
@@ -468,8 +469,8 @@ export default function Workspace({
                                                             className={`flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-md text-[18px] font-light transition ${
                                                                 activeLeft ===
                                                                 index
-                                                                    ? "hover:bg-neutral-100"
-                                                                    : "hover:bg-neutral-200"
+                                                                    ? "hover:bg-neutral-100 dark:hover:bg-neutral-600"
+                                                                    : "hover:bg-neutral-200 dark:hover:bg-neutral-500"
                                                             }`}
                                                             onClick={event => {
                                                                 event.stopPropagation();
@@ -591,8 +592,8 @@ export default function Workspace({
                                                 <span
                                                     className={`flex h-[20px] w-[20px] cursor-pointer items-center justify-center rounded-md text-[18px] font-light transition hover:bg-neutral-100 ${
                                                         activeRight === index
-                                                            ? "hover:bg-neutral-100"
-                                                            : "hover:bg-neutral-200"
+                                                            ? "hover:bg-neutral-100 dark:hover:bg-neutral-600"
+                                                            : "hover:bg-neutral-200 dark:hover:bg-neutral-500"
                                                     }`}
                                                     onClick={async event => {
                                                         event.stopPropagation();
@@ -707,7 +708,7 @@ export default function Workspace({
                                 scrollRef={rightRef}
                             />
                         ) : (
-                            <div className="flex h-full flex-col items-center justify-center text-neutral-200">
+                            <div className="flex h-full flex-col items-center justify-center text-neutral-200 dark:bg-neutral-900 dark:text-gray-300">
                                 <BookOpen
                                     className="h-32 w-32"
                                     strokeWidth={0.5}

@@ -26,8 +26,10 @@ import {
 import { Label } from "./ui/Label";
 import { Input } from "./ui/Input";
 import { useToast } from "../hooks/ui/useToast";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import Unsplash from "./Unsplash";
+import ThemeContext from "./ThemeContext";
+import { useHotkeys } from "react-hotkeys-hook";
 
 export default function MenubarDemo({
     keyboardHandler,
@@ -36,8 +38,8 @@ export default function MenubarDemo({
     message,
     setBackground
 }) {
-    const { toast } = useToast();
     const { data: session } = useSession();
+    const { theme, setTheme } = useContext(ThemeContext);
 
     const toggleFullscreen = () => {
         if (document) {
@@ -47,10 +49,11 @@ export default function MenubarDemo({
     };
 
     const toggleSidebar = () => sidebar.showSidebar(!sidebar.sidebar);
+    useHotkeys("ctrl+b", toggleSidebar);
 
     return (
         <Dialog>
-            <Menubar className="backdrop-blur-50 h-fit space-x-0 rounded-none border-none bg-white/70 px-3 py-0 backdrop-invert backdrop-opacity-5 backdrop-saturate-150">
+            <Menubar className="backdrop-blur-50 h-fit space-x-0 rounded-none border-none bg-white/70 px-3 py-0 backdrop-invert backdrop-opacity-5 backdrop-saturate-150 dark:bg-neutral-900/70 dark:text-white">
                 <MenubarMenu>
                     <MenubarTrigger className="px-1.5 py-2 leading-none hover:bg-transparent focus:bg-transparent data-[state=open]:bg-transparent">
                         <b>{session && session.user.name}</b>
@@ -81,12 +84,16 @@ export default function MenubarDemo({
                         <MenubarSub>
                             <MenubarSubTrigger>Main theme</MenubarSubTrigger>
                             <MenubarSubContent>
-                                <MenubarCheckboxItem checked>
+                                <MenubarCheckboxItem
+                                    checked={theme === "light"}
+                                    onClick={() => setTheme("light")}>
                                     Light
                                 </MenubarCheckboxItem>
-                                <MenubarItem inset disabled>
-                                    More coming soon!
-                                </MenubarItem>
+                                <MenubarCheckboxItem
+                                    checked={theme === "dark"}
+                                    onClick={() => setTheme("dark")}>
+                                    Dark
+                                </MenubarCheckboxItem>
                             </MenubarSubContent>
                         </MenubarSub>
                         <MenubarSeparator />

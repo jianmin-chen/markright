@@ -1,10 +1,12 @@
 import AceEditor from "react-ace";
 import "ace-builds/src-noconflict/mode-markdown";
 import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/src-noconflict/theme-terminal";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/keybinding-vscode";
 import "ace-builds/src-noconflict/keybinding-vim";
-import { useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import ThemeContext from "./ThemeContext";
 
 export default function Editor({
     options,
@@ -17,9 +19,13 @@ export default function Editor({
     scrollRef,
     scroll
 }) {
+    const { theme } = useContext(ThemeContext);
+
     return (
         <AceEditor
             {...options}
+            className="dark:bg-neutral-900"
+            theme={theme === "dark" ? "terminal" : "github"}
             commands={[
                 {
                     name: "insertItalic",
@@ -61,6 +67,17 @@ export default function Editor({
                         editor.insert("****");
                         ({ row, column } = editor.getCursorPosition());
                         editor.moveCursorTo(row, column - 2);
+                    }
+                },
+                {
+                    name: "unfocus",
+                    bindKey: {
+                        win: "Ctrl-esc",
+                        mac: "Ctrl-w"
+                    },
+                    exec: editor => {
+                        console.log("?");
+                        editor.blur();
                     }
                 }
             ]}

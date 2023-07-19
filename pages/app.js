@@ -87,6 +87,7 @@ export default function Index({
                 backgroundImage: `url("${background}")`,
                 backgroundSize: "cover"
             }}>
+            <img src={background} className="hidden" />
             <div>
                 <Menu
                     setBackground={setBackground}
@@ -98,15 +99,18 @@ export default function Index({
                         downloadMarkdown: () => downloadMarkdown(value),
                         downloadHTML: () => downloadHTML(value)
                     }}
-                    keyboardHandler={{ keyboardHandler, setKeyboardHandler }}
+                    keyboardHandler={{
+                        keyboardHandler,
+                        setKeyboardHandler
+                    }}
                     message={message}
                 />
             </div>
-            <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md bg-white shadow-md">
+            <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md bg-white shadow-md dark:bg-neutral-900">
                 {showSidebar === true && (
-                    <div className="col-span-8 flex h-full flex-col overflow-auto border-r bg-neutral-100 md:col-span-4">
+                    <div className="col-span-8 flex h-full flex-col overflow-auto border-r bg-neutral-100 dark:border-r dark:border-r-neutral-700 dark:bg-neutral-900 dark:text-gray-300 md:col-span-4">
                         <Tabs defaultValue="files">
-                            <TabsList className="sticky top-0 mx-auto w-full flex-1 rounded-none border-b bg-gray-200 p-0">
+                            <TabsList className="sticky top-0 mx-auto w-full flex-1 rounded-none border-b bg-gray-200 p-0 dark:border-b-neutral-700">
                                 <TabsTrigger
                                     className="w-full rounded-none !shadow-none data-[state=active]:bg-neutral-100"
                                     value="files">
@@ -163,7 +167,7 @@ export default function Index({
                             ? "col-span-16 md:col-span-20"
                             : "col-span-24 md:col-span-24"
                     } h-full overflow-hidden`}>
-                    <div className="h-full border-r">
+                    <div className="h-full">
                         <Workspace
                             setValue={setValue}
                             keyboardHandler={keyboardHandler}
@@ -176,7 +180,10 @@ export default function Index({
                             activeRight={activeRight}
                             setActiveLeft={setActiveLeft}
                             setActiveRight={setActiveRight}
-                            aceOptions={{ keyboardHandler, theme: aceTheme }}
+                            aceOptions={{
+                                keyboardHandler,
+                                theme: aceTheme
+                            }}
                             setMessage={setMessage}
                             leftRef={leftRef}
                             rightRef={rightRef}

@@ -119,6 +119,7 @@ export default function Open({
     if (file.type === "input")
         return (
             <div
+                className="dark:bg-neutral-900"
                 onMouseEnter={() => setScroll(true)}
                 onMouseLeave={() => setScroll(false)}>
                 <AceEditor
@@ -142,7 +143,7 @@ export default function Open({
 
     return (
         <div
-            className="h-full overflow-auto"
+            className="h-full overflow-auto dark:bg-neutral-900"
             onMouseEnter={() => setScroll(true)}
             onMouseLeave={() => setScroll(false)}
             onScroll={() => {
@@ -159,7 +160,7 @@ export default function Open({
                 }
             `}</style>
             <div
-                className={`prose prose-lg max-w-none px-8 ${inter.className}`}
+                className={`!dark:bg-neutral-900 prose prose-lg max-w-none px-8 dark:prose-invert ${inter.className}`}
                 dangerouslySetInnerHTML={{
                     __html: parseMarkdown(value)
                 }}

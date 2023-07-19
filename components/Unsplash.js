@@ -54,7 +54,7 @@ export default function Unsplash({ setBackground }) {
             onScroll={onScroll}
             ref={container}>
             <input
-                className="sticky top-0 mb-0.5 w-full rounded-md bg-neutral-100 py-2 px-3"
+                className="sticky top-0 mb-0.5 w-full rounded-md bg-neutral-100 py-2 px-3 dark:bg-neutral-700 dark:placeholder:text-neutral-500"
                 placeholder="Search Unsplash"
                 onChange={event => setQuery(event.target.value)}
             />

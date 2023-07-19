@@ -17,6 +17,12 @@ html {
     font-feature-settings: "rlig" 1, "calt" 1;
 }
 
+.dark {
+    img {
+        @apply bg-white;
+    }
+}
+
 input:not(.ui-input) {
     @apply border-none;
 }
@@ -74,7 +80,7 @@ textarea {
     }
 
     body {
-        @apply prose prose-2xl prose-slate block py-0 pl-7 pr-14;
+        @apply prose prose-2xl prose-invert prose-slate block py-0 pl-7 pr-14;
     }
 
     pre {
