@@ -107,46 +107,48 @@ export default function Index({
                 />
             </div>
             <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md bg-white shadow-md dark:bg-neutral-900">
-                {showSidebar === true && (
-                    <div className="col-span-8 flex h-full flex-col overflow-auto border-r bg-neutral-100 dark:border-r dark:border-r-neutral-700 dark:bg-neutral-900 dark:text-gray-300 md:col-span-4">
-                        <Tabs defaultValue="files">
-                            <TabsList className="sticky top-0 mx-auto w-full flex-1 rounded-none border-b bg-gray-200 p-0 dark:border-b-neutral-700">
-                                <TabsTrigger
-                                    className="w-full rounded-none !shadow-none data-[state=active]:bg-neutral-100"
-                                    value="files">
-                                    Files
-                                </TabsTrigger>
-                            </TabsList>
-                            <TabsContent
-                                className="flex flex-col gap-y-4 border-none p-0"
+                <div
+                    className={`${
+                        !showSidebar && "hidden"
+                    } col-span-8 flex h-full flex-col overflow-auto border-r bg-neutral-100 dark:border-r dark:border-r-neutral-700 dark:bg-neutral-900 dark:text-gray-300 md:col-span-4`}>
+                    <Tabs defaultValue="files">
+                        <TabsList className="sticky top-0 z-[1] mx-auto w-full flex-1 rounded-none border-b bg-gray-200 p-0 dark:border-b-neutral-700">
+                            <TabsTrigger
+                                className="w-full rounded-none !shadow-none data-[state=active]:bg-neutral-100"
                                 value="files">
-                                <Files
-                                    files={files}
-                                    setFiles={setFiles}
-                                    openFile={(filename, location) => {
-                                        addLeft({
-                                            filename,
-                                            location,
-                                            type: "input"
-                                        });
-                                        addRight({
-                                            filename,
-                                            location,
-                                            type: "output"
-                                        });
-                                    }}
-                                    userId={userId}
-                                    setLeft={setLeft}
-                                    setRight={setRight}
-                                    left={left}
-                                    right={right}
-                                    activeLeft={activeLeft}
-                                    activeRight={activeRight}
-                                    setActiveLeft={setActiveLeft}
-                                    setActiveRight={setActiveRight}
-                                />
-                            </TabsContent>
-                            {/*
+                                Files
+                            </TabsTrigger>
+                        </TabsList>
+                        <TabsContent
+                            className="flex flex-col gap-y-4 border-none p-0"
+                            value="files">
+                            <Files
+                                files={files}
+                                setFiles={setFiles}
+                                openFile={(filename, location) => {
+                                    addLeft({
+                                        filename,
+                                        location,
+                                        type: "input"
+                                    });
+                                    addRight({
+                                        filename,
+                                        location,
+                                        type: "output"
+                                    });
+                                }}
+                                userId={userId}
+                                setLeft={setLeft}
+                                setRight={setRight}
+                                left={left}
+                                right={right}
+                                activeLeft={activeLeft}
+                                activeRight={activeRight}
+                                setActiveLeft={setActiveLeft}
+                                setActiveRight={setActiveRight}
+                            />
+                        </TabsContent>
+                        {/*
                                 <Outline
                                     value={value}
                                     onClick={line => {
@@ -158,9 +160,8 @@ export default function Index({
                                     }}
                                 />
                                 */}
-                        </Tabs>
-                    </div>
-                )}
+                    </Tabs>
+                </div>
                 <div
                     className={`${
                         showSidebar

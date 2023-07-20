@@ -19,7 +19,7 @@ import {
 import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
 import ReactToPrint from "react-to-print";
 import Tool, { tools } from "./Tool";
-import { useHotkeys, useRecordHotkeys } from "react-hotkeys-hook";
+import { useHotkeys } from "react-hotkeys-hook";
 
 const inter = Inter({
     variable: "--sans",
@@ -148,6 +148,12 @@ export default function Workspace({
         }
     };
 
+    useHotkeys("ctrl+k+w", async () => {
+        await updateActiveTabs();
+        setLeft([]);
+        setRight([]);
+    });
+
     useEffect(() => {
         window.addEventListener("beforeunload", updateActiveTabs);
         return () => window.addEventListener("beforeunload", updateActiveTabs);
@@ -175,10 +181,14 @@ export default function Workspace({
                                                 {...provided.dragHandleProps}
                                                 className={`${
                                                     snapshot.isDragging &&
-                                                    "bg-neutral-200 shadow-sm"
+                                                    "bg-neutral-200 shadow-sm dark:bg-neutral-700"
                                                 } ${
                                                     index === activeLeft &&
                                                     "bg-white dark:bg-neutral-900"
+                                                } ${
+                                                    index !== 0 &&
+                                                    index !== activeLeft &&
+                                                    "border-l dark:border-l dark:border-l-neutral-600"
                                                 } flex w-[0] shrink grow basis-0 items-center justify-between border-b px-3 py-1.5 text-center text-sm font-medium text-slate-700 !shadow-none  transition-colors disabled:pointer-events-none  disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:border-b dark:border-b-neutral-700 dark:text-slate-200 dark:data-[state=active]:bg-neutral-900 dark:data-[state=active]:text-slate-100`}
                                                 onClick={async () => {
                                                     await updateActiveTabs();
@@ -454,10 +464,14 @@ export default function Workspace({
                                                 {...provided.dragHandleProps}
                                                 className={`${
                                                     snapshot.isDragging &&
-                                                    "bg-neutral-200 shadow-sm"
+                                                    "bg-neutral-200 shadow-sm dark:bg-neutral-700"
                                                 } ${
                                                     index === activeRight &&
                                                     "bg-white dark:bg-neutral-900"
+                                                } ${
+                                                    index !== 0 &&
+                                                    index !== activeRight &&
+                                                    "border-l dark:border-l dark:border-l-neutral-600"
                                                 } flex w-[0] shrink grow basis-0 items-center justify-center border-b px-3 py-1.5 text-center text-sm  font-medium text-slate-700 !shadow-none transition-colors  disabled:pointer-events-none disabled:opacity-50  data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:border-b dark:border-b-neutral-700 dark:text-slate-200 dark:data-[state=active]:bg-neutral-900 dark:data-[state=active]:text-slate-100`}
                                                 onClick={async () => {
                                                     await updateActiveTabs();

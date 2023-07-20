@@ -11,17 +11,23 @@ export default function Slug({ username, markdown, title }) {
         document.querySelectorAll(".prose pre").forEach(el => {
             if (!el.querySelector("span")) hljs.highlightElement(el);
         });
+        if (
+            window.localStorage.getItem("theme") === "dark" ||
+            (window.localStorage.getItem("theme") !== "dark" &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches)
+        )
+            document.querySelector("html").classList.add("dark");
     }, []);
 
     return (
-        <div className="relative flex min-h-screen flex-col items-center justify-end gap-y-4 bg-neutral-100 pt-4">
+        <div className="relative flex min-h-screen flex-col items-center justify-end gap-y-4 bg-neutral-100 pt-4 dark:bg-neutral-800">
             <Link href="/" target="_blank">
                 <Button
                     disabled
                     variant="outline"
-                    className=" rounded-3xl bg-white px-14 py-1.5 shadow-lg hover:bg-white">
+                    className=" mx-4 rounded-3xl bg-white px-14 !py-7 shadow-lg hover:bg-white dark:bg-neutral-900 md:mx-0 md:!py-1.5">
                     {title} &middot; Shared by {username} with Markright{" "}
-                    <ExternalLink className="ml-1 h-4 w-4" />
+                    <ExternalLink className="ml-1 hidden h-4 w-4 md:block" />
                 </Button>
             </Link>
             <style jsx global>{`
@@ -35,7 +41,7 @@ export default function Slug({ username, markdown, title }) {
                 }
             `}</style>
             <div
-                className="prose prose-lg w-11/12 max-w-none overflow-auto rounded-t-3xl border bg-white px-14 py-7 shadow-2xl lg:w-7/12"
+                className="prose prose-lg w-11/12 max-w-none overflow-auto rounded-t-3xl border bg-white px-7 shadow-2xl dark:prose-invert dark:border-neutral-700 dark:bg-neutral-900 md:px-14 md:py-7 lg:w-7/12"
                 dangerouslySetInnerHTML={{
                     __html: parseMarkdown(markdown)
                 }}

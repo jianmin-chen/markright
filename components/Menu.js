@@ -26,7 +26,7 @@ import {
 import { Label } from "./ui/Label";
 import { Input } from "./ui/Input";
 import { useToast } from "../hooks/ui/useToast";
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useRef } from "react";
 import Unsplash from "./Unsplash";
 import ThemeContext from "./ThemeContext";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -41,15 +41,22 @@ export default function MenubarDemo({
     const { data: session } = useSession();
     const { theme, setTheme } = useContext(ThemeContext);
 
-    const toggleFullscreen = () => {
+    const fullscreenButton = useRef(null);
+
+    const toggleFullscreen = event => {
+        if (event) event.preventDefault();
         if (document) {
             if (document.fullscreenElement) document.exitFullscreen();
             else document.body.requestFullscreen();
         }
     };
 
-    const toggleSidebar = () => sidebar.showSidebar(!sidebar.sidebar);
-    useHotkeys("ctrl+b", toggleSidebar);
+    const toggleSidebar = event => {
+        event.preventDefault();
+        sidebar.showSidebar(!sidebar.sidebar);
+    };
+
+    useHotkeys("ctrl+b, meta+b", toggleSidebar);
 
     return (
         <Dialog>
@@ -65,7 +72,10 @@ export default function MenubarDemo({
                             <MenubarItem>About</MenubarItem>
                         </a>
                         <MenubarItem
-                            onClick={() => signOut({ callbackUrl: "/" })}>
+                            onClick={() => {
+                                window.localStorage.removeItem("theme");
+                                signOut({ callbackUrl: "/" });
+                            }}>
                             Sign out
                         </MenubarItem>
                     </MenubarContent>
@@ -98,17 +108,6 @@ export default function MenubarDemo({
                         </MenubarSub>
                         <MenubarSeparator />
                         <MenubarLabel>Editor</MenubarLabel>
-                        <MenubarSub>
-                            <MenubarSubTrigger>Main theme</MenubarSubTrigger>
-                            <MenubarSubContent>
-                                <MenubarCheckboxItem checked>
-                                    GitHub
-                                </MenubarCheckboxItem>
-                                <MenubarItem inset disabled>
-                                    More coming soon!
-                                </MenubarItem>
-                            </MenubarSubContent>
-                        </MenubarSub>
                         <MenubarSub>
                             <MenubarSubTrigger>Keybindings</MenubarSubTrigger>
                             <MenubarSubContent>
@@ -181,7 +180,7 @@ export default function MenubarDemo({
                         </MenubarItem>
                         <MenubarSeparator />
                         <MenubarItem onClick={toggleSidebar}>
-                            Toggle Sidebar
+                            Toggle Sidebar <MenubarShortcut>⌘B</MenubarShortcut>
                         </MenubarItem>
                     </MenubarContent>
                 </MenubarMenu>

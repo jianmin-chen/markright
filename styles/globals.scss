@@ -21,6 +21,12 @@ html {
     img {
         @apply bg-white;
     }
+
+    .tasklist {
+        input[type="checkbox"]:not(:checked) {
+            background-color: transparent !important;
+        }
+    }
 }
 
 input:not(.ui-input) {

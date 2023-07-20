@@ -59,17 +59,21 @@ export default function Unsplash({ setBackground }) {
                 onChange={event => setQuery(event.target.value)}
             />
             <div className="mt-1 flex flex-col gap-y-1 p-1">
-                {photos.map(img => (
-                    <button
-                        key={img.id}
-                        onClick={() => setPhoto(img.links.download)}>
-                        <img
-                            className="max-w-[300px]"
+                {photos.length ? (
+                    photos.map(img => (
+                        <button
                             key={img.id}
-                            src={img.links.download}
-                        />
-                    </button>
-                ))}
+                            onClick={() => setPhoto(img.links.download)}>
+                            <img
+                                className="max-w-[300px]"
+                                key={img.id}
+                                src={img.links.download}
+                            />
+                        </button>
+                    ))
+                ) : (
+                    <p className="text-center">No photos found.</p>
+                )}
             </div>
         </div>
     );

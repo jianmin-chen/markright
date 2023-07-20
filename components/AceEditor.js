@@ -5,7 +5,7 @@ import "ace-builds/src-noconflict/theme-terminal";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/keybinding-vscode";
 import "ace-builds/src-noconflict/keybinding-vim";
-import { useEffect, useState, useContext } from "react";
+import { useContext } from "react";
 import ThemeContext from "./ThemeContext";
 
 export default function Editor({
@@ -73,12 +73,9 @@ export default function Editor({
                     name: "unfocus",
                     bindKey: {
                         win: "Ctrl-esc",
-                        mac: "Ctrl-w"
+                        mac: "Ctrl-esc"
                     },
-                    exec: editor => {
-                        console.log("?");
-                        editor.blur();
-                    }
+                    exec: editor => editor.blur()
                 }
             ]}
             mode="markdown"
