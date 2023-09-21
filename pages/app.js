@@ -1,23 +1,26 @@
-import { getServerSession } from "next-auth";
-import { useSession } from "next-auth/react";
-import { useEffect, useState, useRef, use } from "react";
-import dynamic from "next/dynamic";
-import "highlight.js/styles/default.css";
 import Menu from "../components/Menu";
+import Notes from "../components/Notes";
 import Outline from "../components/Outline";
+import PreferencesContext from "../components/PreferencesContext";
+import Files from "../components/files/Files";
 import {
     Tabs,
     TabsContent,
     TabsList,
     TabsTrigger
 } from "../components/ui/Tabs";
-import Files from "../components/files/Files";
 import dbConnect from "../database/connect";
 import User from "../database/services/user.service";
+import { post } from "../utils/fetch";
 import { downloadMarkdown, downloadHTML } from "../utils/markdownUtils";
-import { useRouter } from "next/router";
+import "highlight.js/styles/default.css";
+import "highlight.js/styles/github-dark.css";
+import { getServerSession } from "next-auth";
 import { getToken } from "next-auth/jwt";
-import Notes from "../components/Notes";
+import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import { useEffect, useState, useRef } from "react";
 
 const Workspace = dynamic(() => import("../components/Workspace"), {
     ssr: false
@@ -26,12 +29,17 @@ const Workspace = dynamic(() => import("../components/Workspace"), {
 export default function Index({
     files: initialFiles,
     background: initialBackground,
+    preferences: {
+        theme: initialTheme = "light",
+        keyboardHandler: initialKeyboardHandler = "none"
+    },
     userId
 }) {
     const session = useSession();
     const router = useRouter();
 
     const [background, setBackground] = useState(initialBackground);
+    const [theme, setTheme] = useState(initialTheme);
 
     const [value, setValue] = useState("");
 
@@ -40,8 +48,9 @@ export default function Index({
     const [showSidebar, setShowSidebar] = useState(true);
 
     // Editor themes
-    const [keyboardHandler, setKeyboardHandler] = useState(null);
-    const [aceTheme, setAceTheme] = useState("github");
+    const [keyboardHandler, setKeyboardHandler] = useState(
+        initialKeyboardHandler
+    );
 
     const leftRef = useRef(null);
     const rightRef = useRef(null);
@@ -77,78 +86,92 @@ export default function Index({
     const [files, setFiles] = useState(initialFiles);
 
     useEffect(() => {
+        document
+            .querySelector("html")
+            .classList.remove(theme === "light" ? "dark" : "light");
+        document.querySelector("html").classList.add(theme);
+        post({
+            route: "/api/preferences",
+            data: { preferences: { theme, keyboardHandler } }
+        });
+    }, [theme, keyboardHandler]);
+
+    useEffect(() => {
         if (session.status === "unauthenticated") return router.push("/");
+        document.querySelector("html").classList.add(theme);
     }, []);
 
     return (
-        <div
-            className={`flex max-h-screen min-h-screen flex-col overflow-hidden`}
-            style={{
-                backgroundImage: `url("${background}")`,
-                backgroundSize: "cover"
-            }}>
-            <img src={background} className="hidden" />
-            <div>
-                <Menu
-                    setBackground={setBackground}
-                    sidebar={{
-                        sidebar: showSidebar,
-                        showSidebar: setShowSidebar
-                    }}
-                    downloads={{
-                        downloadMarkdown: () => downloadMarkdown(value),
-                        downloadHTML: () => downloadHTML(value)
-                    }}
-                    keyboardHandler={{
-                        keyboardHandler,
-                        setKeyboardHandler
-                    }}
-                    message={message}
-                />
-            </div>
-            <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md bg-white shadow-md dark:bg-neutral-900">
-                <div
-                    className={`${
-                        !showSidebar && "hidden"
-                    } col-span-8 flex h-full flex-col overflow-auto border-r bg-neutral-100 dark:border-r dark:border-r-neutral-700 dark:bg-neutral-900 dark:text-gray-300 md:col-span-4`}>
-                    <Tabs defaultValue="files">
-                        <TabsList className="sticky top-0 z-[1] mx-auto w-full flex-1 rounded-none border-b bg-gray-200 p-0 dark:border-b-neutral-700">
-                            <TabsTrigger
-                                className="w-full rounded-none !shadow-none data-[state=active]:bg-neutral-100"
+        <PreferencesContext.Provider
+            value={{ theme, setTheme, keyboardHandler, setKeyboardHandler }}>
+            <div
+                className={`flex max-h-screen min-h-screen flex-col overflow-hidden`}
+                style={{
+                    backgroundImage: `url("${background}")`,
+                    backgroundSize: "cover"
+                }}>
+                <img src={background} className="hidden" />
+                <div>
+                    <Menu
+                        setBackground={setBackground}
+                        sidebar={{
+                            sidebar: showSidebar,
+                            showSidebar: setShowSidebar
+                        }}
+                        downloads={{
+                            downloadMarkdown: () => downloadMarkdown(value),
+                            downloadHTML: () => downloadHTML(value)
+                        }}
+                        keyboardHandler={{
+                            keyboardHandler,
+                            setKeyboardHandler
+                        }}
+                        message={message}
+                    />
+                </div>
+                <div className="m-2 grid h-full flex-1 grid-cols-24 overflow-hidden rounded-md bg-white shadow-md dark:bg-neutral-900">
+                    <div
+                        className={`${
+                            !showSidebar && "hidden"
+                        } col-span-8 flex h-full flex-col overflow-auto border-r bg-neutral-100 dark:border-r dark:border-r-neutral-700 dark:bg-neutral-900 dark:text-gray-300 md:col-span-4`}>
+                        <Tabs defaultValue="files">
+                            <TabsList className="sticky top-0 z-[1] mx-auto w-full flex-1 rounded-none border-b bg-gray-200 p-0 dark:border-b-neutral-700">
+                                <TabsTrigger
+                                    className="w-full rounded-none !shadow-none data-[state=active]:bg-neutral-100"
+                                    value="files">
+                                    Files
+                                </TabsTrigger>
+                            </TabsList>
+                            <TabsContent
+                                className="flex flex-col gap-y-4 border-none p-0"
                                 value="files">
-                                Files
-                            </TabsTrigger>
-                        </TabsList>
-                        <TabsContent
-                            className="flex flex-col gap-y-4 border-none p-0"
-                            value="files">
-                            <Files
-                                files={files}
-                                setFiles={setFiles}
-                                openFile={(filename, location) => {
-                                    addLeft({
-                                        filename,
-                                        location,
-                                        type: "input"
-                                    });
-                                    addRight({
-                                        filename,
-                                        location,
-                                        type: "output"
-                                    });
-                                }}
-                                userId={userId}
-                                setLeft={setLeft}
-                                setRight={setRight}
-                                left={left}
-                                right={right}
-                                activeLeft={activeLeft}
-                                activeRight={activeRight}
-                                setActiveLeft={setActiveLeft}
-                                setActiveRight={setActiveRight}
-                            />
-                        </TabsContent>
-                        {/*
+                                <Files
+                                    files={files}
+                                    setFiles={setFiles}
+                                    openFile={(filename, location) => {
+                                        addLeft({
+                                            filename,
+                                            location,
+                                            type: "input"
+                                        });
+                                        addRight({
+                                            filename,
+                                            location,
+                                            type: "output"
+                                        });
+                                    }}
+                                    userId={userId}
+                                    setLeft={setLeft}
+                                    setRight={setRight}
+                                    left={left}
+                                    right={right}
+                                    activeLeft={activeLeft}
+                                    activeRight={activeRight}
+                                    setActiveLeft={setActiveLeft}
+                                    setActiveRight={setActiveRight}
+                                />
+                            </TabsContent>
+                            {/*
                                 <Outline
                                     value={value}
                                     onClick={line => {
@@ -160,39 +183,38 @@ export default function Index({
                                     }}
                                 />
                                 */}
-                    </Tabs>
-                </div>
-                <div
-                    className={`${
-                        showSidebar
-                            ? "col-span-16 md:col-span-20"
-                            : "col-span-24 md:col-span-24"
-                    } h-full overflow-hidden`}>
-                    <div className="h-full">
-                        <Workspace
-                            setValue={setValue}
-                            keyboardHandler={keyboardHandler}
-                            aceTheme={aceTheme}
-                            left={left}
-                            right={right}
-                            setLeft={setLeft}
-                            setRight={setRight}
-                            activeLeft={activeLeft}
-                            activeRight={activeRight}
-                            setActiveLeft={setActiveLeft}
-                            setActiveRight={setActiveRight}
-                            aceOptions={{
-                                keyboardHandler,
-                                theme: aceTheme
-                            }}
-                            setMessage={setMessage}
-                            leftRef={leftRef}
-                            rightRef={rightRef}
-                        />
+                        </Tabs>
+                    </div>
+                    <div
+                        className={`${
+                            showSidebar
+                                ? "col-span-16 md:col-span-20"
+                                : "col-span-24 md:col-span-24"
+                        } h-full overflow-hidden`}>
+                        <div className="h-full">
+                            <Workspace
+                                setValue={setValue}
+                                keyboardHandler={keyboardHandler}
+                                left={left}
+                                right={right}
+                                setLeft={setLeft}
+                                setRight={setRight}
+                                activeLeft={activeLeft}
+                                activeRight={activeRight}
+                                setActiveLeft={setActiveLeft}
+                                setActiveRight={setActiveRight}
+                                aceOptions={{
+                                    keyboardHandler
+                                }}
+                                setMessage={setMessage}
+                                leftRef={leftRef}
+                                rightRef={rightRef}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </PreferencesContext.Provider>
     );
 }
 
@@ -209,6 +231,7 @@ export async function getServerSideProps({ req, res }) {
         props: {
             files: user.decryptObj(user.filesystem, token.sub, { safe: true }),
             background: user.background,
+            preferences: user.editorSettings,
             userId: user._id.toString()
         }
     };

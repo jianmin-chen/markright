@@ -3,3 +3,4 @@ package-lock.json
 .next/*
 */*/*.mdx
 */*/*/*.mdx
+components/AceEditor.js

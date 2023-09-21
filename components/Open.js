@@ -1,10 +1,10 @@
-import AceEditor from "./AceEditor";
-import parseMarkdown from "../utils/parser";
-import { useState, useEffect, useRef } from "react";
-import { get, post } from "../utils/fetch";
 import { useToast } from "../hooks/ui/useToast";
-import { Inter } from "next/font/google";
-import hljs from "highlight.js";
+import { get, post } from "../utils/fetch";
+import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
+import parseMarkdown from "../utils/parser";
+import AceEditor from "./AceEditor";
+import Loader from "./Loader";
+import { Button } from "./ui/Button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,11 +14,6 @@ import {
     DropdownMenuSubContent,
     DropdownMenuSubTrigger
 } from "./ui/DropdownMenu";
-import { Menu, Settings2 } from "lucide-react";
-import { Button } from "./ui/Button";
-import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
-import ReactToPrint from "react-to-print";
-import Loader from "./Loader";
 import {
     Menubar,
     MenubarLabel,
@@ -27,7 +22,12 @@ import {
     MenubarMenu,
     MenubarTrigger
 } from "./ui/Menubar";
+import hljs from "highlight.js";
+import { Menu, Settings2 } from "lucide-react";
+import { Inter } from "next/font/google";
+import { useState, useEffect, useRef } from "react";
 import { useResizeDetector } from "react-resize-detector";
+import ReactToPrint from "react-to-print";
 
 const inter = Inter({
     variable: "--sans",
@@ -37,7 +37,6 @@ const inter = Inter({
 export default function Open({
     file,
     sizeRef,
-    aceOptions,
     setMessage,
     setMirror,
     mirror,
@@ -54,7 +53,6 @@ export default function Open({
 
     const highlight = () => {
         document.querySelectorAll(".prose pre").forEach(el => {
-            console.log(el);
             if (!el.querySelector("span")) hljs.highlightElement(el);
         });
     };
@@ -131,9 +129,6 @@ export default function Open({
                     }}
                     width={sizeRef.width}
                     height={sizeRef.height}
-                    options={{
-                        ...aceOptions
-                    }}
                     scrollRef={scrollRef}
                     scroll={scroll}
                     onScroll={onScroll}

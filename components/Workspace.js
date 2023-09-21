@@ -1,11 +1,8 @@
-import { useState, useEffect, useRef } from "react";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { IBM_Plex_Mono, Inter } from "next/font/google";
-import { useResizeDetector } from "react-resize-detector";
-import Open from "./Open";
-import { post } from "../utils/fetch";
-import { BookOpen, MoreHorizontal } from "lucide-react";
 import { useToast } from "../hooks/ui/useToast";
+import { post } from "../utils/fetch";
+import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
+import Open from "./Open";
+import Tool, { tools } from "./Tool";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,10 +13,13 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuLabel
 } from "./ui/DropdownMenu";
-import { downloadHTML, downloadMarkdown } from "../utils/markdownUtils";
-import ReactToPrint from "react-to-print";
-import Tool, { tools } from "./Tool";
+import { BookOpen, MoreHorizontal } from "lucide-react";
+import { IBM_Plex_Mono, Inter } from "next/font/google";
+import { useState, useEffect, useRef } from "react";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useHotkeys } from "react-hotkeys-hook";
+import { useResizeDetector } from "react-resize-detector";
+import ReactToPrint from "react-to-print";
 
 const inter = Inter({
     variable: "--sans",
@@ -54,7 +54,6 @@ export default function Workspace({
     activeRight,
     setActiveLeft,
     setActiveRight,
-    aceOptions,
     setMessage,
     setValue,
     leftRef: leftScrollRef,
@@ -267,10 +266,9 @@ export default function Workspace({
                                                                         Paragraph
                                                                     </DropdownMenuSubTrigger>
                                                                     <DropdownMenuSubContent>
-                                                                        <DropdownMenuLabel>
-                                                                            Coming
-                                                                            soon!
-                                                                        </DropdownMenuLabel>
+                                                                        <DropdownMenuItem>
+                                                                            Emoji
+                                                                        </DropdownMenuItem>
                                                                     </DropdownMenuSubContent>
                                                                 </DropdownMenuSub>
                                                                 <DropdownMenuSub>
@@ -286,10 +284,9 @@ export default function Workspace({
                                                                 </DropdownMenuSub>
                                                                 <DropdownMenuSub>
                                                                     <DropdownMenuSubTrigger>
-                                                                        Plugins
+                                                                        Tools
                                                                     </DropdownMenuSubTrigger>
                                                                     <DropdownMenuSubContent>
-                                                                        {/*
                                                                         {tools.map(
                                                                             tool => (
                                                                                 <DropdownMenuItem
@@ -306,13 +303,17 @@ export default function Workspace({
                                                                                     }
                                                                                 </DropdownMenuItem>
                                                                             )
-                                                                                )}*/}
-                                                                        <DropdownMenuLabel>
-                                                                            Coming
-                                                                            soon!
-                                                                        </DropdownMenuLabel>
+                                                                        )}
                                                                     </DropdownMenuSubContent>
                                                                 </DropdownMenuSub>
+                                                                <DropdownMenuLabel>
+                                                                    Word count:{" "}
+                                                                    {
+                                                                        leftValue.split(
+                                                                            " "
+                                                                        ).length
+                                                                    }
+                                                                </DropdownMenuLabel>
                                                             </>
                                                         )}
                                                     </DropdownMenuContent>
@@ -369,7 +370,6 @@ export default function Workspace({
                                 docRef={docRef}
                                 file={left[activeLeft]}
                                 sizeRef={leftRef}
-                                aceOptions={aceOptions}
                                 setMessage={setMessage}
                                 setSideValue={setLeftValue}
                                 mirror={
@@ -550,10 +550,9 @@ export default function Workspace({
                                                                         Paragraph
                                                                     </DropdownMenuSubTrigger>
                                                                     <DropdownMenuSubContent>
-                                                                        <DropdownMenuLabel>
-                                                                            Coming
-                                                                            soon!
-                                                                        </DropdownMenuLabel>
+                                                                        <DropdownMenuItem>
+                                                                            Emoji
+                                                                        </DropdownMenuItem>
                                                                     </DropdownMenuSubContent>
                                                                 </DropdownMenuSub>
                                                                 <DropdownMenuSub>
@@ -569,10 +568,9 @@ export default function Workspace({
                                                                 </DropdownMenuSub>
                                                                 <DropdownMenuSub>
                                                                     <DropdownMenuSubTrigger>
-                                                                        Plugins
+                                                                        Tools
                                                                     </DropdownMenuSubTrigger>
                                                                     <DropdownMenuSubContent>
-                                                                        {/*
                                                                         {tools.map(
                                                                             tool => (
                                                                                 <DropdownMenuItem
@@ -589,12 +587,18 @@ export default function Workspace({
                                                                                     }
                                                                                 </DropdownMenuItem>
                                                                             )
-                                                                                )}*/}
-                                                                        <DropdownMenuLabel>
-                                                                            Coming
-                                                                            soon!
-                                                                        </DropdownMenuLabel>
+                                                                        )}
                                                                     </DropdownMenuSubContent>
+                                                                    <DropdownMenuLabel>
+                                                                        Word
+                                                                        count:{" "}
+                                                                        {
+                                                                            rightValue.split(
+                                                                                " "
+                                                                            )
+                                                                                .length
+                                                                        }
+                                                                    </DropdownMenuLabel>
                                                                 </DropdownMenuSub>
                                                             </>
                                                         )}
@@ -647,7 +651,6 @@ export default function Workspace({
                         right[activeRight] !== undefined ? (
                             <Open
                                 file={right[activeRight]}
-                                aceOptions={aceOptions}
                                 updateValue={value => {
                                     if (right[activeRight].type === "input") {
                                         // Update value in tabs

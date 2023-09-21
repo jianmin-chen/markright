@@ -1,8 +1,8 @@
+import { encrypt, decrypt } from "../../utils/filesystem";
+import { upload, get, crypt, del } from "../aws/aws";
 import mongoose from "mongoose";
 import seedrandom from "seedrandom";
 import { v4 as uuid } from "uuid";
-import { encrypt, decrypt } from "../../utils/filesystem";
-import { upload, get, crypt, del } from "../aws/aws";
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -38,6 +38,11 @@ const userSchema = new mongoose.Schema({
 
 userSchema.methods.setBackground = async function (data) {
     this.background = data;
+    return await this.save();
+};
+
+userSchema.methods.setPreferences = async function (preferences) {
+    this.editorSettings = { ...this.editorSettings, ...preferences };
     return await this.save();
 };
 

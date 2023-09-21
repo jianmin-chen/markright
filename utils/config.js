@@ -38,6 +38,18 @@ if (!GOOGLE_CLIENT_SECRET)
         "Please define the GOOGLE_CLIENT_SECRET environment variable inside .env"
     );
 
+const GRAMMAR_USERNAME = process.env.GRAMMAR_USERNAME;
+if (!GRAMMAR_USERNAME)
+    throw new Error(
+        "Please define the GRAMMAR_USERNAME environment variable inside .env"
+    );
+
+const GRAMMAR_PASSWORD = process.env.GRAMMAR_PASSWORD;
+if (!GRAMMAR_PASSWORD)
+    throw new Error(
+        "Please define the GRAMMAR_PASSWORD environment variable inside .env"
+    );
+
 const IV_LENGTH = process.env.IV_LENGTH;
 if (!IV_LENGTH)
     throw new Error(

@@ -52,6 +52,10 @@ textarea {
         @apply font-mono;
     }
 
+    blockquote {
+        font-style: normal;
+    }
+
     .tasklist {
         @apply ml-0 list-none pl-0;
 
@@ -77,6 +81,16 @@ textarea {
 .rdp {
     button[aria-selected="true"] {
         @apply bg-neutral-200;
+    }
+}
+
+.EmojiPickerReact * {
+    font-family: var(--sans) !important;
+}
+
+.grammar-error {
+    * {
+        @apply underline decoration-red-500 decoration-wavy;
     }
 }
 

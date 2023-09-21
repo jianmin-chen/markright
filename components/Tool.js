@@ -19,4 +19,4 @@ export default function Tool({ name }) {
     }
 }
 
-export let tools = ["ChatGPT"];
+export let tools = ["Grammar"];

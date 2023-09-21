@@ -10,6 +10,7 @@
     "format": "prettier --ignore-path ./.prettierignore --write ."
   },
   "dependencies": {
+    "@grammarly/editor-sdk-react": "^2.5.1",
     "@next/font": "13.2.3",
     "@radix-ui/react-alert-dialog": "^1.0.2",
     "@radix-ui/react-avatar": "^1.0.1",
@@ -29,12 +30,13 @@
     "clsx": "^1.2.1",
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
+    "emoji-picker-react": "^4.4.10",
     "highlight.js": "^11.7.0",
     "lru-cache": "^9.0.0",
     "lucide-react": "^0.121.0",
     "mathjax": "^3.2.2",
     "mongoose": "^7.0.0",
-    "next": "13.2.3",
+    "next": "^13.5.2",
     "next-auth": "^4.20.1",
     "openai": "^3.2.1",
     "react": "18.2.0",
@@ -61,6 +63,7 @@
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.3",
     "@tailwindcss/typography": "^0.5.9",
+    "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "@types/node": "18.14.4",
     "@types/react": "18.0.28",
     "autoprefixer": "^10.4.13",

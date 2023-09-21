@@ -14,6 +14,6 @@ This is actually the second version! Check out the [first](https://github.com/ji
 -   [ ] Adding more (unnecessary but fun) features, including:
     -   [ ] Outline for editor tabs
     -   [ ] Direct insert options in the menu bar
-    -   [ ] Shortcuts
-    -   [ ] Grammar checking integration, ChatGPT integration
+    -   [ ] Shortcuts (Ctrl+Shift+T to open last closed tab, Ctrl+Shift, Ctrl+Option+O for ordered lists, Ctrl+Option+U for unordered lists, shortcuts for code snippets and blocks)
+    -   [ ] Grammar checking integration
     -   [ ] "Notes" for highlighting content
