@@ -55,6 +55,7 @@
     "react-to-print": "^2.14.12",
     "scroll-sync-react": "^1.2.0",
     "seedrandom": "^3.0.5",
+    "showdown": "^2.1.0",
     "tailwind-merge": "^1.10.0",
     "tailwindcss-animate": "^1.0.5",
     "unsplash-js": "^7.0.15",

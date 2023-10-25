@@ -1,3 +1,5 @@
+import showdown from "showdown"
+
 const escapeHTML = text => {
     // > When we have created a document, it will have to be reduced to a string.
     // > But building this string from the data structures we have been producing is very straightforward. The important thing is to remember to transform the special characters in the text of our document.
@@ -301,7 +303,13 @@ const renderHTML = element => {
     return pieces.join("");
 };
 
-export default function parseMarkdown(markdown, html = true) {
+export default function replacementParseMarkdown(markdown, html=true) {
+    // Let's use a external library for now
+    const converter = new showdown.Converter()
+    return converter.makeHtml(markdown);
+}
+
+export function parseMarkdown(markdown, html = true) {
     // MAIN WRAPPER FUNCTION
     // :check 1. Split the file into paragraphs by cutting it at every empty line.
     // :check 2. Remove the "#" characters from header paragraphs and mark them as headers.
