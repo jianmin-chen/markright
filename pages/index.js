@@ -1,7 +1,7 @@
-import { getServerSession } from "next-auth";
-import { signIn } from "next-auth/react";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { ExternalLink } from "lucide-react";
+import { getServerSession } from "next-auth";
+import { signIn } from "next-auth/react";
 
 export default function Login() {
     return (

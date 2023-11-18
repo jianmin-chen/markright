@@ -1,7 +1,7 @@
 // TODO: Rewrite for new version of AWS
 import config from "../../utils/config";
-import AWS from "aws-sdk";
 import { decrypt, encrypt } from "../../utils/filesystem";
+import AWS from "aws-sdk";
 
 const S3 = new AWS.S3({
     endpoint: new AWS.Endpoint(config.R2_ENDPOINT),

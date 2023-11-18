@@ -1,8 +1,8 @@
-import { getServerSession } from "next-auth/next";
-import { getToken } from "next-auth/jwt";
-import authOptions from "../auth/[...nextauth]";
 import dbConnect from "../../../database/connect";
 import User from "../../../database/services/user.service";
+import authOptions from "../auth/[...nextauth]";
+import { getToken } from "next-auth/jwt";
+import { getServerSession } from "next-auth/next";
 
 export default async function handler(req, res) {
     const session = await getServerSession(req, res, authOptions);

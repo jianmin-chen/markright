@@ -1,4 +1,4 @@
-import showdown from "showdown"
+import showdown from "showdown";
 
 const escapeHTML = text => {
     // > When we have created a document, it will have to be reduced to a string.
@@ -303,9 +303,11 @@ const renderHTML = element => {
     return pieces.join("");
 };
 
-export default function replacementParseMarkdown(markdown, html=true) {
+export default function replacementParseMarkdown(markdown, html = true) {
     // Let's use a external library for now
-    const converter = new showdown.Converter()
+    const converter = new showdown.Converter({
+        tasklists: true
+    });
     return converter.makeHtml(markdown);
 }
 

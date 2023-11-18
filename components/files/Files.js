@@ -1,3 +1,18 @@
+import { useToast } from "../../hooks/ui/useToast";
+import { del, get, post } from "../../utils/fetch";
+import catchError from "../../utils/logging";
+import { Button } from "../ui/Button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from "../ui/DropdownMenu";
+import { Input } from "../ui/Input";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
+import styles from "./Files.module.scss";
 import {
     FolderClosed,
     File as FileIcon,
@@ -8,22 +23,7 @@ import {
     Plus,
     PlusCircle
 } from "lucide-react";
-import { Button } from "../ui/Button";
 import { useEffect, useRef, useState } from "react";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger
-} from "../ui/DropdownMenu";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/Popover";
-import styles from "./Files.module.scss";
-import { Input } from "../ui/Input";
-import { useToast } from "../../hooks/ui/useToast";
-import { del, get, post } from "../../utils/fetch";
-import catchError from "../../utils/logging";
 
 function File({
     name: initialName,

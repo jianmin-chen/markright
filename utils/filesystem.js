@@ -1,5 +1,5 @@
-import crypto from "crypto";
 import config from "./config";
+import crypto from "crypto";
 
 export function encrypt(data, password) {
     const iv = crypto.randomBytes(16);

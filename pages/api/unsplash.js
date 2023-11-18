@@ -1,9 +1,9 @@
-import { getServerSession } from "next-auth/next";
-import authOptions from "./auth/[...nextauth]";
-import { createApi } from "unsplash-js";
-import config from "../../utils/config";
 import dbConnect from "../../database/connect";
 import User from "../../database/services/user.service";
+import config from "../../utils/config";
+import authOptions from "./auth/[...nextauth]";
+import { getServerSession } from "next-auth/next";
+import { createApi } from "unsplash-js";
 
 const unsplash = createApi({
     accessKey: config.UNSPLASH_ACCESS_KEY

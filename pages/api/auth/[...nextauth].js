@@ -1,8 +1,8 @@
-import NextAuth from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import config from "../../../utils/config";
 import dbConnect from "../../../database/connect";
 import User from "../../../database/services/user.service";
+import config from "../../../utils/config";
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 
 export default NextAuth({
     providers: [

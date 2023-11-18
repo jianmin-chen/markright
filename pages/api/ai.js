@@ -1,6 +1,6 @@
-import { getServerSession } from "next-auth/next";
-import authOptions from "./auth/[...nextauth]";
 import connect from "../../utils/openai";
+import authOptions from "./auth/[...nextauth]";
+import { getServerSession } from "next-auth/next";
 
 export default async function handler(req, res) {
     return res.status(404);
