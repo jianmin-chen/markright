@@ -56,6 +56,25 @@ textarea {
         font-style: normal;
     }
 
+    .task-list-item {
+        input[type="checkbox"] {
+            border: 1px solid #e5e5e5 !important;
+            border-radius: 5px;
+            line-height: inherit;
+            margin-right: 6px;
+            vertical-align: middle;
+
+            &:focus {
+                box-shadow: none !important;
+                outline: 0 !important;
+            }
+
+            &:checked {
+                border-color: #0284c7;
+            }
+        }
+    }
+
     .tasklist {
         @apply ml-0 list-none pl-0;
 
